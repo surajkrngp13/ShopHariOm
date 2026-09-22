@@ -1,0 +1,1581 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>GST Records</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;font-family:Arial,sans-serif;background:#f4f6f8;color:#1f2937}
+button,input,select{font:inherit}
+button{cursor:pointer;border:0;border-radius:6px;padding:9px 14px}
+.topbar{background:#111827;color:#fff;padding:14px 18px;display:flex;align-items:center;justify-content:space-between;gap:15px;position:sticky;top:0;z-index:20}
+.topbar h2{margin:0;font-size:20px}
+.topbar-right{display:flex;align-items:center;gap:10px}
+.status{padding:5px 9px;border-radius:20px;font-size:12px;background:#374151}
+.logout{background:#dc2626;color:#fff}
+.container{max-width:1500px;margin:auto;padding:18px}
+.nav{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:18px}
+.nav button{background:#fff;border:1px solid #d1d5db}
+.nav button:hover{background:#f3f4f6}
+.section{background:#fff;border-radius:10px;padding:18px;margin-bottom:18px;box-shadow:0 1px 4px rgba(0,0,0,.08)}
+.section h3{margin:0 0 15px}
+.message{padding:10px;border-radius:7px;margin-bottom:15px;display:none}
+.message.show{display:block}
+.success-msg{background:#dcfce7;color:#166534}
+.error-msg{background:#fee2e2;color:#991b1b}
+.info-msg{background:#dbeafe;color:#1e40af}
+.filters{display:grid;grid-template-columns:2fr 1.2fr 1.2fr 1.2fr 1.2fr;gap:10px;margin-bottom:15px}
+.field{display:flex;flex-direction:column;gap:5px}
+.field label{font-size:13px;font-weight:600}
+.field input,.field select{border:1px solid #d1d5db;border-radius:6px;padding:9px;background:#fff;width:100%}
+.actions{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:15px}
+.primary{background:#2563eb;color:#fff}
+.success{background:#16a34a;color:#fff}
+.warning{background:#d97706;color:#fff}
+.danger{background:#dc2626;color:#fff}
+.secondary{background:#6b7280;color:#fff}
+.table-wrap{overflow:auto;border:1px solid #e5e7eb;border-radius:7px}
+table{width:100%;border-collapse:collapse;min-width:1250px}
+th,td{padding:9px 10px;border-bottom:1px solid #e5e7eb;text-align:left;white-space:nowrap;font-size:13px}
+th{background:#f9fafb;position:sticky;top:0}
+.summary{display:grid;grid-template-columns:repeat(6,1fr);gap:12px;margin-bottom:18px}
+.card{background:#fff;border-radius:9px;padding:15px;box-shadow:0 1px 4px rgba(0,0,0,.08)}
+.card-title{font-size:12px;color:#6b7280}
+.card-value{font-size:21px;font-weight:bold;margin-top:5px}
+.badge{display:inline-block;padding:4px 8px;border-radius:15px;font-size:11px;font-weight:bold}
+.badge-sent{background:#dcfce7;color:#166534}
+.badge-pending{background:#fef3c7;color:#92400e}
+.badge-error{background:#fee2e2;color:#991b1b}
+.badge-syncing{background:#dbeafe;color:#1e40af}
+.empty{text-align:center;color:#6b7280;padding:25px}
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.55);display:none;align-items:center;justify-content:center;z-index:100;padding:15px}
+.modal.show{display:flex}
+.modal-box{background:#fff;border-radius:10px;width:min(900px,100%);max-height:90vh;overflow:auto;padding:20px}
+.modal-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:15px}
+.modal-header h3{margin:0}
+.detail-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.detail{background:#f9fafb;padding:10px;border-radius:6px}
+.detail span{display:block;color:#6b7280;font-size:12px}
+.detail strong{display:block;margin-top:4px}
+.loading{position:fixed;inset:0;background:rgba(255,255,255,.75);display:none;align-items:center;justify-content:center;z-index:200}
+.loading.show{display:flex}
+.loader-box{background:#fff;padding:25px 35px;border-radius:10px;box-shadow:0 4px 20px rgba(0,0,0,.2);text-align:center}
+.progress{height:9px;background:#e5e7eb;border-radius:10px;overflow:hidden;margin-top:10px}
+.progress-bar{height:100%;width:0;background:#2563eb;transition:width .2s}
+@media(max-width:1100px){
+.filters{grid-template-columns:repeat(3,1fr)}
+.summary{grid-template-columns:repeat(3,1fr)}
+.detail-grid{grid-template-columns:repeat(2,1fr)}
+}
+@media(max-width:700px){
+.container{padding:10px}
+.filters{grid-template-columns:1fr}
+.summary{grid-template-columns:repeat(2,1fr)}
+.detail-grid{grid-template-columns:1fr}
+.topbar{align-items:flex-start}
+.topbar-right{flex-direction:column;align-items:flex-end}
+}
+</style>
+</head>
+<body>
+
+<div id="loading" class="loading">
+<div class="loader-box">
+<div id="loadingText">Loading...</div>
+<div class="progress">
+<div id="loadingProgress" class="progress-bar"></div>
+</div>
+</div>
+</div>
+
+<div id="detailModal" class="modal">
+<div class="modal-box">
+<div class="modal-header">
+<h3>GST Record Details</h3>
+<button class="danger" id="closeModalBtn">Close</button>
+</div>
+<div id="detailContent"></div>
+<div class="actions" style="margin-top:18px;margin-bottom:0">
+<button class="primary" id="modalPrintBtn">Print</button>
+<button class="success" id="modalExportBtn">Export CSV</button>
+</div>
+</div>
+</div>
+
+<div class="topbar">
+<h2>GST Records</h2>
+<div class="topbar-right">
+<span id="connectionStatus" class="status">Checking...</span>
+<span id="userInfo" class="status">Loading...</span>
+<button id="logoutBtn" class="logout">Logout</button>
+</div>
+</div>
+
+<div class="container">
+
+<div id="message" class="message"></div>
+
+<div class="nav">
+<button id="homeBtn">Shop</button>
+<button class="primary" id="refreshBtn">Refresh</button>
+<button class="warning" id="syncBtn">Sync Now</button>
+<button class="secondary" id="retryBtn">Retry Failed</button>
+<button class="success" id="exportBtn">Export All CSV</button>
+<button class="primary" id="printBtn">Print List</button>
+</div>
+
+<section class="section">
+<div class="summary">
+<div class="card">
+<div class="card-title">GST Records</div>
+<div id="totalRecords" class="card-value">0</div>
+</div>
+<div class="card">
+<div class="card-title">Taxable Amount</div>
+<div id="totalTaxable" class="card-value">₹0.00</div>
+</div>
+<div class="card">
+<div class="card-title">CGST</div>
+<div id="totalCgst" class="card-value">₹0.00</div>
+</div>
+<div class="card">
+<div class="card-title">SGST</div>
+<div id="totalSgst" class="card-value">₹0.00</div>
+</div>
+<div class="card">
+<div class="card-title">IGST</div>
+<div id="totalIgst" class="card-value">₹0.00</div>
+</div>
+<div class="card">
+<div class="card-title">Total GST</div>
+<div id="totalGst" class="card-value">₹0.00</div>
+</div>
+</div>
+
+<div class="filters">
+<div class="field">
+<label>Search</label>
+<input id="searchInput" placeholder="Invoice / Customer / GSTIN / GST ID">
+</div>
+
+<div class="field">
+<label>From Date</label>
+<input id="fromDate" type="date">
+</div>
+
+<div class="field">
+<label>To Date</label>
+<input id="toDate" type="date">
+</div>
+
+<div class="field">
+<label>Sync Status</label>
+<select id="syncFilter">
+<option value="">All</option>
+<option value="SENT">Sent</option>
+<option value="PENDING">Pending</option>
+<option value="ERROR">Error</option>
+<option value="SYNCING">Syncing</option>
+</select>
+</div>
+
+<div class="field">
+<label>GST Type</label>
+<select id="gstTypeFilter">
+<option value="">All</option>
+<option value="CGST_SGST">CGST + SGST</option>
+<option value="IGST">IGST</option>
+</select>
+</div>
+</div>
+
+<div class="actions">
+<button class="secondary" id="clearFilterBtn">Clear Filters</button>
+</div>
+
+<div class="table-wrap">
+<table>
+<thead>
+<tr>
+<th>GST ID</th>
+<th>Invoice No.</th>
+<th>Date</th>
+<th>Customer</th>
+<th>GSTIN</th>
+<th>Taxable Amount</th>
+<th>CGST</th>
+<th>SGST</th>
+<th>IGST</th>
+<th>Total GST</th>
+<th>Invoice Total</th>
+<th>Sync Status</th>
+<th>Created At</th>
+<th>Action</th>
+</tr>
+</thead>
+<tbody id="gstTableBody"></tbody>
+</table>
+</div>
+</section>
+
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/11.10.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/11.10.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/11.10.0/firebase-database-compat.js"></script>
+
+<script>
+const firebaseConfig = {
+    apiKey: "AIzaSyApCoYU29E90_fORBdOKnR8BroSlURI_20",
+    authDomain: "shop-management-system-909d3.firebaseapp.com",
+    databaseURL: "https://shop-management-system-909d3-default-rtdb.asia-southeast1.firebasedatabase.app/",
+    projectId: "shop-management-system-909d3",
+    storageBucket: "shop-management-system-909d3.firebasestorage.app",
+    messagingSenderId: "108966486935",
+    appId: "1:108966486935:web:47ffa7b9eb7b6d69a81ad2"
+};
+
+const SYNC_URL="YOUR_GOOGLE_APPS_SCRIPT_WEB_APP_URL";
+const DB_NAME="ShopManagementDB";
+const DB_VERSION=1;
+const GST_STORE="gst_records";
+const QUEUE_STORE="sync_queue";
+const ACTIVITY_STORE="activity_logs";
+const PRODUCT_STORE="products";
+const SALES_STORE="sales";
+const SHOP_STORE="shops";
+const AGENT_STORE="agents";
+const SETTINGS_STORE="settings";
+
+let db=null;
+let currentUser=null;
+let currentProfile=null;
+let gstRecords=[];
+let filteredRecords=[];
+let selectedRecord=null;
+let syncRunning=false;
+
+firebase.initializeApp(firebaseConfig);
+
+const auth=firebase.auth();
+const database=firebase.database();
+
+function $(id){
+return document.getElementById(id);
+}
+
+function showMessage(text,type="info"){
+const el=$("message");
+el.textContent=text;
+el.className="message show "+(
+type==="success"?"success-msg":
+type==="error"?"error-msg":
+"info-msg"
+);
+
+clearTimeout(showMessage.timer);
+
+showMessage.timer=setTimeout(()=>{
+el.className="message";
+},5000);
+}
+
+function setLoading(show,text="Processing...",percent=0){
+$("loading").classList.toggle("show",show);
+$("loadingText").textContent=text;
+$("loadingProgress").style.width=Math.max(0,Math.min(100,percent))+"%";
+}
+
+function money(value){
+return "₹"+Number(value||0).toLocaleString("en-IN",{
+minimumFractionDigits:2,
+maximumFractionDigits:2
+});
+}
+
+function nowISO(){
+return new Date().toISOString();
+}
+
+function generateId(prefix){
+const bytes=new Uint8Array(12);
+crypto.getRandomValues(bytes);
+const random=Array.from(bytes)
+.map(x=>x.toString(16).padStart(2,"0"))
+.join("")
+.toUpperCase();
+
+return prefix+"-"+Date.now().toString(36).toUpperCase()+"-"+random;
+}
+
+function escapeHtml(value){
+return String(value??"").replace(/[&<>"']/g,m=>({
+"&":"&amp;",
+"<":"&lt;",
+">":"&gt;",
+'"':"&quot;",
+"'":"&#039;"
+}[m]));
+}
+
+function updateConnection(){
+const online=navigator.onLine;
+$("connectionStatus").textContent=online?"ONLINE":"OFFLINE";
+$("connectionStatus").style.background=online?"#166534":"#92400e";
+}
+
+function openDB(){
+return new Promise((resolve,reject)=>{
+const request=indexedDB.open(DB_NAME,DB_VERSION);
+
+request.onupgradeneeded=e=>{
+const databaseInstance=e.target.result;
+
+if(!databaseInstance.objectStoreNames.contains(PRODUCT_STORE)){
+const store=databaseInstance.createObjectStore(PRODUCT_STORE,{keyPath:"id"});
+store.createIndex("recordId","recordId",{unique:true});
+store.createIndex("shopId","shopId");
+store.createIndex("productId","productId");
+store.createIndex("sku","sku");
+}
+
+if(!databaseInstance.objectStoreNames.contains(SALES_STORE)){
+const store=databaseInstance.createObjectStore(SALES_STORE,{keyPath:"id"});
+store.createIndex("recordId","recordId",{unique:true});
+store.createIndex("shopId","shopId");
+store.createIndex("agentId","agentId");
+}
+
+if(!databaseInstance.objectStoreNames.contains(GST_STORE)){
+const store=databaseInstance.createObjectStore(GST_STORE,{keyPath:"id"});
+store.createIndex("recordId","recordId",{unique:true});
+store.createIndex("shopId","shopId");
+store.createIndex("agentId","agentId");
+store.createIndex("gstId","gstId");
+store.createIndex("invoiceNo","invoiceNo");
+store.createIndex("createdAt","createdAt");
+}
+
+if(!databaseInstance.objectStoreNames.contains(ACTIVITY_STORE)){
+const store=databaseInstance.createObjectStore(ACTIVITY_STORE,{keyPath:"id"});
+store.createIndex("activityId","activityId",{unique:true});
+store.createIndex("shopId","shopId");
+store.createIndex("agentId","agentId");
+store.createIndex("timestamp","timestamp");
+}
+
+if(!databaseInstance.objectStoreNames.contains(QUEUE_STORE)){
+const store=databaseInstance.createObjectStore(QUEUE_STORE,{keyPath:"id"});
+store.createIndex("recordId","recordId",{unique:true});
+store.createIndex("recordType","recordType");
+store.createIndex("shopId","shopId");
+store.createIndex("agentId","agentId");
+store.createIndex("syncStatus","syncStatus");
+store.createIndex("createdAt","createdAt");
+}
+
+if(!databaseInstance.objectStoreNames.contains(SHOP_STORE)){
+const store=databaseInstance.createObjectStore(SHOP_STORE,{keyPath:"id"});
+store.createIndex("shopId","shopId",{unique:true});
+}
+
+if(!databaseInstance.objectStoreNames.contains(AGENT_STORE)){
+const store=databaseInstance.createObjectStore(AGENT_STORE,{keyPath:"id"});
+store.createIndex("agentId","agentId",{unique:true});
+}
+
+if(!databaseInstance.objectStoreNames.contains(SETTINGS_STORE)){
+databaseInstance.createObjectStore(SETTINGS_STORE,{keyPath:"key"});
+}
+};
+
+request.onsuccess=e=>{
+db=e.target.result;
+resolve(db);
+};
+
+request.onerror=()=>{
+reject(request.error);
+};
+});
+}
+
+function idbGetAll(storeName){
+return new Promise((resolve,reject)=>{
+const tx=db.transaction(storeName,"readonly");
+const request=tx.objectStore(storeName).getAll();
+
+request.onsuccess=()=>{
+resolve(request.result||[]);
+};
+
+request.onerror=()=>{
+reject(request.error);
+};
+});
+}
+
+function idbGet(storeName,key){
+return new Promise((resolve,reject)=>{
+const tx=db.transaction(storeName,"readonly");
+const request=tx.objectStore(storeName).get(key);
+
+request.onsuccess=()=>{
+resolve(request.result);
+};
+
+request.onerror=()=>{
+reject(request.error);
+};
+});
+}
+
+function idbPut(storeName,value){
+return new Promise((resolve,reject)=>{
+const tx=db.transaction(storeName,"readwrite");
+
+tx.objectStore(storeName).put(value);
+
+tx.oncomplete=()=>{
+resolve(value);
+};
+
+tx.onerror=()=>{
+reject(tx.error);
+};
+});
+}
+
+function idbDelete(storeName,key){
+return new Promise((resolve,reject)=>{
+const tx=db.transaction(storeName,"readwrite");
+
+tx.objectStore(storeName).delete(key);
+
+tx.oncomplete=()=>{
+resolve();
+};
+
+tx.onerror=()=>{
+reject(tx.error);
+};
+});
+}
+
+async function validateAccess(){
+const user=auth.currentUser;
+
+if(!user){
+location.replace("index.html");
+return false;
+}
+
+currentUser=user;
+
+const snapshot=await database
+.ref("users/"+user.uid)
+.once("value");
+
+const profile=snapshot.val();
+
+if(!profile){
+await auth.signOut();
+location.replace("index.html");
+return false;
+}
+
+if(profile.status!=="ACTIVE"){
+await auth.signOut();
+location.replace("index.html");
+return false;
+}
+
+if(profile.role!=="agent"){
+showMessage("This page is available for Agent accounts.","error");
+
+setTimeout(()=>{
+location.replace("index.html");
+},1200);
+
+return false;
+}
+
+if(!profile.shopId){
+showMessage("No shop is assigned to this account.","error");
+return false;
+}
+
+const accessSnapshot=await database
+.ref("agent_access/"+profile.agentId)
+.once("value");
+
+const access=accessSnapshot.val();
+
+if(
+!access||
+access.status!=="ACTIVE"||
+access.uid!==user.uid||
+access.shopId!==profile.shopId
+){
+await auth.signOut();
+location.replace("index.html");
+return false;
+}
+
+currentProfile=profile;
+
+$("userInfo").textContent=
+(profile.name||user.email)+" | "+profile.shopId;
+
+return true;
+}
+
+async function getFirebaseToken(){
+if(!currentUser){
+throw new Error("Authentication required.");
+}
+
+return await currentUser.getIdToken(true);
+}
+
+async function addQueue(record){
+const existing=await idbGet(
+QUEUE_STORE,
+record.recordId
+);
+
+if(existing&&existing.syncStatus==="SENT"){
+return existing;
+}
+
+const item={
+id:record.recordId,
+recordId:record.recordId,
+recordType:record.recordType,
+shopId:record.shopId,
+agentId:record.agentId,
+operation:record.operation,
+payload:record.payload,
+syncStatus:record.syncStatus||"PENDING",
+retryCount:Number(record.retryCount||0),
+lastAttempt:record.lastAttempt||"",
+lastError:record.lastError||"",
+createdAt:record.createdAt||nowISO(),
+updatedAt:record.updatedAt||nowISO(),
+syncedAt:record.syncedAt||""
+};
+
+await idbPut(QUEUE_STORE,item);
+
+return item;
+}
+
+async function addActivity(action,module,recordId,status,details){
+const timestamp=nowISO();
+
+const activityId=generateId("ACT");
+
+const record={
+id:activityId,
+activityId,
+timestamp,
+date:timestamp.slice(0,10),
+time:timestamp.slice(11,19),
+shopId:currentProfile?.shopId||"",
+agentId:currentProfile?.agentId||"",
+userId:currentUser?.uid||"",
+userName:currentProfile?.name||currentUser?.email||"",
+role:currentProfile?.role||"",
+action,
+module,
+recordId:recordId||"",
+status,
+details:typeof details==="string"
+?details
+:JSON.stringify(details||{}),
+syncStatus:"PENDING"
+};
+
+await idbPut(ACTIVITY_STORE,record);
+
+await addQueue({
+recordId:activityId,
+recordType:"Activity_Log",
+shopId:record.shopId,
+agentId:record.agentId,
+operation:"CREATE",
+payload:record,
+syncStatus:"PENDING",
+retryCount:0,
+lastAttempt:"",
+lastError:"",
+createdAt:timestamp,
+updatedAt:timestamp,
+syncedAt:""
+});
+
+return record;
+}
+
+async function loadGSTRecords(){
+const all=await idbGetAll(GST_STORE);
+
+gstRecords=all.filter(x=>
+x.shopId===currentProfile.shopId
+);
+
+applyFilters();
+}
+
+async function getQueueStatus(recordId){
+const queue=await idbGet(
+QUEUE_STORE,
+recordId
+);
+
+return queue?.syncStatus||"PENDING";
+}
+
+async function applyFilters(){
+const search=$("searchInput").value.trim().toLowerCase();
+const from=$("fromDate").value;
+const to=$("toDate").value;
+const syncStatus=$("syncFilter").value;
+const gstType=$("gstTypeFilter").value;
+
+const result=[];
+
+for(const record of gstRecords){
+
+const text=[
+record.gstId,
+record.recordId,
+record.invoiceNo,
+record.customerName,
+record.customerGSTIN
+].join(" ").toLowerCase();
+
+if(search&&!text.includes(search)){
+continue;
+}
+
+if(from&&record.date<from){
+continue;
+}
+
+if(to&&record.date>to){
+continue;
+}
+
+const status=await getQueueStatus(record.recordId);
+
+if(syncStatus&&status!==syncStatus){
+continue;
+}
+
+const hasIGST=Number(record.igst||0)>0;
+
+if(gstType==="IGST"&&!hasIGST){
+continue;
+}
+
+if(gstType==="CGST_SGST"&&hasIGST){
+continue;
+}
+
+result.push({
+...record,
+syncStatus:status
+});
+}
+
+filteredRecords=result;
+
+renderTable();
+renderSummary();
+}
+
+function statusBadge(status){
+const normalized=status||"PENDING";
+
+const cls=
+normalized==="SENT"?"badge-sent":
+normalized==="ERROR"?"badge-error":
+normalized==="SYNCING"?"badge-syncing":
+"badge-pending";
+
+return `<span class="badge ${cls}">${escapeHtml(normalized)}</span>`;
+}
+
+function renderTable(){
+const body=$("gstTableBody");
+
+body.innerHTML="";
+
+if(!filteredRecords.length){
+body.innerHTML=
+'<tr><td colspan="14" class="empty">No GST records found</td></tr>';
+
+return;
+}
+
+filteredRecords.sort((a,b)=>
+String(b.createdAt||"")
+.localeCompare(String(a.createdAt||""))
+);
+
+filteredRecords.forEach(record=>{
+
+const tr=document.createElement("tr");
+
+tr.innerHTML=`
+<td>${escapeHtml(record.gstId)}</td>
+<td>${escapeHtml(record.invoiceNo)}</td>
+<td>${escapeHtml(record.date)}</td>
+<td>${escapeHtml(record.customerName||"")}</td>
+<td>${escapeHtml(record.customerGSTIN||"")}</td>
+<td>${money(record.taxableAmount)}</td>
+<td>${money(record.cgst)}</td>
+<td>${money(record.sgst)}</td>
+<td>${money(record.igst)}</td>
+<td><strong>${money(record.totalGST)}</strong></td>
+<td><strong>${money(record.invoiceTotal)}</strong></td>
+<td>${statusBadge(record.syncStatus)}</td>
+<td>${escapeHtml(formatDateTime(record.createdAt))}</td>
+<td>
+<button class="primary view-record" data-id="${escapeHtml(record.id)}">View</button>
+</td>
+`;
+
+body.appendChild(tr);
+});
+}
+
+function renderSummary(){
+let taxable=0;
+let cgst=0;
+let sgst=0;
+let igst=0;
+let gst=0;
+
+filteredRecords.forEach(record=>{
+taxable+=Number(record.taxableAmount||0);
+cgst+=Number(record.cgst||0);
+sgst+=Number(record.sgst||0);
+igst+=Number(record.igst||0);
+gst+=Number(record.totalGST||0);
+});
+
+$("totalRecords").textContent=filteredRecords.length;
+$("totalTaxable").textContent=money(taxable);
+$("totalCgst").textContent=money(cgst);
+$("totalSgst").textContent=money(sgst);
+$("totalIgst").textContent=money(igst);
+$("totalGst").textContent=money(gst);
+}
+
+function formatDateTime(value){
+if(!value)return"";
+const date=new Date(value);
+
+if(Number.isNaN(date.getTime())){
+return String(value);
+}
+
+return date.toLocaleString("en-IN");
+}
+
+function showRecord(record){
+selectedRecord=record;
+
+const queueStatus=record.syncStatus||"PENDING";
+
+$("detailContent").innerHTML=`
+<div class="detail-grid">
+<div class="detail">
+<span>GST ID</span>
+<strong>${escapeHtml(record.gstId)}</strong>
+</div>
+
+<div class="detail">
+<span>Record ID</span>
+<strong>${escapeHtml(record.recordId)}</strong>
+</div>
+
+<div class="detail">
+<span>Invoice No.</span>
+<strong>${escapeHtml(record.invoiceNo)}</strong>
+</div>
+
+<div class="detail">
+<span>Date</span>
+<strong>${escapeHtml(record.date)}</strong>
+</div>
+
+<div class="detail">
+<span>Customer Name</span>
+<strong>${escapeHtml(record.customerName||"")}</strong>
+</div>
+
+<div class="detail">
+<span>Customer GSTIN</span>
+<strong>${escapeHtml(record.customerGSTIN||"")}</strong>
+</div>
+
+<div class="detail">
+<span>Shop ID</span>
+<strong>${escapeHtml(record.shopId)}</strong>
+</div>
+
+<div class="detail">
+<span>Agent ID</span>
+<strong>${escapeHtml(record.agentId)}</strong>
+</div>
+
+<div class="detail">
+<span>Sync Status</span>
+<strong>${statusBadge(queueStatus)}</strong>
+</div>
+
+<div class="detail">
+<span>Taxable Amount</span>
+<strong>${money(record.taxableAmount)}</strong>
+</div>
+
+<div class="detail">
+<span>CGST</span>
+<strong>${money(record.cgst)}</strong>
+</div>
+
+<div class="detail">
+<span>SGST</span>
+<strong>${money(record.sgst)}</strong>
+</div>
+
+<div class="detail">
+<span>IGST</span>
+<strong>${money(record.igst)}</strong>
+</div>
+
+<div class="detail">
+<span>Total GST</span>
+<strong>${money(record.totalGST)}</strong>
+</div>
+
+<div class="detail">
+<span>Invoice Total</span>
+<strong>${money(record.invoiceTotal)}</strong>
+</div>
+
+<div class="detail">
+<span>Created At</span>
+<strong>${escapeHtml(formatDateTime(record.createdAt))}</strong>
+</div>
+</div>
+`;
+
+$("detailModal").classList.add("show");
+}
+
+function closeModal(){
+$("detailModal").classList.remove("show");
+selectedRecord=null;
+}
+
+function csvValue(value){
+const text=String(value??"");
+return '"'+text.replace(/"/g,'""')+'"';
+}
+
+function createCSV(records){
+const headers=[
+"recordId",
+"shopId",
+"agentId",
+"gstId",
+"invoiceNo",
+"date",
+"customerName",
+"customerGSTIN",
+"taxableAmount",
+"cgst",
+"sgst",
+"igst",
+"totalGST",
+"invoiceTotal",
+"createdAt",
+"syncStatus"
+];
+
+const rows=[headers];
+
+records.forEach(record=>{
+rows.push([
+record.recordId,
+record.shopId,
+record.agentId,
+record.gstId,
+record.invoiceNo,
+record.date,
+record.customerName,
+record.customerGSTIN,
+record.taxableAmount,
+record.cgst,
+record.sgst,
+record.igst,
+record.totalGST,
+record.invoiceTotal,
+record.createdAt,
+record.syncStatus||"PENDING"
+].map(csvValue));
+});
+
+return "\uFEFF"+rows.map(row=>row.join(",")).join("\r\n");
+}
+
+function downloadCSV(records,filename){
+const csv=createCSV(records);
+const blob=new Blob([csv],{
+type:"text/csv;charset=utf-8;"
+});
+
+const url=URL.createObjectURL(blob);
+const a=document.createElement("a");
+
+a.href=url;
+a.download=filename;
+document.body.appendChild(a);
+a.click();
+a.remove();
+
+setTimeout(()=>{
+URL.revokeObjectURL(url);
+},1000);
+}
+
+async function exportAll(){
+const all=await idbGetAll(GST_STORE);
+
+const records=all.filter(x=>
+x.shopId===currentProfile.shopId
+);
+
+const enriched=[];
+
+for(const record of records){
+enriched.push({
+...record,
+syncStatus:await getQueueStatus(record.recordId)
+});
+}
+
+if(!enriched.length){
+showMessage("No GST records available for export.","info");
+return;
+}
+
+downloadCSV(
+enriched,
+"GST_Records_"+currentProfile.shopId+"_"+new Date().toISOString().slice(0,10)+".csv"
+);
+
+await addActivity(
+"Export",
+"GST",
+"",
+"SUCCESS",
+{count:enriched.length}
+);
+
+showMessage(enriched.length+" GST records exported.","success");
+}
+
+function printRecords(records){
+if(!records.length){
+showMessage("No GST records to print.","info");
+return;
+}
+
+const rows=records.map(record=>`
+<tr>
+<td>${escapeHtml(record.gstId)}</td>
+<td>${escapeHtml(record.invoiceNo)}</td>
+<td>${escapeHtml(record.date)}</td>
+<td>${escapeHtml(record.customerName||"")}</td>
+<td>${escapeHtml(record.customerGSTIN||"")}</td>
+<td>${money(record.taxableAmount)}</td>
+<td>${money(record.cgst)}</td>
+<td>${money(record.sgst)}</td>
+<td>${money(record.igst)}</td>
+<td>${money(record.totalGST)}</td>
+<td>${money(record.invoiceTotal)}</td>
+</tr>
+`).join("");
+
+const html=`
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>GST Records</title>
+<style>
+body{font-family:Arial;margin:20px}
+h2{margin-bottom:5px}
+p{margin-top:0}
+table{width:100%;border-collapse:collapse;font-size:11px}
+th,td{border:1px solid #999;padding:5px;text-align:left}
+th{background:#eee}
+</style>
+</head>
+<body>
+<h2>GST Records</h2>
+<p>Shop: ${escapeHtml(currentProfile.shopId)}</p>
+<p>Generated: ${escapeHtml(new Date().toLocaleString("en-IN"))}</p>
+<table>
+<thead>
+<tr>
+<th>GST ID</th>
+<th>Invoice</th>
+<th>Date</th>
+<th>Customer</th>
+<th>GSTIN</th>
+<th>Taxable</th>
+<th>CGST</th>
+<th>SGST</th>
+<th>IGST</th>
+<th>Total GST</th>
+<th>Invoice Total</th>
+</tr>
+</thead>
+<tbody>${rows}</tbody>
+</table>
+</body>
+</html>
+`;
+
+const win=window.open("","_blank");
+
+if(!win){
+showMessage("Popup blocked. Allow popups to print.","error");
+return;
+}
+
+win.document.write(html);
+win.document.close();
+
+setTimeout(()=>{
+win.focus();
+win.print();
+},300);
+
+await addActivity(
+"Print",
+"GST",
+"",
+"SUCCESS",
+{count:records.length}
+);
+}
+
+async function markActivitySent(recordId){
+const all=await idbGetAll(ACTIVITY_STORE);
+const activity=all.find(x=>x.activityId===recordId);
+
+if(activity){
+activity.syncStatus="SENT";
+await idbPut(ACTIVITY_STORE,activity);
+}
+}
+
+async function sendBatch(batch){
+if(
+!SYNC_URL||
+SYNC_URL==="https://script.google.com/macros/s/AKfycbyrS_NNgH1siSwOGdY9wMzfqqUnMZvauKDIAvS6R7s87kDr3ubvTWRCzRhjHPRTAleK8w/exec"
+){
+throw new Error("SYNC_URL is not configured.");
+}
+
+const idToken=await getFirebaseToken();
+
+const body={
+action:"batchSync",
+siteId:"shophariom",
+timestamp:Date.now(),
+nonce:generateId("NONCE"),
+idToken,
+records:batch.map(item=>({
+recordId:item.recordId,
+recordType:item.recordType,
+shopId:item.shopId,
+agentId:item.agentId,
+operation:item.operation,
+payload:item.payload
+}))
+};
+
+const response=await fetch(SYNC_URL,{
+method:"POST",
+headers:{
+"Content-Type":"text/plain;charset=utf-8"
+},
+body:JSON.stringify(body),
+cache:"no-store"
+});
+
+if(!response.ok){
+throw new Error("HTTP "+response.status);
+}
+
+const text=await response.text();
+
+let data;
+
+try{
+data=JSON.parse(text);
+}catch{
+throw new Error("Invalid Apps Script response.");
+}
+
+if(!data||data.success!==true){
+throw new Error(
+data?.error||
+data?.message||
+"Apps Script sync failed."
+);
+}
+
+return data;
+}
+
+async function syncPending(forceRetry=false){
+if(syncRunning)return;
+
+if(!navigator.onLine){
+showMessage(
+"Offline mode. GST records remain safely stored locally.",
+"info"
+);
+return;
+}
+
+syncRunning=true;
+
+try{
+
+let queue=await idbGetAll(QUEUE_STORE);
+
+queue=queue.filter(item=>
+item.shopId===currentProfile.shopId&&
+(
+item.syncStatus==="PENDING"||
+item.syncStatus==="ERROR"||
+item.syncStatus==="SYNCING"
+)
+);
+
+if(forceRetry){
+queue=queue.filter(item=>
+item.syncStatus==="ERROR"||
+item.syncStatus==="PENDING"||
+item.syncStatus==="SYNCING"
+);
+}
+
+if(!queue.length){
+showMessage("No pending GST/activity records to sync.","success");
+return;
+}
+
+const total=queue.length;
+let success=0;
+let failed=0;
+let processing=0;
+let nextIndex=0;
+
+setLoading(true,"Starting sync...",0);
+
+async function worker(){
+while(true){
+
+const index=nextIndex++;
+
+if(index>=queue.length)return;
+
+const item=queue[index];
+
+item.syncStatus="SYNCING";
+item.lastAttempt=nowISO();
+item.retryCount=Number(item.retryCount||0)+1;
+item.lastError="";
+item.updatedAt=nowISO();
+
+await idbPut(QUEUE_STORE,item);
+
+processing++;
+
+const completed=success+failed;
+
+setLoading(
+true,
+"Syncing "+item.recordId+" ("+(completed+1)+"/"+total+")",
+Math.floor((completed/total)*100)
+);
+
+try{
+
+const result=await sendBatch([item]);
+
+const resultItem=
+Array.isArray(result.results)
+?result.results[0]
+:null;
+
+const serverStatus=
+resultItem?.status||
+resultItem?.syncStatus||
+"SENT";
+
+if(
+serverStatus==="SENT"||
+serverStatus==="ALREADY_EXISTS"||
+serverStatus==="SUCCESS"
+){
+
+item.syncStatus="SENT";
+item.syncedAt=nowISO();
+item.lastError="";
+item.updatedAt=nowISO();
+
+await idbPut(QUEUE_STORE,item);
+
+if(item.recordType==="Activity_Log"){
+await markActivitySent(item.recordId);
+}
+
+success++;
+
+}else{
+throw new Error(
+resultItem?.error||
+"Server did not confirm success."
+);
+}
+
+}catch(error){
+
+item.syncStatus="ERROR";
+item.lastError=String(
+error.message||error
+);
+item.updatedAt=nowISO();
+
+await idbPut(QUEUE_STORE,item);
+
+failed++;
+
+}finally{
+
+processing--;
+
+const completedNow=success+failed;
+
+setLoading(
+true,
+"Sync progress "+completedNow+"/"+total,
+Math.floor((completedNow/total)*100)
+);
+}
+}
+}
+
+const workers=Math.min(3,total);
+
+await Promise.all(
+Array.from({length:workers},()=>worker())
+);
+
+const finalPercent=
+total>0
+?Math.floor((success/total)*100)
+:100;
+
+setLoading(
+true,
+"Sync complete: "+success+"/"+total,
+finalPercent
+);
+
+await addActivity(
+failed?"Sync Error":"Sync Success",
+"Sync",
+"",
+failed?"ERROR":"SUCCESS",
+{
+total,
+success,
+failed
+}
+);
+
+await loadGSTRecords();
+
+setTimeout(()=>{
+setLoading(false,"",0);
+},400);
+
+if(failed){
+showMessage(
+success+" records synced, "+failed+" failed. Failed records remain in the queue.",
+"error"
+);
+}else{
+showMessage(
+"All "+success+" records confirmed successfully.",
+"success"
+);
+}
+
+}catch(error){
+
+setLoading(false,"",0);
+
+showMessage(
+error.message||"Sync failed.",
+"error"
+);
+
+}finally{
+syncRunning=false;
+}
+}
+
+function clearFilters(){
+$("searchInput").value="";
+$("fromDate").value="";
+$("toDate").value="";
+$("syncFilter").value="";
+$("gstTypeFilter").value="";
+applyFilters();
+}
+
+function setupEvents(){
+
+$("homeBtn").addEventListener("click",()=>{
+location.replace("shop.html");
+});
+
+$("refreshBtn").addEventListener("click",async()=>{
+await loadGSTRecords();
+showMessage("GST records refreshed.","success");
+});
+
+$("syncBtn").addEventListener("click",()=>{
+syncPending(false);
+});
+
+$("retryBtn").addEventListener("click",()=>{
+syncPending(true);
+});
+
+$("exportBtn").addEventListener("click",exportAll);
+
+$("printBtn").addEventListener("click",()=>{
+printRecords(filteredRecords);
+});
+
+$("clearFilterBtn").addEventListener("click",clearFilters);
+
+$("searchInput").addEventListener("input",applyFilters);
+$("fromDate").addEventListener("change",applyFilters);
+$("toDate").addEventListener("change",applyFilters);
+$("syncFilter").addEventListener("change",applyFilters);
+$("gstTypeFilter").addEventListener("change",applyFilters);
+
+$("gstTableBody").addEventListener("click",async event=>{
+const button=event.target.closest(".view-record");
+
+if(!button)return;
+
+const record=await idbGet(
+GST_STORE,
+button.dataset.id
+);
+
+if(!record)return;
+
+record.syncStatus=await getQueueStatus(record.recordId);
+
+showRecord(record);
+});
+
+$("closeModalBtn").addEventListener("click",closeModal);
+
+$("detailModal").addEventListener("click",event=>{
+if(event.target===$("detailModal")){
+closeModal();
+}
+});
+
+$("modalExportBtn").addEventListener("click",()=>{
+if(!selectedRecord)return;
+
+downloadCSV(
+[selectedRecord],
+"GST_"+selectedRecord.gstId+".csv"
+);
+
+addActivity(
+"Export",
+"GST",
+selectedRecord.recordId,
+"SUCCESS",
+{gstId:selectedRecord.gstId}
+);
+});
+
+$("modalPrintBtn").addEventListener("click",()=>{
+if(selectedRecord){
+printRecords([selectedRecord]);
+}
+});
+
+$("logoutBtn").addEventListener("click",async()=>{
+try{
+await addActivity(
+"Logout",
+"Authentication",
+"",
+"SUCCESS",
+{}
+);
+}catch{}
+
+await auth.signOut();
+location.replace("index.html");
+});
+
+window.addEventListener("online",()=>{
+updateConnection();
+
+showMessage(
+"Internet connection restored. Sync starting.",
+"success"
+);
+
+syncPending(false);
+});
+
+window.addEventListener("offline",()=>{
+updateConnection();
+
+showMessage(
+"Offline mode enabled. Local GST data remains available.",
+"info"
+);
+});
+
+document.addEventListener("visibilitychange",()=>{
+if(document.visibilityState==="visible"){
+loadGSTRecords();
+
+if(navigator.onLine){
+syncPending(false);
+}
+}
+});
+}
+
+async function initialize(){
+
+updateConnection();
+
+setLoading(
+true,
+"Opening local database...",
+5
+);
+
+try{
+
+await openDB();
+
+await auth.setPersistence(
+firebase.auth.Auth.Persistence.SESSION
+);
+
+auth.onAuthStateChanged(async user=>{
+
+if(!user){
+location.replace("index.html");
+return;
+}
+
+try{
+
+currentUser=user;
+
+setLoading(
+true,
+"Checking authorization...",
+20
+);
+
+const valid=await validateAccess();
+
+if(!valid){
+setLoading(false);
+return;
+}
+
+setLoading(
+true,
+"Loading GST records...",
+45
+);
+
+await loadGSTRecords();
+
+setupEvents();
+
+setLoading(
+true,
+"Checking pending sync...",
+80
+);
+
+if(navigator.onLine){
+setTimeout(()=>{
+syncPending(false);
+},500);
+}
+
+setLoading(false);
+
+}catch(error){
+
+setLoading(false);
+
+showMessage(
+error.message||"GST page initialization failed.",
+"error"
+);
+}
+});
+
+}catch(error){
+
+setLoading(false);
+
+showMessage(
+error.message||"IndexedDB initialization failed.",
+"error"
+);
+}
+}
+
+initialize();
+</script>
+
+</body>
+</html>
