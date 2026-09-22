@@ -467,7 +467,7 @@ async function validateAccess(){
 const user=auth.currentUser;
 
 if(!user){
-location.replace("index.html");
+location.replace("./index.html");
 return false;
 }
 
@@ -481,13 +481,13 @@ const profile=snapshot.val();
 
 if(!profile){
 await auth.signOut();
-location.replace("index.html");
+location.replace("./index.html");
 return false;
 }
 
 if(profile.status!=="ACTIVE"){
 await auth.signOut();
-location.replace("index.html");
+location.replace("./index.html");
 return false;
 }
 
@@ -495,7 +495,7 @@ if(profile.role!=="agent"){
 showMessage("This page is available for Agent accounts.","error");
 
 setTimeout(()=>{
-location.replace("index.html");
+location.replace("./index.html");
 },1200);
 
 return false;
@@ -519,7 +519,7 @@ access.uid!==user.uid||
 access.shopId!==profile.shopId
 ){
 await auth.signOut();
-location.replace("index.html");
+location.replace("./index.html");
 return false;
 }
 
@@ -1452,7 +1452,7 @@ await addActivity(
 }catch{}
 
 await auth.signOut();
-location.replace("index.html");
+location.replace("./index.html");
 });
 
 window.addEventListener("online",()=>{
@@ -1507,7 +1507,7 @@ firebase.auth.Auth.Persistence.SESSION
 auth.onAuthStateChanged(async user=>{
 
 if(!user){
-location.replace("index.html");
+location.replace("./index.html");
 return;
 }
 
