@@ -1,0 +1,3429 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Shop Management - Admin</title>
+<style>
+*{
+    box-sizing:border-box;
+}
+html,body{
+    margin:0;
+    padding:0;
+    width:100%;
+    min-height:100%;
+    font-family:Arial,sans-serif;
+    background:#f4f6f8;
+    color:#1f2937;
+}
+body{
+    min-height:100vh;
+}
+.topbar{
+    height:64px;
+    background:#fff;
+    border-bottom:1px solid #e5e7eb;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    padding:0 24px;
+    position:sticky;
+    top:0;
+    z-index:100;
+}
+.brand{
+    font-size:20px;
+    font-weight:700;
+    color:#111827;
+}
+.user-area{
+    display:flex;
+    align-items:center;
+    gap:12px;
+}
+.user-info{
+    text-align:right;
+}
+.user-name{
+    font-size:13px;
+    font-weight:700;
+}
+.user-role{
+    font-size:11px;
+    color:#6b7280;
+}
+.logout-btn{
+    width:auto;
+    height:36px;
+    padding:0 14px;
+    background:#dc2626;
+    border-radius:8px;
+    font-size:13px;
+}
+.logout-btn:hover{
+    background:#b91c1c;
+}
+.navbar{
+    background:#fff;
+    border-bottom:1px solid #e5e7eb;
+    padding:0 24px;
+    display:flex;
+    gap:4px;
+    overflow-x:auto;
+}
+.navbar a{
+    text-decoration:none;
+    color:#4b5563;
+    padding:14px 16px;
+    font-size:13px;
+    white-space:nowrap;
+    border-bottom:2px solid transparent;
+}
+.navbar a:hover,
+.navbar a.active{
+    color:#2563eb;
+    border-bottom-color:#2563eb;
+}
+.container{
+    width:100%;
+    max-width:1500px;
+    margin:0 auto;
+    padding:24px;
+}
+.page-header{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    gap:16px;
+    margin-bottom:22px;
+}
+.page-title{
+    margin:0;
+    font-size:26px;
+}
+.page-subtitle{
+    margin:5px 0 0;
+    color:#6b7280;
+    font-size:13px;
+}
+.header-actions{
+    display:flex;
+    gap:8px;
+}
+button{
+    height:40px;
+    border:0;
+    border-radius:8px;
+    padding:0 15px;
+    background:#2563eb;
+    color:#fff;
+    font-weight:700;
+    cursor:pointer;
+    font-size:13px;
+}
+button:hover{
+    background:#1d4ed8;
+}
+button:disabled{
+    opacity:.55;
+    cursor:not-allowed;
+}
+.btn-secondary{
+    background:#6b7280;
+}
+.btn-secondary:hover{
+    background:#4b5563;
+}
+.btn-success{
+    background:#16a34a;
+}
+.btn-success:hover{
+    background:#15803d;
+}
+.btn-danger{
+    background:#dc2626;
+}
+.btn-danger:hover{
+    background:#b91c1c;
+}
+.btn-warning{
+    background:#d97706;
+}
+.btn-warning:hover{
+    background:#b45309;
+}
+.btn-small{
+    height:32px;
+    padding:0 10px;
+    font-size:12px;
+}
+.cards{
+    display:grid;
+    grid-template-columns:repeat(6,minmax(0,1fr));
+    gap:14px;
+    margin-bottom:24px;
+}
+.card{
+    background:#fff;
+    border:1px solid #e5e7eb;
+    border-radius:12px;
+    padding:18px;
+}
+.stat-label{
+    color:#6b7280;
+    font-size:12px;
+    margin-bottom:8px;
+}
+.stat-value{
+    font-size:25px;
+    font-weight:700;
+}
+.stat-sub{
+    color:#9ca3af;
+    font-size:11px;
+    margin-top:5px;
+}
+.section{
+    background:#fff;
+    border:1px solid #e5e7eb;
+    border-radius:12px;
+    margin-bottom:20px;
+    overflow:hidden;
+}
+.section-header{
+    padding:16px 18px;
+    border-bottom:1px solid #e5e7eb;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    gap:12px;
+}
+.section-title{
+    margin:0;
+    font-size:17px;
+}
+.section-actions{
+    display:flex;
+    gap:8px;
+}
+.toolbar{
+    padding:14px 18px;
+    display:grid;
+    grid-template-columns:2fr 1fr 1fr 1fr auto;
+    gap:9px;
+    border-bottom:1px solid #e5e7eb;
+}
+input,
+select{
+    width:100%;
+    height:38px;
+    border:1px solid #d1d5db;
+    border-radius:8px;
+    padding:0 10px;
+    outline:none;
+    background:#fff;
+    color:#1f2937;
+    font-size:13px;
+}
+input:focus,
+select:focus{
+    border-color:#2563eb;
+    box-shadow:0 0 0 3px rgba(37,99,235,.08);
+}
+.table-wrap{
+    width:100%;
+    overflow:auto;
+}
+table{
+    width:100%;
+    border-collapse:collapse;
+    min-width:950px;
+}
+th,
+td{
+    padding:11px 12px;
+    border-bottom:1px solid #e5e7eb;
+    text-align:left;
+    font-size:12px;
+    white-space:nowrap;
+}
+th{
+    background:#f9fafb;
+    color:#4b5563;
+    font-weight:700;
+}
+tr:hover td{
+    background:#fafafa;
+}
+.status-badge{
+    display:inline-flex;
+    align-items:center;
+    padding:4px 8px;
+    border-radius:999px;
+    font-size:10px;
+    font-weight:700;
+}
+.status-active{
+    background:#dcfce7;
+    color:#15803d;
+}
+.status-disabled{
+    background:#fee2e2;
+    color:#b91c1c;
+}
+.status-pending{
+    background:#fef3c7;
+    color:#92400e;
+}
+.status-sent{
+    background:#dcfce7;
+    color:#15803d;
+}
+.status-error{
+    background:#fee2e2;
+    color:#b91c1c;
+}
+.empty{
+    padding:35px;
+    text-align:center;
+    color:#9ca3af;
+    font-size:13px;
+}
+.modal{
+    position:fixed;
+    inset:0;
+    background:rgba(0,0,0,.45);
+    display:none;
+    align-items:center;
+    justify-content:center;
+    z-index:500;
+    padding:20px;
+}
+.modal.show{
+    display:flex;
+}
+.modal-box{
+    width:100%;
+    max-width:650px;
+    max-height:90vh;
+    overflow:auto;
+    background:#fff;
+    border-radius:14px;
+}
+.modal-header{
+    padding:17px 20px;
+    border-bottom:1px solid #e5e7eb;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+}
+.modal-title{
+    margin:0;
+    font-size:18px;
+}
+.close-btn{
+    width:34px;
+    height:34px;
+    padding:0;
+    background:#f3f4f6;
+    color:#374151;
+    font-size:20px;
+}
+.close-btn:hover{
+    background:#e5e7eb;
+}
+.modal-body{
+    padding:20px;
+}
+.form-grid{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:14px;
+}
+.form-group{
+    margin-bottom:14px;
+}
+.form-group.full{
+    grid-column:1/-1;
+}
+.form-group label{
+    display:block;
+    margin-bottom:6px;
+    font-size:12px;
+    font-weight:700;
+}
+.modal-footer{
+    padding:14px 20px;
+    border-top:1px solid #e5e7eb;
+    display:flex;
+    justify-content:flex-end;
+    gap:8px;
+}
+.info-box{
+    background:#eff6ff;
+    border:1px solid #bfdbfe;
+    color:#1d4ed8;
+    padding:11px 13px;
+    border-radius:8px;
+    font-size:12px;
+    line-height:1.5;
+    margin-bottom:14px;
+}
+.warning-box{
+    background:#fffbeb;
+    border:1px solid #fde68a;
+    color:#92400e;
+    padding:11px 13px;
+    border-radius:8px;
+    font-size:12px;
+    line-height:1.5;
+    margin-bottom:14px;
+}
+.toast{
+    position:fixed;
+    right:20px;
+    bottom:20px;
+    max-width:400px;
+    padding:13px 16px;
+    border-radius:9px;
+    background:#111827;
+    color:#fff;
+    font-size:13px;
+    z-index:1000;
+    display:none;
+    box-shadow:0 5px 20px rgba(0,0,0,.2);
+}
+.toast.show{
+    display:block;
+}
+.toast.success{
+    background:#15803d;
+}
+.toast.error{
+    background:#b91c1c;
+}
+.toast.warning{
+    background:#b45309;
+}
+.connection{
+    display:flex;
+    align-items:center;
+    gap:6px;
+    font-size:11px;
+    color:#6b7280;
+}
+.dot{
+    width:8px;
+    height:8px;
+    border-radius:50%;
+    background:#9ca3af;
+}
+.dot.online{
+    background:#16a34a;
+}
+.dot.offline{
+    background:#dc2626;
+}
+.loading{
+    padding:30px;
+    text-align:center;
+    color:#6b7280;
+    font-size:13px;
+}
+.hidden{
+    display:none!important;
+}
+@media(max-width:1200px){
+    .cards{
+        grid-template-columns:repeat(3,minmax(0,1fr));
+    }
+    .toolbar{
+        grid-template-columns:1fr 1fr;
+    }
+}
+@media(max-width:700px){
+    .topbar{
+        padding:0 14px;
+    }
+    .brand{
+        font-size:17px;
+    }
+    .user-info{
+        display:none;
+    }
+    .navbar{
+        padding:0 10px;
+    }
+    .navbar a{
+        padding:12px 10px;
+    }
+    .container{
+        padding:14px;
+    }
+    .page-header{
+        align-items:flex-start;
+        flex-direction:column;
+    }
+    .header-actions{
+        width:100%;
+    }
+    .header-actions button{
+        flex:1;
+    }
+    .cards{
+        grid-template-columns:1fr 1fr;
+        gap:10px;
+    }
+    .card{
+        padding:14px;
+    }
+    .stat-value{
+        font-size:21px;
+    }
+    .toolbar{
+        grid-template-columns:1fr;
+    }
+    .form-grid{
+        grid-template-columns:1fr;
+    }
+    .form-group.full{
+        grid-column:auto;
+    }
+}
+</style>
+</head>
+<body>
+
+<header class="topbar">
+    <div class="brand">Shop Management</div>
+
+    <div class="user-area">
+        <div class="user-info">
+            <div id="userName" class="user-name">Loading...</div>
+            <div id="userRole" class="user-role">Admin</div>
+        </div>
+
+        <button id="logoutButton" class="logout-btn">
+            Logout
+        </button>
+    </div>
+</header>
+
+<nav class="navbar">
+    <a href="index.html">Home</a>
+    <a href="admin.html" class="active">Admin</a>
+    <a href="shop.html">Shop</a>
+    <a href="gst.html">GST</a>
+    <a href="records.html">Records</a>
+</nav>
+
+<main class="container">
+
+    <div class="page-header">
+        <div>
+            <h1 class="page-title">Admin Dashboard</h1>
+            <p class="page-subtitle">
+                Manage shops, agents and local system data
+            </p>
+        </div>
+
+        <div class="header-actions">
+            <button id="syncButton">Sync Now</button>
+            <button id="refreshButton" class="btn-secondary">
+                Refresh
+            </button>
+            <div class="connection">
+                <span id="connectionDot" class="dot"></span>
+                <span id="connectionText">Checking...</span>
+            </div>
+        </div>
+    </div>
+
+    <section class="cards">
+
+        <div class="card">
+            <div class="stat-label">Total Shops</div>
+            <div id="totalShops" class="stat-value">0</div>
+            <div class="stat-sub">Local records</div>
+        </div>
+
+        <div class="card">
+            <div class="stat-label">Total Agents</div>
+            <div id="totalAgents" class="stat-value">0</div>
+            <div class="stat-sub">Local records</div>
+        </div>
+
+        <div class="card">
+            <div class="stat-label">Total Products</div>
+            <div id="totalProducts" class="stat-value">0</div>
+            <div class="stat-sub">All products</div>
+        </div>
+
+        <div class="card">
+            <div class="stat-label">Total Sales</div>
+            <div id="totalSales" class="stat-value">0</div>
+            <div class="stat-sub">All sales</div>
+        </div>
+
+        <div class="card">
+            <div class="stat-label">GST Records</div>
+            <div id="totalGST" class="stat-value">0</div>
+            <div class="stat-sub">All GST records</div>
+        </div>
+
+        <div class="card">
+            <div class="stat-label">Pending Sync</div>
+            <div id="pendingSync" class="stat-value">0</div>
+            <div class="stat-sub">Pending + errors</div>
+        </div>
+
+    </section>
+
+    <section class="section">
+        <div class="section-header">
+            <h2 class="section-title">Shop Management</h2>
+
+            <div class="section-actions">
+                <button id="addShopButton">
+                    Add Shop
+                </button>
+            </div>
+        </div>
+
+        <div class="toolbar">
+            <input
+                id="shopSearch"
+                type="search"
+                placeholder="Search shop ID, name, owner, mobile, GSTIN"
+            >
+
+            <select id="shopStatusFilter">
+                <option value="">All Status</option>
+                <option value="active">Active</option>
+                <option value="disabled">Disabled</option>
+            </select>
+
+            <select id="shopAgentFilter">
+                <option value="">All Agents</option>
+            </select>
+
+            <select id="shopSort">
+                <option value="updatedDesc">Recently Updated</option>
+                <option value="createdDesc">Recently Created</option>
+                <option value="nameAsc">Shop Name A-Z</option>
+                <option value="nameDesc">Shop Name Z-A</option>
+            </select>
+
+            <button id="clearShopFilter" class="btn-secondary">
+                Clear
+            </button>
+        </div>
+
+        <div id="shopLoading" class="loading">
+            Loading shops...
+        </div>
+
+        <div id="shopTableWrap" class="table-wrap hidden">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Shop ID</th>
+                        <th>Shop Name</th>
+                        <th>Owner</th>
+                        <th>Mobile</th>
+                        <th>GSTIN</th>
+                        <th>Status</th>
+                        <th>Agents</th>
+                        <th>Created</th>
+                        <th>Updated</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="shopTableBody"></tbody>
+            </table>
+        </div>
+    </section>
+
+    <section class="section">
+        <div class="section-header">
+            <h2 class="section-title">Agent Management</h2>
+
+            <div class="section-actions">
+                <button id="addAgentButton">
+                    Add Agent
+                </button>
+            </div>
+        </div>
+
+        <div class="info-box">
+            Firebase Authentication user creation must be completed
+            through Firebase Console. This page manages the local
+            agent metadata and shop assignment.
+        </div>
+
+        <div class="toolbar">
+            <input
+                id="agentSearch"
+                type="search"
+                placeholder="Search agent ID, name or email"
+            >
+
+            <select id="agentShopFilter">
+                <option value="">All Shops</option>
+            </select>
+
+            <select id="agentStatusFilter">
+                <option value="">All Status</option>
+                <option value="active">Active</option>
+                <option value="disabled">Disabled</option>
+            </select>
+
+            <select id="agentSort">
+                <option value="updatedDesc">Recently Updated</option>
+                <option value="nameAsc">Name A-Z</option>
+                <option value="nameDesc">Name Z-A</option>
+            </select>
+
+            <button id="clearAgentFilter" class="btn-secondary">
+                Clear
+            </button>
+        </div>
+
+        <div id="agentLoading" class="loading">
+            Loading agents...
+        </div>
+
+        <div id="agentTableWrap" class="table-wrap hidden">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Agent ID / UID</th>
+                        <th>Name</th>
+                        <th>Email</th>
+                        <th>Shop</th>
+                        <th>Role</th>
+                        <th>Status</th>
+                        <th>Created</th>
+                        <th>Last Login</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="agentTableBody"></tbody>
+            </table>
+        </div>
+    </section>
+
+    <section class="section">
+        <div class="section-header">
+            <h2 class="section-title">Recent Activity</h2>
+        </div>
+
+        <div id="activityTableWrap" class="table-wrap">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Time</th>
+                        <th>User</th>
+                        <th>Role</th>
+                        <th>Action</th>
+                        <th>Module</th>
+                        <th>Record ID</th>
+                        <th>Status</th>
+                        <th>Sync</th>
+                    </tr>
+                </thead>
+                <tbody id="activityTableBody"></tbody>
+            </table>
+        </div>
+    </section>
+
+</main>
+
+<div id="shopModal" class="modal">
+    <div class="modal-box">
+        <div class="modal-header">
+            <h2 id="shopModalTitle" class="modal-title">
+                Add Shop
+            </h2>
+            <button
+                type="button"
+                class="close-btn"
+                data-close="shopModal"
+            >×</button>
+        </div>
+
+        <form id="shopForm">
+            <div class="modal-body">
+
+                <div class="form-grid">
+
+                    <div class="form-group">
+                        <label for="shopId">
+                            Shop ID
+                        </label>
+                        <input
+                            id="shopId"
+                            type="text"
+                            maxlength="100"
+                            required
+                        >
+                    </div>
+
+                    <div class="form-group">
+                        <label for="shopName">
+                            Shop Name
+                        </label>
+                        <input
+                            id="shopName"
+                            type="text"
+                            maxlength="200"
+                            required
+                        >
+                    </div>
+
+                    <div class="form-group">
+                        <label for="ownerName">
+                            Owner Name
+                        </label>
+                        <input
+                            id="ownerName"
+                            type="text"
+                            maxlength="200"
+                        >
+                    </div>
+
+                    <div class="form-group">
+                        <label for="shopMobile">
+                            Mobile
+                        </label>
+                        <input
+                            id="shopMobile"
+                            type="tel"
+                            maxlength="30"
+                        >
+                    </div>
+
+                    <div class="form-group">
+                        <label for="shopGSTIN">
+                            GSTIN
+                        </label>
+                        <input
+                            id="shopGSTIN"
+                            type="text"
+                            maxlength="30"
+                        >
+                    </div>
+
+                    <div class="form-group">
+                        <label for="shopStatus">
+                            Status
+                        </label>
+                        <select id="shopStatus">
+                            <option value="active">Active</option>
+                            <option value="disabled">Disabled</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group full">
+                        <label for="shopAddress">
+                            Address
+                        </label>
+                        <input
+                            id="shopAddress"
+                            type="text"
+                            maxlength="500"
+                        >
+                    </div>
+
+                </div>
+
+            </div>
+
+            <div class="modal-footer">
+                <button
+                    type="button"
+                    class="btn-secondary"
+                    data-close="shopModal"
+                >
+                    Cancel
+                </button>
+
+                <button type="submit" id="saveShopButton">
+                    Save Shop
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div id="agentModal" class="modal">
+    <div class="modal-box">
+        <div class="modal-header">
+            <h2 id="agentModalTitle" class="modal-title">
+                Add Agent
+            </h2>
+
+            <button
+                type="button"
+                class="close-btn"
+                data-close="agentModal"
+            >×</button>
+        </div>
+
+        <form id="agentForm">
+            <div class="modal-body">
+
+                <div class="warning-box">
+                    Create the Firebase Authentication account first
+                    in Firebase Console and enter its Firebase UID here.
+                </div>
+
+                <div class="form-grid">
+
+                    <div class="form-group">
+                        <label for="agentId">
+                            Firebase UID / Agent ID
+                        </label>
+                        <input
+                            id="agentId"
+                            type="text"
+                            maxlength="200"
+                            required
+                        >
+                    </div>
+
+                    <div class="form-group">
+                        <label for="agentName">
+                            Agent Name
+                        </label>
+                        <input
+                            id="agentName"
+                            type="text"
+                            maxlength="200"
+                            required
+                        >
+                    </div>
+
+                    <div class="form-group">
+                        <label for="agentEmail">
+                            Email
+                        </label>
+                        <input
+                            id="agentEmail"
+                            type="email"
+                            maxlength="200"
+                            required
+                        >
+                    </div>
+
+                    <div class="form-group">
+                        <label for="agentShopId">
+                            Assigned Shop
+                        </label>
+                        <select
+                            id="agentShopId"
+                            required
+                        ></select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="agentRole">
+                            Role
+                        </label>
+                        <select id="agentRole">
+                            <option value="agent">Agent</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="agentStatus">
+                            Status
+                        </label>
+                        <select id="agentStatus">
+                            <option value="active">Active</option>
+                            <option value="disabled">Disabled</option>
+                        </select>
+                    </div>
+
+                </div>
+
+            </div>
+
+            <div class="modal-footer">
+                <button
+                    type="button"
+                    class="btn-secondary"
+                    data-close="agentModal"
+                >
+                    Cancel
+                </button>
+
+                <button type="submit" id="saveAgentButton">
+                    Save Agent
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div id="toast" class="toast"></div>
+
+<script type="module">
+import {
+    initializeApp
+} from "https://www.gstatic.com/firebasejs/12.2.1/firebase-app.js";
+
+import {
+    getAuth,
+    browserSessionPersistence,
+    setPersistence,
+    onAuthStateChanged,
+    signOut
+} from "https://www.gstatic.com/firebasejs/12.2.1/firebase-auth.js";
+
+import {
+    getDatabase,
+    ref,
+    get,
+    child
+} from "https://www.gstatic.com/firebasejs/12.2.1/firebase-database.js";
+
+const firebaseConfig = {
+    apiKey: "AIzaSyApCoYU29E90_fORBdOKnR8BroSlURI_20",
+    authDomain: "shop-management-system-909d3.firebaseapp.com",
+    databaseURL: "https://shop-management-system-909d3-default-rtdb.asia-southeast1.firebasedatabase.app/",
+    projectId: "shop-management-system-909d3",
+    storageBucket: "shop-management-system-909d3.firebasestorage.app",
+    messagingSenderId: "108966486935",
+    appId: "1:108966486935:web:47ffa7b9eb7b6d69a81ad2"
+};
+
+const APP_CONFIG = {
+    SITE_ID: "shophariom",
+    APPS_SCRIPT_URL: "https://script.google.com/macros/s/AKfycbyrS_NNgH1siSwOGdY9wMzfqqUnMZvauKDIAvS6R7s87kDr3ubvTWRCzRhjHPRTAleK8w/exec",
+    DATABASE_NAME: "ShopManagementDB",
+    DATABASE_VERSION: 1
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const database = getDatabase(app);
+
+let currentUser = null;
+let currentProfile = null;
+let editingShopId = null;
+let editingAgentId = null;
+let shops = [];
+let agents = [];
+let activities = [];
+
+const $ = id => document.getElementById(id);
+
+function showToast(message, type = "") {
+    const toast = $("toast");
+
+    toast.textContent = message;
+    toast.className = "toast show " + type;
+
+    clearTimeout(showToast.timer);
+
+    showToast.timer = setTimeout(() => {
+        toast.className = "toast";
+    }, 3500);
+}
+
+function setConnectionStatus() {
+    if (navigator.onLine) {
+        $("connectionDot").className = "dot online";
+        $("connectionText").textContent = "Online";
+    } else {
+        $("connectionDot").className = "dot offline";
+        $("connectionText").textContent = "Offline";
+    }
+}
+
+function formatDate(value) {
+    const number = Number(value || 0);
+
+    if (!number) {
+        return "-";
+    }
+
+    return new Date(number).toLocaleString();
+}
+
+function generateId(prefix) {
+    const randomPart =
+        crypto.randomUUID
+            ? crypto.randomUUID().replace(/-/g, "")
+            : Date.now().toString(36) +
+              Math.random().toString(36).slice(2);
+
+    return prefix + "-" + Date.now() + "-" + randomPart;
+}
+
+function generateNonce() {
+    if (crypto.randomUUID) {
+        return crypto.randomUUID() + "-" + crypto.randomUUID();
+    }
+
+    const array = new Uint8Array(32);
+
+    crypto.getRandomValues(array);
+
+    return Array.from(array)
+        .map(value =>
+            value.toString(16).padStart(2, "0")
+        )
+        .join("");
+}
+
+function openDatabase() {
+    return new Promise((resolve, reject) => {
+        const request = indexedDB.open(
+            APP_CONFIG.DATABASE_NAME,
+            APP_CONFIG.DATABASE_VERSION
+        );
+
+        request.onupgradeneeded = event => {
+            const db = event.target.result;
+
+            if (!db.objectStoreNames.contains("products")) {
+                const store = db.createObjectStore(
+                    "products",
+                    { keyPath: "recordId" }
+                );
+
+                store.createIndex(
+                    "shopId",
+                    "shopId",
+                    { unique: false }
+                );
+
+                store.createIndex(
+                    "agentId",
+                    "agentId",
+                    { unique: false }
+                );
+
+                store.createIndex(
+                    "createdAt",
+                    "createdAt",
+                    { unique: false }
+                );
+
+                store.createIndex(
+                    "updatedAt",
+                    "updatedAt",
+                    { unique: false }
+                );
+
+                store.createIndex(
+                    "syncStatus",
+                    "syncStatus",
+                    { unique: false }
+                );
+            }
+
+            if (!db.objectStoreNames.contains("sales")) {
+                const store = db.createObjectStore(
+                    "sales",
+                    { keyPath: "recordId" }
+                );
+
+                store.createIndex(
+                    "shopId",
+                    "shopId",
+                    { unique: false }
+                );
+
+                store.createIndex(
+                    "agentId",
+                    "agentId",
+                    { unique: false }
+                );
+
+                store.createIndex(
+                    "createdAt",
+                    "createdAt",
+                    { unique: false }
+                );
+
+                store.createIndex(
+                    "syncStatus",
+                    "syncStatus",
+                    { unique: false }
+                );
+            }
+
+            if (!db.objectStoreNames.contains("gst_records")) {
+                const store = db.createObjectStore(
+                    "gst_records",
+                    { keyPath: "recordId" }
+                );
+
+                store.createIndex(
+                    "shopId",
+                    "shopId",
+                    { unique: false }
+                );
+
+                store.createIndex(
+                    "agentId",
+                    "agentId",
+                    { unique: false }
+                );
+
+                store.createIndex(
+                    "createdAt",
+                    "createdAt",
+                    { unique: false }
+                );
+
+                store.createIndex(
+                    "syncStatus",
+                    "syncStatus",
+                    { unique: false }
+                );
+            }
+
+            if (!db.objectStoreNames.contains("activity_logs")) {
+                const store = db.createObjectStore(
+                    "activity_logs",
+                    { keyPath: "activityId" }
+                );
+
+                store.createIndex(
+                    "timestamp",
+                    "timestamp",
+                    { unique: false }
+                );
+
+                store.createIndex(
+                    "shopId",
+                    "shopId",
+                    { unique: false }
+                );
+
+                store.createIndex(
+                    "agentId",
+                    "agentId",
+                    { unique: false }
+                );
+
+                store.createIndex(
+                    "recordId",
+                    "recordId",
+                    { unique: false }
+                );
+
+                store.createIndex(
+                    "syncStatus",
+                    "syncStatus",
+                    { unique: false }
+                );
+            }
+
+            if (!db.objectStoreNames.contains("sync_queue")) {
+                const store = db.createObjectStore(
+                    "sync_queue",
+                    { keyPath: "recordId" }
+                );
+
+                store.createIndex(
+                    "recordType",
+                    "recordType",
+                    { unique: false }
+                );
+
+                store.createIndex(
+                    "shopId",
+                    "shopId",
+                    { unique: false }
+                );
+
+                store.createIndex(
+                    "agentId",
+                    "agentId",
+                    { unique: false }
+                );
+
+                store.createIndex(
+                    "syncStatus",
+                    "syncStatus",
+                    { unique: false }
+                );
+
+                store.createIndex(
+                    "createdAt",
+                    "createdAt",
+                    { unique: false }
+                );
+
+                store.createIndex(
+                    "updatedAt",
+                    "updatedAt",
+                    { unique: false }
+                });
+            }
+
+            if (!db.objectStoreNames.contains("shops")) {
+                const store = db.createObjectStore(
+                    "shops",
+                    { keyPath: "shopId" }
+                );
+
+                store.createIndex(
+                    "status",
+                    "status",
+                    { unique: false }
+                );
+            }
+
+            if (!db.objectStoreNames.contains("agents")) {
+                const store = db.createObjectStore(
+                    "agents",
+                    { keyPath: "agentId" }
+                );
+
+                store.createIndex(
+                    "shopId",
+                    "shopId",
+                    { unique: false }
+                );
+
+                store.createIndex(
+                    "status",
+                    "status",
+                    { unique: false }
+                );
+            }
+
+            if (!db.objectStoreNames.contains("settings")) {
+                db.createObjectStore(
+                    "settings",
+                    { keyPath: "key" }
+                );
+            }
+        };
+
+        request.onsuccess = event => {
+            resolve(event.target.result);
+        };
+
+        request.onerror = () => {
+            reject(
+                request.error ||
+                new Error("INDEXEDDB_OPEN_FAILED")
+            );
+        };
+    });
+}
+
+async function putStore(storeName, value) {
+    const db = await openDatabase();
+
+    return new Promise((resolve, reject) => {
+        const transaction = db.transaction(
+            storeName,
+            "readwrite"
+        );
+
+        transaction.objectStore(storeName).put(value);
+
+        transaction.oncomplete = () => {
+            db.close();
+            resolve();
+        };
+
+        transaction.onerror = () => {
+            db.close();
+            reject(
+                transaction.error ||
+                new Error("INDEXEDDB_WRITE_FAILED")
+            );
+        };
+    });
+}
+
+async function getAllStore(storeName) {
+    const db = await openDatabase();
+
+    return new Promise((resolve, reject) => {
+        const transaction = db.transaction(
+            storeName,
+            "readonly"
+        );
+
+        const request =
+            transaction.objectStore(storeName).getAll();
+
+        request.onsuccess = () => {
+            db.close();
+            resolve(request.result || []);
+        };
+
+        request.onerror = () => {
+            db.close();
+            reject(
+                request.error ||
+                new Error("INDEXEDDB_READ_FAILED")
+            );
+        };
+    });
+}
+
+async function getStoreValue(storeName, key) {
+    const db = await openDatabase();
+
+    return new Promise((resolve, reject) => {
+        const transaction = db.transaction(
+            storeName,
+            "readonly"
+        );
+
+        const request =
+            transaction.objectStore(storeName).get(key);
+
+        request.onsuccess = () => {
+            db.close();
+            resolve(request.result);
+        };
+
+        request.onerror = () => {
+            db.close();
+            reject(
+                request.error ||
+                new Error("INDEXEDDB_GET_FAILED")
+            );
+        };
+    });
+}
+
+async function deleteStoreValue(storeName, key) {
+    const db = await openDatabase();
+
+    return new Promise((resolve, reject) => {
+        const transaction = db.transaction(
+            storeName,
+            "readwrite"
+        );
+
+        transaction.objectStore(storeName).delete(key);
+
+        transaction.oncomplete = () => {
+            db.close();
+            resolve();
+        };
+
+        transaction.onerror = () => {
+            db.close();
+            reject(
+                transaction.error ||
+                new Error("INDEXEDDB_DELETE_FAILED")
+            );
+        };
+    });
+}
+
+async function getUserProfile(uid) {
+    const snapshot = await get(
+        ref(database, "users/" + uid)
+    );
+
+    if (!snapshot.exists()) {
+        throw new Error("USER_PROFILE_NOT_FOUND");
+    }
+
+    const data = snapshot.val();
+
+    const role =
+        String(data.role || "").toLowerCase();
+
+    const status =
+        String(data.status || "").toLowerCase();
+
+    if (role !== "admin") {
+        throw new Error("ADMIN_ACCESS_REQUIRED");
+    }
+
+    if (status !== "active") {
+        throw new Error("USER_ACCOUNT_DISABLED");
+    }
+
+    return {
+        name: String(data.name || ""),
+        email: String(data.email || ""),
+        role: role,
+        shopId: String(data.shopId || ""),
+        status: status,
+        createdAt: Number(data.createdAt || 0),
+        lastLogin: Number(data.lastLogin || 0)
+    };
+}
+
+async function ensureAuthorized() {
+    await setPersistence(
+        auth,
+        browserSessionPersistence
+    );
+
+    return new Promise((resolve, reject) => {
+        const unsubscribe = onAuthStateChanged(
+            auth,
+            async user => {
+                unsubscribe();
+
+                if (!user) {
+                    window.location.replace(
+                        "index.html"
+                    );
+                    return;
+                }
+
+                try {
+                    const profile =
+                        await getUserProfile(user.uid);
+
+                    currentUser = user;
+                    currentProfile = profile;
+
+                    $("userName").textContent =
+                        profile.name ||
+                        user.email ||
+                        "Admin";
+
+                    $("userRole").textContent =
+                        "Administrator";
+
+                    resolve();
+                } catch (error) {
+                    try {
+                        await signOut(auth);
+                    } catch (signOutError) {
+                    }
+
+                    window.location.replace(
+                        "index.html"
+                    );
+                }
+            }
+        );
+    });
+}
+
+async function createActivity(
+    action,
+    module,
+    recordId,
+    status,
+    details
+) {
+    if (!currentUser || !currentProfile) {
+        return;
+    }
+
+    const now = Date.now();
+
+    const activityId =
+        generateId("ACTIVITY");
+
+    const activity = {
+        activityId: activityId,
+        timestamp: now,
+        date: new Date(now)
+            .toISOString()
+            .slice(0, 10),
+        time: new Date(now)
+            .toTimeString()
+            .slice(0, 8),
+        shopId: "",
+        agentId: "",
+        userId: currentUser.uid,
+        userName:
+            currentProfile.name ||
+            currentUser.email ||
+            "",
+        role: currentProfile.role,
+        action: action,
+        module: module,
+        recordId: recordId || activityId,
+        status: status,
+        details: details || "",
+        syncStatus: "PENDING"
+    };
+
+    await putStore(
+        "activity_logs",
+        activity
+    );
+
+    await putStore(
+        "sync_queue",
+        {
+            recordId: activityId,
+            recordType: "ACTIVITY_LOG",
+            shopId: "",
+            agentId: "",
+            operation: "CREATE",
+            payload: activity,
+            syncStatus: "PENDING",
+            retryCount: 0,
+            lastAttempt: 0,
+            lastError: "",
+            createdAt: now,
+            updatedAt: now,
+            syncedAt: 0
+        }
+    );
+}
+
+async function createShopRecord(data) {
+    const now = Date.now();
+
+    const existing =
+        await getStoreValue(
+            "shops",
+            data.shopId
+        );
+
+    if (existing && !editingShopId) {
+        throw new Error(
+            "SHOP_ID_ALREADY_EXISTS"
+        );
+    }
+
+    const record = {
+        shopId: data.shopId,
+        shopName: data.shopName,
+        ownerName: data.ownerName,
+        address: data.address,
+        mobile: data.mobile,
+        GSTIN: data.GSTIN,
+        status: data.status,
+        createdAt:
+            existing && existing.createdAt
+                ? existing.createdAt
+                : now,
+        updatedAt: now
+    };
+
+    await putStore(
+        "shops",
+        record
+    );
+
+    const recordId =
+        "SHOP-" + data.shopId;
+
+    await putStore(
+        "sync_queue",
+        {
+            recordId: recordId,
+            recordType: "SHOP",
+            shopId: data.shopId,
+            agentId: "",
+            operation:
+                existing
+                    ? "UPDATE"
+                    : "CREATE",
+            payload: record,
+            syncStatus: "PENDING",
+            retryCount: 0,
+            lastAttempt: 0,
+            lastError: "",
+            createdAt: now,
+            updatedAt: now,
+            syncedAt: 0
+        }
+    );
+
+    await createActivity(
+        existing
+            ? "Shop Updated"
+            : "Shop Created",
+        "Admin",
+        recordId,
+        "SUCCESS",
+        existing
+            ? "Shop updated locally"
+            : "Shop created locally"
+    );
+}
+
+async function createAgentRecord(data) {
+    const now = Date.now();
+
+    const existing =
+        await getStoreValue(
+            "agents",
+            data.agentId
+        );
+
+    if (existing && !editingAgentId) {
+        throw new Error(
+            "AGENT_ID_ALREADY_EXISTS"
+        );
+    }
+
+    const record = {
+        agentId: data.agentId,
+        name: data.name,
+        email: data.email,
+        shopId: data.shopId,
+        role: "agent",
+        status: data.status,
+        createdAt:
+            existing && existing.createdAt
+                ? existing.createdAt
+                : now,
+        lastLogin:
+            existing && existing.lastLogin
+                ? existing.lastLogin
+                : 0,
+        updatedAt: now
+    };
+
+    await putStore(
+        "agents",
+        record
+    );
+
+    await putStore(
+        "sync_queue",
+        {
+            recordId:
+                "AGENT-" + data.agentId,
+            recordType: "AGENT",
+            shopId: data.shopId,
+            agentId: data.agentId,
+            operation:
+                existing
+                    ? "UPDATE"
+                    : "CREATE",
+            payload: record,
+            syncStatus: "PENDING",
+            retryCount: 0,
+            lastAttempt: 0,
+            lastError: "",
+            createdAt: now,
+            updatedAt: now,
+            syncedAt: 0
+        }
+    );
+
+    await createActivity(
+        existing
+            ? "Agent Updated"
+            : "Agent Created",
+        "Admin",
+        "AGENT-" + data.agentId,
+        "SUCCESS",
+        existing
+            ? "Agent metadata updated locally"
+            : "Agent metadata created locally"
+    );
+}
+
+function openModal(id) {
+    $(id).classList.add("show");
+}
+
+function closeModal(id) {
+    $(id).classList.remove("show");
+}
+
+function resetShopForm() {
+    editingShopId = null;
+
+    $("shopModalTitle").textContent =
+        "Add Shop";
+
+    $("shopForm").reset();
+
+    $("shopStatus").value = "active";
+
+    $("shopId").disabled = false;
+}
+
+function resetAgentForm() {
+    editingAgentId = null;
+
+    $("agentModalTitle").textContent =
+        "Add Agent";
+
+    $("agentForm").reset();
+
+    $("agentRole").value = "agent";
+    $("agentStatus").value = "active";
+
+    $("agentId").disabled = false;
+}
+
+function populateShopSelects() {
+    const agentShopFilter =
+        $("agentShopFilter");
+
+    const agentShopId =
+        $("agentShopId");
+
+    const currentFilter =
+        agentShopFilter.value;
+
+    const currentAgentShop =
+        agentShopId.value;
+
+    agentShopFilter.innerHTML =
+        '<option value="">All Shops</option>';
+
+    agentShopId.innerHTML =
+        '<option value="">Select Shop</option>';
+
+    shops
+        .slice()
+        .sort((a, b) =>
+            String(a.shopName || "")
+                .localeCompare(
+                    String(b.shopName || "")
+                )
+        )
+        .forEach(shop => {
+            const option1 =
+                document.createElement("option");
+
+            option1.value = shop.shopId;
+            option1.textContent =
+                shop.shopName +
+                " (" +
+                shop.shopId +
+                ")";
+
+            agentShopFilter.appendChild(
+                option1
+            );
+
+            const option2 =
+                document.createElement("option");
+
+            option2.value = shop.shopId;
+            option2.textContent =
+                shop.shopName +
+                " (" +
+                shop.shopId +
+                ")";
+
+            agentShopId.appendChild(
+                option2
+            );
+        });
+
+    if (
+        Array.from(
+            agentShopFilter.options
+        ).some(
+            option =>
+                option.value === currentFilter
+        )
+    ) {
+        agentShopFilter.value =
+            currentFilter;
+    }
+
+    if (
+        Array.from(
+            agentShopId.options
+        ).some(
+            option =>
+                option.value === currentAgentShop
+        )
+    ) {
+        agentShopId.value =
+            currentAgentShop;
+    }
+}
+
+function getShopAgentCount(shopId) {
+    return agents.filter(
+        agent =>
+            String(agent.shopId) ===
+            String(shopId)
+    ).length;
+}
+
+function renderShops() {
+    const search =
+        $("shopSearch").value
+            .trim()
+            .toLowerCase();
+
+    const status =
+        $("shopStatusFilter").value;
+
+    const agentFilter =
+        $("shopAgentFilter").value;
+
+    const sort =
+        $("shopSort").value;
+
+    let filtered =
+        shops.filter(shop => {
+            const text = [
+                shop.shopId,
+                shop.shopName,
+                shop.ownerName,
+                shop.mobile,
+                shop.GSTIN,
+                shop.address
+            ]
+                .join(" ")
+                .toLowerCase();
+
+            if (
+                search &&
+                !text.includes(search)
+            ) {
+                return false;
+            }
+
+            if (
+                status &&
+                shop.status !== status
+            ) {
+                return false;
+            }
+
+            if (
+                agentFilter &&
+                !agents.some(
+                    agent =>
+                        agent.shopId ===
+                            shop.shopId &&
+                        agent.agentId
+                )
+            ) {
+                return false;
+            }
+
+            return true;
+        });
+
+    if (sort === "nameAsc") {
+        filtered.sort((a, b) =>
+            String(a.shopName || "")
+                .localeCompare(
+                    String(b.shopName || "")
+                )
+        );
+    } else if (sort === "nameDesc") {
+        filtered.sort((a, b) =>
+            String(b.shopName || "")
+                .localeCompare(
+                    String(a.shopName || "")
+                )
+        );
+    } else if (sort === "createdDesc") {
+        filtered.sort(
+            (a, b) =>
+                Number(b.createdAt || 0) -
+                Number(a.createdAt || 0)
+        );
+    } else {
+        filtered.sort(
+            (a, b) =>
+                Number(b.updatedAt || 0) -
+                Number(a.updatedAt || 0)
+        );
+    }
+
+    const tbody =
+        $("shopTableBody");
+
+    tbody.innerHTML = "";
+
+    if (!filtered.length) {
+        tbody.innerHTML =
+            '<tr><td colspan="10" class="empty">No shops found</td></tr>';
+
+        $("shopLoading").classList.add(
+            "hidden"
+        );
+
+        $("shopTableWrap").classList.remove(
+            "hidden"
+        );
+
+        return;
+    }
+
+    filtered.forEach(shop => {
+        const tr =
+            document.createElement("tr");
+
+        const statusClass =
+            shop.status === "active"
+                ? "status-active"
+                : "status-disabled";
+
+        const agentCount =
+            getShopAgentCount(
+                shop.shopId
+            );
+
+        tr.innerHTML = `
+            <td>${escapeHtml(shop.shopId)}</td>
+            <td>${escapeHtml(shop.shopName)}</td>
+            <td>${escapeHtml(shop.ownerName || "-")}</td>
+            <td>${escapeHtml(shop.mobile || "-")}</td>
+            <td>${escapeHtml(shop.GSTIN || "-")}</td>
+            <td>
+                <span class="status-badge ${statusClass}">
+                    ${escapeHtml(shop.status)}
+                </span>
+            </td>
+            <td>${agentCount}</td>
+            <td>${formatDate(shop.createdAt)}</td>
+            <td>${formatDate(shop.updatedAt)}</td>
+            <td>
+                <button
+                    class="btn-small"
+                    data-edit-shop="${escapeHtml(shop.shopId)}"
+                >
+                    Edit
+                </button>
+                <button
+                    class="btn-small ${
+                        shop.status === "active"
+                            ? "btn-danger"
+                            : "btn-success"
+                    }"
+                    data-toggle-shop="${escapeHtml(shop.shopId)}"
+                >
+                    ${
+                        shop.status === "active"
+                            ? "Disable"
+                            : "Enable"
+                    }
+                </button>
+            </td>
+        `;
+
+        tbody.appendChild(tr);
+    });
+
+    $("shopLoading").classList.add(
+        "hidden"
+    );
+
+    $("shopTableWrap").classList.remove(
+        "hidden"
+    );
+}
+
+function renderAgents() {
+    const search =
+        $("agentSearch").value
+            .trim()
+            .toLowerCase();
+
+    const shopFilter =
+        $("agentShopFilter").value;
+
+    const statusFilter =
+        $("agentStatusFilter").value;
+
+    const sort =
+        $("agentSort").value;
+
+    let filtered =
+        agents.filter(agent => {
+            const text = [
+                agent.agentId,
+                agent.name,
+                agent.email,
+                agent.shopId
+            ]
+                .join(" ")
+                .toLowerCase();
+
+            if (
+                search &&
+                !text.includes(search)
+            ) {
+                return false;
+            }
+
+            if (
+                shopFilter &&
+                agent.shopId !== shopFilter
+            ) {
+                return false;
+            }
+
+            if (
+                statusFilter &&
+                agent.status !==
+                    statusFilter
+            ) {
+                return false;
+            }
+
+            return true;
+        });
+
+    if (sort === "nameAsc") {
+        filtered.sort((a, b) =>
+            String(a.name || "")
+                .localeCompare(
+                    String(b.name || "")
+                )
+        );
+    } else if (sort === "nameDesc") {
+        filtered.sort((a, b) =>
+            String(b.name || "")
+                .localeCompare(
+                    String(a.name || "")
+                )
+        );
+    } else {
+        filtered.sort(
+            (a, b) =>
+                Number(b.updatedAt || 0) -
+                Number(a.updatedAt || 0)
+        );
+    }
+
+    const tbody =
+        $("agentTableBody");
+
+    tbody.innerHTML = "";
+
+    if (!filtered.length) {
+        tbody.innerHTML =
+            '<tr><td colspan="9" class="empty">No agents found</td></tr>';
+
+        $("agentLoading").classList.add(
+            "hidden"
+        );
+
+        $("agentTableWrap").classList.remove(
+            "hidden"
+        );
+
+        return;
+    }
+
+    filtered.forEach(agent => {
+        const tr =
+            document.createElement("tr");
+
+        const statusClass =
+            agent.status === "active"
+                ? "status-active"
+                : "status-disabled";
+
+        const shop =
+            shops.find(
+                item =>
+                    item.shopId ===
+                    agent.shopId
+            );
+
+        const shopText =
+            shop
+                ? shop.shopName +
+                  " (" +
+                  shop.shopId +
+                  ")"
+                : agent.shopId || "-";
+
+        tr.innerHTML = `
+            <td>${escapeHtml(agent.agentId)}</td>
+            <td>${escapeHtml(agent.name)}</td>
+            <td>${escapeHtml(agent.email)}</td>
+            <td>${escapeHtml(shopText)}</td>
+            <td>${escapeHtml(agent.role)}</td>
+            <td>
+                <span class="status-badge ${statusClass}">
+                    ${escapeHtml(agent.status)}
+                </span>
+            </td>
+            <td>${formatDate(agent.createdAt)}</td>
+            <td>${formatDate(agent.lastLogin)}</td>
+            <td>
+                <button
+                    class="btn-small"
+                    data-edit-agent="${escapeHtml(agent.agentId)}"
+                >
+                    Edit
+                </button>
+                <button
+                    class="btn-small ${
+                        agent.status === "active"
+                            ? "btn-danger"
+                            : "btn-success"
+                    }"
+                    data-toggle-agent="${escapeHtml(agent.agentId)}"
+                >
+                    ${
+                        agent.status === "active"
+                            ? "Disable"
+                            : "Enable"
+                    }
+                </button>
+            </td>
+        `;
+
+        tbody.appendChild(tr);
+    });
+
+    $("agentLoading").classList.add(
+        "hidden"
+    );
+
+    $("agentTableWrap").classList.remove(
+        "hidden"
+    );
+}
+
+function renderActivities() {
+    const tbody =
+        $("activityTableBody");
+
+    tbody.innerHTML = "";
+
+    const recent =
+        activities
+            .slice()
+            .sort(
+                (a, b) =>
+                    Number(b.timestamp || 0) -
+                    Number(a.timestamp || 0)
+            )
+            .slice(0, 30);
+
+    if (!recent.length) {
+        tbody.innerHTML =
+            '<tr><td colspan="8" class="empty">No activity records</td></tr>';
+        return;
+    }
+
+    recent.forEach(activity => {
+        const tr =
+            document.createElement("tr");
+
+        const statusClass =
+            String(
+                activity.status || ""
+            ).toUpperCase() ===
+            "SUCCESS"
+                ? "status-active"
+                : "status-error";
+
+        const syncStatus =
+            String(
+                activity.syncStatus || ""
+            ).toUpperCase();
+
+        const syncClass =
+            syncStatus === "SENT"
+                ? "status-sent"
+                : syncStatus === "ERROR"
+                    ? "status-error"
+                    : "status-pending";
+
+        tr.innerHTML = `
+            <td>${formatDate(activity.timestamp)}</td>
+            <td>${escapeHtml(activity.userName || "-")}</td>
+            <td>${escapeHtml(activity.role || "-")}</td>
+            <td>${escapeHtml(activity.action || "-")}</td>
+            <td>${escapeHtml(activity.module || "-")}</td>
+            <td>${escapeHtml(activity.recordId || "-")}</td>
+            <td>
+                <span class="status-badge ${statusClass}">
+                    ${escapeHtml(activity.status || "-")}
+                </span>
+            </td>
+            <td>
+                <span class="status-badge ${syncClass}">
+                    ${escapeHtml(syncStatus || "-")}
+                </span>
+            </td>
+        `;
+
+        tbody.appendChild(tr);
+    });
+}
+
+function escapeHtml(value) {
+    return String(value ?? "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+}
+
+async function loadLocalData() {
+    shops =
+        await getAllStore("shops");
+
+    agents =
+        await getAllStore("agents");
+
+    activities =
+        await getAllStore("activity_logs");
+
+    const products =
+        await getAllStore("products");
+
+    const sales =
+        await getAllStore("sales");
+
+    const gst =
+        await getAllStore("gst_records");
+
+    const queue =
+        await getAllStore("sync_queue");
+
+    $("totalShops").textContent =
+        shops.length;
+
+    $("totalAgents").textContent =
+        agents.length;
+
+    $("totalProducts").textContent =
+        products.length;
+
+    $("totalSales").textContent =
+        sales.length;
+
+    $("totalGST").textContent =
+        gst.length;
+
+    $("pendingSync").textContent =
+        queue.filter(
+            item =>
+                item.syncStatus !== "SENT"
+        ).length;
+
+    populateShopSelects();
+
+    renderShops();
+    renderAgents();
+    renderActivities();
+}
+
+async function updateShopStatus(shopId) {
+    const shop =
+        await getStoreValue(
+            "shops",
+            shopId
+        );
+
+    if (!shop) {
+        throw new Error(
+            "SHOP_NOT_FOUND"
+        );
+    }
+
+    shop.status =
+        shop.status === "active"
+            ? "disabled"
+            : "active";
+
+    shop.updatedAt = Date.now();
+
+    await putStore(
+        "shops",
+        shop
+    );
+
+    const recordId =
+        "SHOP-" + shop.shopId;
+
+    await putStore(
+        "sync_queue",
+        {
+            recordId: recordId,
+            recordType: "SHOP",
+            shopId: shop.shopId,
+            agentId: "",
+            operation: "UPDATE",
+            payload: shop,
+            syncStatus: "PENDING",
+            retryCount: 0,
+            lastAttempt: 0,
+            lastError: "",
+            createdAt: Date.now(),
+            updatedAt: Date.now(),
+            syncedAt: 0
+        }
+    );
+
+    await createActivity(
+        shop.status === "active"
+            ? "Shop Enabled"
+            : "Shop Disabled",
+        "Admin",
+        recordId,
+        "SUCCESS",
+        "Shop status changed locally"
+    );
+}
+
+async function updateAgentStatus(agentId) {
+    const agent =
+        await getStoreValue(
+            "agents",
+            agentId
+        );
+
+    if (!agent) {
+        throw new Error(
+            "AGENT_NOT_FOUND"
+        );
+    }
+
+    agent.status =
+        agent.status === "active"
+            ? "disabled"
+            : "active";
+
+    agent.updatedAt = Date.now();
+
+    await putStore(
+        "agents",
+        agent
+    );
+
+    const recordId =
+        "AGENT-" + agent.agentId;
+
+    await putStore(
+        "sync_queue",
+        {
+            recordId: recordId,
+            recordType: "AGENT",
+            shopId: agent.shopId,
+            agentId: agent.agentId,
+            operation: "UPDATE",
+            payload: agent,
+            syncStatus: "PENDING",
+            retryCount: 0,
+            lastAttempt: 0,
+            lastError: "",
+            createdAt: Date.now(),
+            updatedAt: Date.now(),
+            syncedAt: 0
+        }
+    );
+
+    await createActivity(
+        agent.status === "active"
+            ? "Agent Enabled"
+            : "Agent Disabled",
+        "Admin",
+        recordId,
+        "SUCCESS",
+        "Agent status changed locally"
+    );
+}
+
+function editShop(shopId) {
+    const shop =
+        shops.find(
+            item =>
+                item.shopId === shopId
+        );
+
+    if (!shop) {
+        return;
+    }
+
+    editingShopId =
+        shop.shopId;
+
+    $("shopModalTitle").textContent =
+        "Edit Shop";
+
+    $("shopId").value =
+        shop.shopId || "";
+
+    $("shopName").value =
+        shop.shopName || "";
+
+    $("ownerName").value =
+        shop.ownerName || "";
+
+    $("shopMobile").value =
+        shop.mobile || "";
+
+    $("shopGSTIN").value =
+        shop.GSTIN || "";
+
+    $("shopAddress").value =
+        shop.address || "";
+
+    $("shopStatus").value =
+        shop.status || "active";
+
+    $("shopId").disabled = true;
+
+    openModal("shopModal");
+}
+
+function editAgent(agentId) {
+    const agent =
+        agents.find(
+            item =>
+                item.agentId === agentId
+        );
+
+    if (!agent) {
+        return;
+    }
+
+    editingAgentId =
+        agent.agentId;
+
+    $("agentModalTitle").textContent =
+        "Edit Agent";
+
+    $("agentId").value =
+        agent.agentId || "";
+
+    $("agentName").value =
+        agent.name || "";
+
+    $("agentEmail").value =
+        agent.email || "";
+
+    $("agentShopId").value =
+        agent.shopId || "";
+
+    $("agentRole").value =
+        "agent";
+
+    $("agentStatus").value =
+        agent.status || "active";
+
+    $("agentId").disabled = true;
+
+    openModal("agentModal");
+}
+
+async function syncNow() {
+    if (!navigator.onLine) {
+        showToast(
+            "Internet connection is offline.",
+            "warning"
+        );
+        return;
+    }
+
+    if (
+        !APP_CONFIG.APPS_SCRIPT_URL ||
+        APP_CONFIG.APPS_SCRIPT_URL ===
+            "YOUR_APPS_SCRIPT_WEB_APP_URL"
+    ) {
+        showToast(
+            "Apps Script URL is not configured.",
+            "warning"
+        );
+        return;
+    }
+
+    if (!currentUser) {
+        return;
+    }
+
+    const queue =
+        await getAllStore(
+            "sync_queue"
+        );
+
+    const records =
+        queue.filter(
+            item =>
+                item.syncStatus ===
+                    "PENDING" ||
+                item.syncStatus ===
+                    "ERROR" ||
+                item.syncStatus ===
+                    "SYNCING"
+        );
+
+    if (!records.length) {
+        showToast(
+            "No pending records.",
+            "success"
+        );
+        await loadLocalData();
+        return;
+    }
+
+    $("syncButton").disabled = true;
+    $("syncButton").textContent =
+        "Syncing...";
+
+    await createActivity(
+        "Sync Started",
+        "Sync",
+        "",
+        "SUCCESS",
+        "Admin started manual synchronization"
+    );
+
+    try {
+        const token =
+            await currentUser.getIdToken(true);
+
+        const batchSize = 20;
+
+        for (
+            let i = 0;
+            i < records.length;
+            i += batchSize
+        ) {
+            const batch =
+                records.slice(
+                    i,
+                    i + batchSize
+                );
+
+            await setQueueSyncing(
+                batch
+            );
+
+            const response =
+                await fetch(
+                    APP_CONFIG.APPS_SCRIPT_URL,
+                    {
+                        method: "POST",
+                        headers: {
+                            "Content-Type":
+                                "text/plain;charset=utf-8"
+                        },
+                        body:
+                            JSON.stringify({
+                                action:
+                                    "batchSync",
+                                siteId:
+                                    APP_CONFIG.SITE_ID,
+                                timestamp:
+                                    Date.now(),
+                                nonce:
+                                    generateNonce(),
+                                idToken:
+                                    token,
+                                shopId: "",
+                                agentId: "",
+                                records:
+                                    batch.map(
+                                        item => ({
+                                            recordId:
+                                                item.recordId,
+                                            recordType:
+                                                item.recordType,
+                                            shopId:
+                                                item.shopId,
+                                            agentId:
+                                                item.agentId,
+                                            operation:
+                                                item.operation,
+                                            payload:
+                                                item.payload
+                                        })
+                                    )
+                            })
+                    }
+                );
+
+            const text =
+                await response.text();
+
+            let data;
+
+            try {
+                data =
+                    JSON.parse(text);
+            } catch (error) {
+                throw new Error(
+                    "INVALID_APPS_SCRIPT_RESPONSE"
+                );
+            }
+
+            if (
+                !response.ok ||
+                !Array.isArray(
+                    data.results
+                )
+            ) {
+                throw new Error(
+                    data.error ||
+                    "BATCH_SYNC_FAILED"
+                );
+            }
+
+            await applySyncResults(
+                data.results
+            );
+        }
+
+        await createActivity(
+            "Sync Success",
+            "Sync",
+            "",
+            "SUCCESS",
+            "Admin synchronization completed"
+        );
+
+        showToast(
+            "Synchronization completed.",
+            "success"
+        );
+    } catch (error) {
+        await createActivity(
+            "Sync Error",
+            "Sync",
+            "",
+            "ERROR",
+            error.message ||
+                String(error)
+        );
+
+        showToast(
+            error.message ||
+                "Synchronization failed.",
+            "error"
+        );
+    } finally {
+        $("syncButton").disabled =
+            false;
+
+        $("syncButton").textContent =
+            "Sync Now";
+
+        await loadLocalData();
+    }
+}
+
+async function setQueueSyncing(records) {
+    const db =
+        await openDatabase();
+
+    return new Promise(
+        (resolve, reject) => {
+            const transaction =
+                db.transaction(
+                    "sync_queue",
+                    "readwrite"
+                );
+
+            const store =
+                transaction.objectStore(
+                    "sync_queue"
+                );
+
+            records.forEach(item => {
+                const request =
+                    store.get(
+                        item.recordId
+                    );
+
+                request.onsuccess = () => {
+                    const value =
+                        request.result;
+
+                    if (!value) {
+                        return;
+                    }
+
+                    value.syncStatus =
+                        "SYNCING";
+
+                    value.lastAttempt =
+                        Date.now();
+
+                    value.updatedAt =
+                        Date.now();
+
+                    value.lastError =
+                        "";
+
+                    store.put(value);
+                };
+            });
+
+            transaction.oncomplete =
+                () => {
+                    db.close();
+                    resolve();
+                };
+
+            transaction.onerror = () => {
+                db.close();
+                reject(
+                    transaction.error ||
+                    new Error(
+                        "QUEUE_UPDATE_FAILED"
+                    )
+                );
+            };
+        }
+    );
+}
+
+async function applySyncResults(
+    results
+) {
+    const db =
+        await openDatabase();
+
+    return new Promise(
+        (resolve, reject) => {
+            const transaction =
+                db.transaction(
+                    [
+                        "sync_queue",
+                        "products",
+                        "sales",
+                        "gst_records",
+                        "activity_logs"
+                    ],
+                    "readwrite"
+                );
+
+            const queueStore =
+                transaction.objectStore(
+                    "sync_queue"
+                );
+
+            const stores = {
+                PRODUCT:
+                    transaction.objectStore(
+                        "products"
+                    ),
+                PRODUCTS:
+                    transaction.objectStore(
+                        "products"
+                    ),
+                SALE:
+                    transaction.objectStore(
+                        "sales"
+                    ),
+                SALES:
+                    transaction.objectStore(
+                        "sales"
+                    ),
+                GST:
+                    transaction.objectStore(
+                        "gst_records"
+                    ),
+                GST_RECORD:
+                    transaction.objectStore(
+                        "gst_records"
+                    ),
+                ACTIVITY:
+                    transaction.objectStore(
+                        "activity_logs"
+                    ),
+                ACTIVITY_LOG:
+                    transaction.objectStore(
+                        "activity_logs"
+                    )
+            };
+
+            results.forEach(result => {
+                if (
+                    !result ||
+                    !result.recordId
+                ) {
+                    return;
+                }
+
+                const request =
+                    queueStore.get(
+                        String(
+                            result.recordId
+                        )
+                    );
+
+                request.onsuccess =
+                    () => {
+                        const item =
+                            request.result;
+
+                        if (!item) {
+                            return;
+                        }
+
+                        if (
+                            result.success
+                        ) {
+                            item.syncStatus =
+                                "SENT";
+
+                            item.syncedAt =
+                                Date.now();
+
+                            item.updatedAt =
+                                Date.now();
+
+                            item.lastError =
+                                "";
+
+                            queueStore.put(
+                                item
+                            );
+
+                            const type =
+                                String(
+                                    item.recordType ||
+                                        ""
+                                ).toUpperCase();
+
+                            const businessStore =
+                                stores[type];
+
+                            if (
+                                businessStore
+                            ) {
+                                const localRequest =
+                                    businessStore.get(
+                                        String(
+                                            result.recordId
+                                        )
+                                    );
+
+                                localRequest.onsuccess =
+                                    () => {
+                                        const local =
+                                            localRequest.result;
+
+                                        if (
+                                            local
+                                        ) {
+                                            local.syncStatus =
+                                                "SENT";
+
+                                            local.syncedAt =
+                                                Date.now();
+
+                                            local.updatedAt =
+                                                Date.now();
+
+                                            businessStore.put(
+                                                local
+                                            );
+                                        }
+                                    };
+                            }
+                        } else {
+                            item.syncStatus =
+                                "ERROR";
+
+                            item.retryCount =
+                                Number(
+                                    item.retryCount ||
+                                        0
+                                ) + 1;
+
+                            item.lastAttempt =
+                                Date.now();
+
+                            item.updatedAt =
+                                Date.now();
+
+                            item.lastError =
+                                String(
+                                    result.message ||
+                                        "REMOTE_SYNC_FAILED"
+                                );
+
+                            queueStore.put(
+                                item
+                            );
+                        }
+                    };
+            });
+
+            transaction.oncomplete =
+                () => {
+                    db.close();
+                    resolve();
+                };
+
+            transaction.onerror = () => {
+                db.close();
+                reject(
+                    transaction.error ||
+                    new Error(
+                        "SYNC_RESULT_UPDATE_FAILED"
+                    )
+                );
+            };
+        }
+    );
+}
+
+$("addShopButton").addEventListener(
+    "click",
+    () => {
+        resetShopForm();
+        openModal("shopModal");
+    }
+);
+
+$("addAgentButton").addEventListener(
+    "click",
+    () => {
+        resetAgentForm();
+        populateShopSelects();
+        openModal("agentModal");
+    }
+);
+
+$("shopForm").addEventListener(
+    "submit",
+    async event => {
+        event.preventDefault();
+
+        const data = {
+            shopId:
+                $("shopId").value.trim(),
+            shopName:
+                $("shopName").value.trim(),
+            ownerName:
+                $("ownerName").value.trim(),
+            address:
+                $("shopAddress").value.trim(),
+            mobile:
+                $("shopMobile").value.trim(),
+            GSTIN:
+                $("shopGSTIN").value
+                    .trim()
+                    .toUpperCase(),
+            status:
+                $("shopStatus").value
+        };
+
+        if (!data.shopId) {
+            showToast(
+                "Shop ID is required.",
+                "error"
+            );
+            return;
+        }
+
+        if (!data.shopName) {
+            showToast(
+                "Shop name is required.",
+                "error"
+            );
+            return;
+        }
+
+        $("saveShopButton").disabled =
+            true;
+
+        try {
+            await createShopRecord(
+                data
+            );
+
+            closeModal("shopModal");
+
+            await loadLocalData();
+
+            showToast(
+                editingShopId
+                    ? "Shop updated locally."
+                    : "Shop saved locally.",
+                "success"
+            );
+
+            resetShopForm();
+        } catch (error) {
+            showToast(
+                error.message ||
+                    "Unable to save shop.",
+                "error"
+            );
+        } finally {
+            $("saveShopButton").disabled =
+                false;
+        }
+    }
+);
+
+$("agentForm").addEventListener(
+    "submit",
+    async event => {
+        event.preventDefault();
+
+        const data = {
+            agentId:
+                $("agentId").value.trim(),
+            name:
+                $("agentName").value.trim(),
+            email:
+                $("agentEmail").value.trim(),
+            shopId:
+                $("agentShopId").value,
+            status:
+                $("agentStatus").value
+        };
+
+        if (!data.agentId) {
+            showToast(
+                "Firebase UID / Agent ID is required.",
+                "error"
+            );
+            return;
+        }
+
+        if (!data.name) {
+            showToast(
+                "Agent name is required.",
+                "error"
+            );
+            return;
+        }
+
+        if (!data.email) {
+            showToast(
+                "Agent email is required.",
+                "error"
+            );
+            return;
+        }
+
+        if (!data.shopId) {
+            showToast(
+                "Please select a shop.",
+                "error"
+            );
+            return;
+        }
+
+        $("saveAgentButton").disabled =
+            true;
+
+        try {
+            await createAgentRecord(
+                data
+            );
+
+            closeModal("agentModal");
+
+            await loadLocalData();
+
+            showToast(
+                editingAgentId
+                    ? "Agent updated locally."
+                    : "Agent saved locally.",
+                "success"
+            );
+
+            resetAgentForm();
+        } catch (error) {
+            showToast(
+                error.message ||
+                    "Unable to save agent.",
+                "error"
+            );
+        } finally {
+            $("saveAgentButton").disabled =
+                false;
+        }
+    }
+);
+
+$("shopTableBody").addEventListener(
+    "click",
+    async event => {
+        const edit =
+            event.target.closest(
+                "[data-edit-shop]"
+            );
+
+        if (edit) {
+            editShop(
+                edit.dataset.editShop
+            );
+            return;
+        }
+
+        const toggle =
+            event.target.closest(
+                "[data-toggle-shop]"
+            );
+
+        if (toggle) {
+            const shopId =
+                toggle.dataset.toggleShop;
+
+            if (
+                !confirm(
+                    "Change this shop status?"
+                )
+            ) {
+                return;
+            }
+
+            try {
+                await updateShopStatus(
+                    shopId
+                );
+
+                await loadLocalData();
+
+                showToast(
+                    "Shop status updated.",
+                    "success"
+                );
+            } catch (error) {
+                showToast(
+                    error.message ||
+                        "Unable to update shop.",
+                    "error"
+                );
+            }
+        }
+    }
+);
+
+$("agentTableBody").addEventListener(
+    "click",
+    async event => {
+        const edit =
+            event.target.closest(
+                "[data-edit-agent]"
+            );
+
+        if (edit) {
+            editAgent(
+                edit.dataset.editAgent
+            );
+            return;
+        }
+
+        const toggle =
+            event.target.closest(
+                "[data-toggle-agent]"
+            );
+
+        if (toggle) {
+            const agentId =
+                toggle.dataset.toggleAgent;
+
+            if (
+                !confirm(
+                    "Change this agent status?"
+                )
+            ) {
+                return;
+            }
+
+            try {
+                await updateAgentStatus(
+                    agentId
+                );
+
+                await loadLocalData();
+
+                showToast(
+                    "Agent status updated.",
+                    "success"
+                );
+            } catch (error) {
+                showToast(
+                    error.message ||
+                        "Unable to update agent.",
+                    "error"
+                );
+            }
+        }
+    }
+);
+
+$("logoutButton").addEventListener(
+    "click",
+    async () => {
+        try {
+            await createActivity(
+                "Logout",
+                "Authentication",
+                "",
+                "SUCCESS",
+                "Admin logout"
+            );
+        } catch (error) {
+        }
+
+        try {
+            await signOut(auth);
+        } finally {
+            window.location.replace(
+                "index.html"
+            );
+        }
+    }
+);
+
+$("syncButton").addEventListener(
+    "click",
+    syncNow
+);
+
+$("refreshButton").addEventListener(
+    "click",
+    async () => {
+        try {
+            await loadLocalData();
+
+            showToast(
+                "Data refreshed.",
+                "success"
+            );
+        } catch (error) {
+            showToast(
+                "Refresh failed.",
+                "error"
+            );
+        }
+    }
+);
+
+[
+    "shopSearch",
+    "shopStatusFilter",
+    "shopAgentFilter",
+    "shopSort"
+].forEach(id => {
+    $(id).addEventListener(
+        "input",
+        renderShops
+    );
+
+    $(id).addEventListener(
+        "change",
+        renderShops
+    );
+});
+
+[
+    "agentSearch",
+    "agentShopFilter",
+    "agentStatusFilter",
+    "agentSort"
+].forEach(id => {
+    $(id).addEventListener(
+        "input",
+        renderAgents
+    );
+
+    $(id).addEventListener(
+        "change",
+        renderAgents
+    );
+});
+
+$("clearShopFilter").addEventListener(
+    "click",
+    () => {
+        $("shopSearch").value = "";
+        $("shopStatusFilter").value = "";
+        $("shopAgentFilter").value = "";
+        $("shopSort").value =
+            "updatedDesc";
+
+        renderShops();
+    }
+);
+
+$("clearAgentFilter").addEventListener(
+    "click",
+    () => {
+        $("agentSearch").value = "";
+        $("agentShopFilter").value = "";
+        $("agentStatusFilter").value = "";
+        $("agentSort").value =
+            "updatedDesc";
+
+        renderAgents();
+    }
+);
+
+document
+    .querySelectorAll(
+        "[data-close]"
+    )
+    .forEach(button => {
+        button.addEventListener(
+            "click",
+            () => {
+                closeModal(
+                    button.dataset.close
+                );
+            }
+        );
+    });
+
+document
+    .querySelectorAll(".modal")
+    .forEach(modal => {
+        modal.addEventListener(
+            "click",
+            event => {
+                if (
+                    event.target ===
+                    modal
+                ) {
+                    closeModal(
+                        modal.id
+                    );
+                }
+            }
+        );
+    });
+
+window.addEventListener(
+    "online",
+    () => {
+        setConnectionStatus();
+
+        if (currentUser) {
+            syncNow().catch(() => {});
+        }
+    }
+);
+
+window.addEventListener(
+    "offline",
+    setConnectionStatus
+);
+
+async function start() {
+    setConnectionStatus();
+
+    try {
+        await ensureAuthorized();
+
+        await openDatabase();
+
+        await loadLocalData();
+    } catch (error) {
+        window.location.replace(
+            "index.html"
+        );
+    }
+}
+
+start();
+</script>
+
+</body>
+</html>
