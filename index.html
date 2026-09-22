@@ -1239,12 +1239,12 @@ async function initializeAfterLogin(user, profile) {
     }
 
     if (profile.role === "admin") {
-        window.location.replace("admin.html");
+        window.location.replace("./admin.html");
         return;
     }
 
     if (profile.role === "agent") {
-        window.location.replace("shop.html");
+        window.location.replace("./shop.html");
         return;
     }
 
