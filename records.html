@@ -1,0 +1,2301 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Records & Sync</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;font-family:Arial,sans-serif;background:#f4f6f8;color:#1f2937}
+button,input,select{font:inherit}
+button{cursor:pointer;border:0;border-radius:6px;padding:9px 14px}
+.topbar{background:#111827;color:#fff;padding:14px 18px;display:flex;align-items:center;justify-content:space-between;gap:15px;position:sticky;top:0;z-index:20}
+.topbar h2{margin:0;font-size:20px}
+.topbar-right{display:flex;align-items:center;gap:10px}
+.status{padding:5px 9px;border-radius:20px;font-size:12px;background:#374151}
+.logout{background:#dc2626;color:#fff}
+.container{max-width:1600px;margin:auto;padding:18px}
+.nav{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:18px}
+.nav button{background:#fff;border:1px solid #d1d5db}
+.nav button.active{background:#2563eb;color:#fff;border-color:#2563eb}
+.section{background:#fff;border-radius:10px;padding:18px;margin-bottom:18px;box-shadow:0 1px 4px rgba(0,0,0,.08)}
+.section h3{margin:0 0 15px}
+.message{padding:10px;border-radius:7px;margin-bottom:15px;display:none}
+.message.show{display:block}
+.success-msg{background:#dcfce7;color:#166534}
+.error-msg{background:#fee2e2;color:#991b1b}
+.info-msg{background:#dbeafe;color:#1e40af}
+.cards{display:grid;grid-template-columns:repeat(7,1fr);gap:12px;margin-bottom:18px}
+.card{background:#fff;border-radius:9px;padding:15px;box-shadow:0 1px 4px rgba(0,0,0,.08)}
+.card-title{font-size:12px;color:#6b7280}
+.card-value{font-size:22px;font-weight:bold;margin-top:5px}
+.filters{display:grid;grid-template-columns:2fr 1fr 1fr 1fr 1fr 1fr;gap:10px;margin-bottom:15px}
+.field{display:flex;flex-direction:column;gap:5px}
+.field label{font-size:13px;font-weight:600}
+.field input,.field select{border:1px solid #d1d5db;border-radius:6px;padding:9px;background:#fff;width:100%}
+.actions{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:15px}
+.primary{background:#2563eb;color:#fff}
+.success{background:#16a34a;color:#fff}
+.warning{background:#d97706;color:#fff}
+.danger{background:#dc2626;color:#fff}
+.secondary{background:#6b7280;color:#fff}
+.table-wrap{overflow:auto;border:1px solid #e5e7eb;border-radius:7px}
+table{width:100%;border-collapse:collapse;min-width:1300px}
+th,td{padding:9px 10px;border-bottom:1px solid #e5e7eb;text-align:left;white-space:nowrap;font-size:13px}
+th{background:#f9fafb;position:sticky;top:0}
+.badge{display:inline-block;padding:4px 8px;border-radius:15px;font-size:11px;font-weight:bold}
+.badge-pending{background:#fef3c7;color:#92400e}
+.badge-sent{background:#dcfce7;color:#166534}
+.badge-error{background:#fee2e2;color:#991b1b}
+.badge-syncing{background:#dbeafe;color:#1e40af}
+.badge-local{background:#e5e7eb;color:#374151}
+.empty{text-align:center;color:#6b7280;padding:25px}
+.progress-container{background:#e5e7eb;border-radius:20px;height:18px;overflow:hidden}
+.progress-bar{height:100%;width:0;background:#2563eb;transition:width .2s}
+.progress-text{display:flex;justify-content:space-between;margin-bottom:7px;font-size:13px}
+.sync-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:10px;margin-top:15px}
+.sync-box{background:#f9fafb;padding:12px;border-radius:7px}
+.sync-box span{display:block;color:#6b7280;font-size:12px}
+.sync-box strong{font-size:19px}
+.module-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:15px}
+.module-box{border:1px solid #e5e7eb;border-radius:8px;padding:12px}
+.module-box h4{margin:0 0 8px}
+.module-line{display:flex;justify-content:space-between;font-size:13px;padding:3px 0}
+.detail-modal{position:fixed;inset:0;background:rgba(0,0,0,.55);display:none;align-items:center;justify-content:center;padding:15px;z-index:100}
+.detail-modal.show{display:flex}
+.modal-box{background:#fff;width:min(1000px,100%);max-height:90vh;overflow:auto;border-radius:10px;padding:20px}
+.modal-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:15px}
+.modal-header h3{margin:0}
+.detail-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.detail{background:#f9fafb;padding:10px;border-radius:6px;word-break:break-word}
+.detail span{display:block;color:#6b7280;font-size:12px}
+.detail strong{display:block;margin-top:4px}
+.loading{position:fixed;inset:0;background:rgba(255,255,255,.75);display:none;align-items:center;justify-content:center;z-index:200}
+.loading.show{display:flex}
+.loader-box{background:#fff;padding:25px 35px;border-radius:10px;box-shadow:0 4px 20px rgba(0,0,0,.2);text-align:center}
+@media(max-width:1200px){
+.cards{grid-template-columns:repeat(4,1fr)}
+.filters{grid-template-columns:repeat(3,1fr)}
+.module-grid{grid-template-columns:repeat(2,1fr)}
+.sync-grid{grid-template-columns:repeat(3,1fr)}
+}
+@media(max-width:700px){
+.container{padding:10px}
+.cards{grid-template-columns:repeat(2,1fr)}
+.filters{grid-template-columns:1fr}
+.module-grid{grid-template-columns:1fr}
+.sync-grid{grid-template-columns:repeat(2,1fr)}
+.detail-grid{grid-template-columns:1fr}
+.topbar{align-items:flex-start}
+.topbar-right{flex-direction:column;align-items:flex-end}
+}
+</style>
+</head>
+<body>
+
+<div id="loading" class="loading">
+<div class="loader-box">
+<div id="loadingText">Processing...</div>
+<div style="margin-top:12px;width:300px;max-width:80vw">
+<div class="progress-container">
+<div id="loadingProgress" class="progress-bar"></div>
+</div>
+</div>
+</div>
+</div>
+
+<div id="detailModal" class="detail-modal">
+<div class="modal-box">
+<div class="modal-header">
+<h3>Record Details</h3>
+<button class="danger" id="closeModalBtn">Close</button>
+</div>
+<div id="detailContent"></div>
+</div>
+</div>
+
+<div class="topbar">
+<h2>Records & Sync</h2>
+<div class="topbar-right">
+<span id="connectionStatus" class="status">Checking...</span>
+<span id="userInfo" class="status">Loading...</span>
+<button id="logoutBtn" class="logout">Logout</button>
+</div>
+</div>
+
+<div class="container">
+
+<div id="message" class="message"></div>
+
+<div class="nav">
+<button id="shopBtn">Shop</button>
+<button id="gstBtn">GST</button>
+<button class="active" data-tab="all">All</button>
+<button data-tab="products">Products</button>
+<button data-tab="sales">Sales</button>
+<button data-tab="gst">GST</button>
+<button data-tab="activity">Activity Log</button>
+<button data-tab="pending">Pending</button>
+<button data-tab="sent">Sent</button>
+<button data-tab="failed">Failed</button>
+</div>
+
+<section class="section">
+<div class="cards">
+<div class="card">
+<div class="card-title">Products</div>
+<div id="productCount" class="card-value">0</div>
+</div>
+<div class="card">
+<div class="card-title">Sales</div>
+<div id="salesCount" class="card-value">0</div>
+</div>
+<div class="card">
+<div class="card-title">GST</div>
+<div id="gstCount" class="card-value">0</div>
+</div>
+<div class="card">
+<div class="card-title">Activity Logs</div>
+<div id="activityCount" class="card-value">0</div>
+</div>
+<div class="card">
+<div class="card-title">Pending</div>
+<div id="pendingCount" class="card-value">0</div>
+</div>
+<div class="card">
+<div class="card-title">Sent</div>
+<div id="sentCount" class="card-value">0</div>
+</div>
+<div class="card">
+<div class="card-title">Failed</div>
+<div id="failedCount" class="card-value">0</div>
+</div>
+</div>
+
+<div class="actions">
+<button class="primary" id="syncNowBtn">Sync Now</button>
+<button class="warning" id="retryBtn">Retry Failed</button>
+<button class="secondary" id="refreshBtn">Refresh</button>
+<button class="success" id="exportBtn">Share / Export All</button>
+</div>
+
+<div class="progress-text">
+<strong>Sync Progress</strong>
+<span id="syncPercent">0%</span>
+</div>
+
+<div class="progress-container">
+<div id="mainProgress" class="progress-bar"></div>
+</div>
+
+<div class="sync-grid">
+<div class="sync-box">
+<span>Total</span>
+<strong id="syncTotal">0</strong>
+</div>
+<div class="sync-box">
+<span>Success</span>
+<strong id="syncSuccess">0</strong>
+</div>
+<div class="sync-box">
+<span>Processing</span>
+<strong id="syncProcessing">0</strong>
+</div>
+<div class="sync-box">
+<span>Remaining</span>
+<strong id="syncRemaining">0</strong>
+</div>
+<div class="sync-box">
+<span>Failed</span>
+<strong id="syncFailed">0</strong>
+</div>
+<div class="sync-box">
+<span>Current</span>
+<strong id="syncCurrent">None</strong>
+</div>
+</div>
+
+<div class="module-grid">
+<div class="module-box">
+<h4>Products</h4>
+<div class="module-line"><span>Total</span><strong id="moduleProductsTotal">0</strong></div>
+<div class="module-line"><span>Sent</span><strong id="moduleProductsSent">0</strong></div>
+<div class="module-line"><span>Pending</span><strong id="moduleProductsPending">0</strong></div>
+<div class="module-line"><span>Failed</span><strong id="moduleProductsFailed">0</strong></div>
+</div>
+
+<div class="module-box">
+<h4>Sales</h4>
+<div class="module-line"><span>Total</span><strong id="moduleSalesTotal">0</strong></div>
+<div class="module-line"><span>Sent</span><strong id="moduleSalesSent">0</strong></div>
+<div class="module-line"><span>Pending</span><strong id="moduleSalesPending">0</strong></div>
+<div class="module-line"><span>Failed</span><strong id="moduleSalesFailed">0</strong></div>
+</div>
+
+<div class="module-box">
+<h4>GST</h4>
+<div class="module-line"><span>Total</span><strong id="moduleGstTotal">0</strong></div>
+<div class="module-line"><span>Sent</span><strong id="moduleGstSent">0</strong></div>
+<div class="module-line"><span>Pending</span><strong id="moduleGstPending">0</strong></div>
+<div class="module-line"><span>Failed</span><strong id="moduleGstFailed">0</strong></div>
+</div>
+
+<div class="module-box">
+<h4>Activity Log</h4>
+<div class="module-line"><span>Total</span><strong id="moduleActivityTotal">0</strong></div>
+<div class="module-line"><span>Sent</span><strong id="moduleActivitySent">0</strong></div>
+<div class="module-line"><span>Pending</span><strong id="moduleActivityPending">0</strong></div>
+<div class="module-line"><span>Failed</span><strong id="moduleActivityFailed">0</strong></div>
+</div>
+</div>
+
+<div style="margin-top:15px">
+<strong>Current Record:</strong>
+<span id="currentRecord">None</span>
+</div>
+
+<div style="margin-top:7px">
+<strong>Last Sync:</strong>
+<span id="lastSync">Never</span>
+</div>
+</section>
+
+<section class="section">
+<h3 id="tableTitle">All Records</h3>
+
+<div class="filters">
+<div class="field">
+<label>Search</label>
+<input id="searchInput" placeholder="Record ID / Invoice / Product / Customer / Action">
+</div>
+
+<div class="field">
+<label>Type</label>
+<select id="typeFilter">
+<option value="">All Types</option>
+<option value="Products">Products</option>
+<option value="Sales">Sales</option>
+<option value="GST">GST</option>
+<option value="Activity_Log">Activity Log</option>
+</select>
+</div>
+
+<div class="field">
+<label>Status</label>
+<select id="statusFilter">
+<option value="">All Status</option>
+<option value="PENDING">Pending</option>
+<option value="SYNCING">Syncing</option>
+<option value="SENT">Sent</option>
+<option value="ERROR">Failed</option>
+</select>
+</div>
+
+<div class="field">
+<label>From Date</label>
+<input id="fromDate" type="date">
+</div>
+
+<div class="field">
+<label>To Date</label>
+<input id="toDate" type="date">
+</div>
+
+<div class="field">
+<label>Agent ID</label>
+<input id="agentFilter" placeholder="Agent ID">
+</div>
+</div>
+
+<div class="actions">
+<button class="secondary" id="clearFiltersBtn">Clear Filters</button>
+</div>
+
+<div class="table-wrap">
+<table>
+<thead>
+<tr>
+<th>Record ID</th>
+<th>Type</th>
+<th>Shop</th>
+<th>Agent</th>
+<th>Date</th>
+<th>Status</th>
+<th>Last Attempt</th>
+<th>Retry Count</th>
+<th>Error</th>
+<th>Action</th>
+</tr>
+</thead>
+<tbody id="recordsBody"></tbody>
+</table>
+</div>
+</section>
+
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/11.10.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/11.10.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/11.10.0/firebase-database-compat.js"></script>
+
+<script>
+const firebaseConfig = {
+    apiKey: "AIzaSyApCoYU29E90_fORBdOKnR8BroSlURI_20",
+    authDomain: "shop-management-system-909d3.firebaseapp.com",
+    databaseURL: "https://shop-management-system-909d3-default-rtdb.asia-southeast1.firebasedatabase.app/",
+    projectId: "shop-management-system-909d3",
+    storageBucket: "shop-management-system-909d3.firebasestorage.app",
+    messagingSenderId: "108966486935",
+    appId: "1:108966486935:web:47ffa7b9eb7b6d69a81ad2"
+};
+
+const SYNC_URL="https://script.google.com/macros/s/AKfycbyrS_NNgH1siSwOGdY9wMzfqqUnMZvauKDIAvS6R7s87kDr3ubvTWRCzRhjHPRTAleK8w/exec";
+const DB_NAME="ShopManagementDB";
+const DB_VERSION=1;
+
+const PRODUCT_STORE="products";
+const SALES_STORE="sales";
+const GST_STORE="gst_records";
+const ACTIVITY_STORE="activity_logs";
+const QUEUE_STORE="sync_queue";
+const SHOP_STORE="shops";
+const AGENT_STORE="agents";
+const SETTINGS_STORE="settings";
+
+let db=null;
+let currentUser=null;
+let currentProfile=null;
+let allRows=[];
+let filteredRows=[];
+let activeTab="all";
+let selectedQueue=null;
+let syncRunning=false;
+
+firebase.initializeApp(firebaseConfig);
+
+const auth=firebase.auth();
+const database=firebase.database();
+
+function $(id){
+return document.getElementById(id);
+}
+
+function showMessage(text,type="info"){
+const element=$("message");
+
+element.textContent=text;
+
+element.className=
+"message show "+
+(
+type==="success"
+?"success-msg":
+type==="error"
+?"error-msg":
+"info-msg"
+);
+
+clearTimeout(showMessage.timer);
+
+showMessage.timer=setTimeout(()=>{
+element.className="message";
+},5000);
+}
+
+function setLoading(show,text="Processing...",percent=0){
+$("loading").classList.toggle("show",show);
+$("loadingText").textContent=text;
+$("loadingProgress").style.width=
+Math.max(0,Math.min(100,percent))+"%";
+}
+
+function escapeHtml(value){
+return String(value??"").replace(/[&<>"']/g,m=>({
+"&":"&amp;",
+"<":"&lt;",
+">":"&gt;",
+'"':"&quot;",
+"'":"&#039;"
+}[m]));
+}
+
+function nowISO(){
+return new Date().toISOString();
+}
+
+function money(value){
+return "₹"+Number(value||0).toLocaleString("en-IN",{
+minimumFractionDigits:2,
+maximumFractionDigits:2
+});
+}
+
+function formatDate(value){
+if(!value)return"";
+
+const date=new Date(value);
+
+if(Number.isNaN(date.getTime())){
+return String(value);
+}
+
+return date.toLocaleString("en-IN");
+}
+
+function generateId(prefix){
+const bytes=new Uint8Array(12);
+crypto.getRandomValues(bytes);
+
+const random=Array.from(bytes)
+.map(x=>x.toString(16).padStart(2,"0"))
+.join("")
+.toUpperCase();
+
+return prefix+"-"+Date.now().toString(36).toUpperCase()+"-"+random;
+}
+
+function updateConnection(){
+const online=navigator.onLine;
+
+$("connectionStatus").textContent=
+online?"ONLINE":"OFFLINE";
+
+$("connectionStatus").style.background=
+online?"#166534":"#92400e";
+}
+
+function openDB(){
+return new Promise((resolve,reject)=>{
+
+const request=indexedDB.open(
+DB_NAME,
+DB_VERSION
+);
+
+request.onupgradeneeded=e=>{
+
+const databaseInstance=e.target.result;
+
+if(!databaseInstance.objectStoreNames.contains(PRODUCT_STORE)){
+const store=databaseInstance.createObjectStore(
+PRODUCT_STORE,
+{keyPath:"id"}
+);
+
+store.createIndex(
+"recordId",
+"recordId",
+{unique:true}
+);
+
+store.createIndex("shopId","shopId");
+store.createIndex("productId","productId");
+}
+
+if(!databaseInstance.objectStoreNames.contains(SALES_STORE)){
+const store=databaseInstance.createObjectStore(
+SALES_STORE,
+{keyPath:"id"}
+);
+
+store.createIndex(
+"recordId",
+"recordId",
+{unique:true}
+);
+
+store.createIndex("shopId","shopId");
+store.createIndex("agentId","agentId");
+}
+
+if(!databaseInstance.objectStoreNames.contains(GST_STORE)){
+const store=databaseInstance.createObjectStore(
+GST_STORE,
+{keyPath:"id"}
+);
+
+store.createIndex(
+"recordId",
+"recordId",
+{unique:true}
+);
+
+store.createIndex("shopId","shopId");
+store.createIndex("agentId","agentId");
+store.createIndex("gstId","gstId");
+}
+
+if(!databaseInstance.objectStoreNames.contains(ACTIVITY_STORE)){
+const store=databaseInstance.createObjectStore(
+ACTIVITY_STORE,
+{keyPath:"id"}
+);
+
+store.createIndex(
+"activityId",
+"activityId",
+{unique:true}
+);
+
+store.createIndex("shopId","shopId");
+store.createIndex("agentId","agentId");
+}
+
+if(!databaseInstance.objectStoreNames.contains(QUEUE_STORE)){
+const store=databaseInstance.createObjectStore(
+QUEUE_STORE,
+{keyPath:"id"}
+);
+
+store.createIndex(
+"recordId",
+"recordId",
+{unique:true}
+);
+
+store.createIndex("recordType","recordType");
+store.createIndex("shopId","shopId");
+store.createIndex("agentId","agentId");
+store.createIndex("syncStatus","syncStatus");
+store.createIndex("createdAt","createdAt");
+}
+
+if(!databaseInstance.objectStoreNames.contains(SHOP_STORE)){
+const store=databaseInstance.createObjectStore(
+SHOP_STORE,
+{keyPath:"id"}
+);
+
+store.createIndex(
+"shopId",
+"shopId",
+{unique:true}
+);
+}
+
+if(!databaseInstance.objectStoreNames.contains(AGENT_STORE)){
+const store=databaseInstance.createObjectStore(
+AGENT_STORE,
+{keyPath:"id"}
+);
+
+store.createIndex(
+"agentId",
+"agentId",
+{unique:true}
+);
+}
+
+if(!databaseInstance.objectStoreNames.contains(SETTINGS_STORE)){
+databaseInstance.createObjectStore(
+SETTINGS_STORE,
+{keyPath:"key"}
+);
+}
+};
+
+request.onsuccess=e=>{
+db=e.target.result;
+resolve(db);
+};
+
+request.onerror=()=>{
+reject(request.error);
+};
+});
+}
+
+function idbGetAll(storeName){
+return new Promise((resolve,reject)=>{
+
+const transaction=
+db.transaction(storeName,"readonly");
+
+const request=
+transaction.objectStore(storeName).getAll();
+
+request.onsuccess=()=>{
+resolve(request.result||[]);
+};
+
+request.onerror=()=>{
+reject(request.error);
+};
+});
+}
+
+function idbGet(storeName,key){
+return new Promise((resolve,reject)=>{
+
+const transaction=
+db.transaction(storeName,"readonly");
+
+const request=
+transaction.objectStore(storeName).get(key);
+
+request.onsuccess=()=>{
+resolve(request.result);
+};
+
+request.onerror=()=>{
+reject(request.error);
+};
+});
+}
+
+function idbPut(storeName,value){
+return new Promise((resolve,reject)=>{
+
+const transaction=
+db.transaction(storeName,"readwrite");
+
+transaction.objectStore(storeName).put(value);
+
+transaction.oncomplete=()=>{
+resolve(value);
+};
+
+transaction.onerror=()=>{
+reject(transaction.error);
+};
+});
+}
+
+function idbDelete(storeName,key){
+return new Promise((resolve,reject)=>{
+
+const transaction=
+db.transaction(storeName,"readwrite");
+
+transaction.objectStore(storeName).delete(key);
+
+transaction.oncomplete=()=>{
+resolve();
+};
+
+transaction.onerror=()=>{
+reject(transaction.error);
+};
+});
+}
+
+async function validateAccess(){
+
+const user=auth.currentUser;
+
+if(!user){
+location.replace("index.html");
+return false;
+}
+
+currentUser=user;
+
+const snapshot=
+await database
+.ref("users/"+user.uid)
+.once("value");
+
+const profile=snapshot.val();
+
+if(!profile){
+await auth.signOut();
+location.replace("index.html");
+return false;
+}
+
+if(profile.status!=="ACTIVE"){
+await auth.signOut();
+location.replace("index.html");
+return false;
+}
+
+if(profile.role!=="agent"){
+showMessage(
+"Records page is available for Agent accounts.",
+"error"
+);
+
+setTimeout(()=>{
+location.replace("index.html");
+},1200);
+
+return false;
+}
+
+if(!profile.shopId){
+showMessage(
+"No shop is assigned to this account.",
+"error"
+);
+
+return false;
+}
+
+const accessSnapshot=
+await database
+.ref("agent_access/"+profile.agentId)
+.once("value");
+
+const access=accessSnapshot.val();
+
+if(
+!access||
+access.status!=="ACTIVE"||
+access.uid!==user.uid||
+access.shopId!==profile.shopId
+){
+await auth.signOut();
+location.replace("index.html");
+return false;
+}
+
+currentProfile=profile;
+
+$("userInfo").textContent=
+(profile.name||user.email)+" | "+profile.shopId;
+
+return true;
+}
+
+async function getFirebaseToken(){
+if(!currentUser){
+throw new Error("Authentication required.");
+}
+
+return await currentUser.getIdToken(true);
+}
+
+function statusBadge(status){
+const value=status||"PENDING";
+
+const cls=
+value==="SENT"
+?"badge-sent":
+value==="ERROR"
+?"badge-error":
+value==="SYNCING"
+?"badge-syncing":
+value==="LOCAL"
+?"badge-local":
+"badge-pending";
+
+return `<span class="badge ${cls}">${escapeHtml(value)}</span>`;
+}
+
+async function loadQueue(){
+const queue=await idbGetAll(QUEUE_STORE);
+
+return queue.filter(item=>
+item.shopId===currentProfile.shopId
+);
+}
+
+async function loadAllRecords(){
+
+const [
+products,
+sales,
+gst,
+activity,
+queue
+]=await Promise.all([
+idbGetAll(PRODUCT_STORE),
+idbGetAll(SALES_STORE),
+idbGetAll(GST_STORE),
+idbGetAll(ACTIVITY_STORE),
+loadQueue()
+]);
+
+const rows=[];
+
+products
+.filter(x=>x.shopId===currentProfile.shopId)
+.forEach(record=>{
+const queueItem=
+queue.find(x=>x.recordId===record.recordId);
+
+rows.push({
+recordId:record.recordId,
+recordType:"Products",
+shopId:record.shopId,
+agentId:record.agentId,
+date:record.updatedAt||record.createdAt,
+status:queueItem?.syncStatus||"LOCAL",
+lastAttempt:queueItem?.lastAttempt||"",
+retryCount:queueItem?.retryCount||0,
+error:queueItem?.lastError||"",
+data:record,
+queue:queueItem
+});
+});
+
+sales
+.filter(x=>x.shopId===currentProfile.shopId)
+.forEach(record=>{
+const queueItem=
+queue.find(x=>x.recordId===record.recordId);
+
+rows.push({
+recordId:record.recordId,
+recordType:"Sales",
+shopId:record.shopId,
+agentId:record.agentId,
+date:record.createdAt,
+status:queueItem?.syncStatus||"LOCAL",
+lastAttempt:queueItem?.lastAttempt||"",
+retryCount:queueItem?.retryCount||0,
+error:queueItem?.lastError||"",
+data:record,
+queue:queueItem
+});
+});
+
+gst
+.filter(x=>x.shopId===currentProfile.shopId)
+.forEach(record=>{
+const queueItem=
+queue.find(x=>x.recordId===record.recordId);
+
+rows.push({
+recordId:record.recordId,
+recordType:"GST",
+shopId:record.shopId,
+agentId:record.agentId,
+date:record.createdAt,
+status:queueItem?.syncStatus||"LOCAL",
+lastAttempt:queueItem?.lastAttempt||"",
+retryCount:queueItem?.retryCount||0,
+error:queueItem?.lastError||"",
+data:record,
+queue:queueItem
+});
+});
+
+activity
+.filter(x=>x.shopId===currentProfile.shopId)
+.forEach(record=>{
+const queueItem=
+queue.find(x=>x.recordId===record.activityId);
+
+rows.push({
+recordId:record.activityId,
+recordType:"Activity_Log",
+shopId:record.shopId,
+agentId:record.agentId,
+date:record.timestamp,
+status:queueItem?.syncStatus||record.syncStatus||"LOCAL",
+lastAttempt:queueItem?.lastAttempt||"",
+retryCount:queueItem?.retryCount||0,
+error:queueItem?.lastError||"",
+data:record,
+queue:queueItem
+});
+});
+
+allRows=rows;
+
+await updateDashboard(queue);
+applyFilters();
+}
+
+function tabMatches(row){
+
+if(activeTab==="all"){
+return true;
+}
+
+if(activeTab==="products"){
+return row.recordType==="Products";
+}
+
+if(activeTab==="sales"){
+return row.recordType==="Sales";
+}
+
+if(activeTab==="gst"){
+return row.recordType==="GST";
+}
+
+if(activeTab==="activity"){
+return row.recordType==="Activity_Log";
+}
+
+if(activeTab==="pending"){
+return row.status==="PENDING"||
+row.status==="SYNCING";
+}
+
+if(activeTab==="sent"){
+return row.status==="SENT";
+}
+
+if(activeTab==="failed"){
+return row.status==="ERROR";
+}
+
+return true;
+}
+
+function applyFilters(){
+
+const search=
+$("searchInput")
+.value
+.trim()
+.toLowerCase();
+
+const type=
+$("typeFilter").value;
+
+const status=
+$("statusFilter").value;
+
+const from=
+$("fromDate").value;
+
+const to=
+$("toDate").value;
+
+const agent=
+$("agentFilter")
+.value
+.trim()
+.toLowerCase();
+
+filteredRows=
+allRows.filter(row=>{
+
+const data=row.data||{};
+
+const text=[
+row.recordId,
+row.recordType,
+row.shopId,
+row.agentId,
+data.productId,
+data.productName,
+data.sku,
+data.saleId,
+data.invoiceNo,
+data.customerName,
+data.customerMobile,
+data.customerGSTIN,
+data.gstId,
+data.action,
+data.module,
+data.details
+]
+.join(" ")
+.toLowerCase();
+
+const date=
+String(row.date||"").slice(0,10);
+
+return(
+tabMatches(row)&&
+(!search||text.includes(search))&&
+(!type||row.recordType===type)&&
+(!status||row.status===status)&&
+(!from||date>=from)&&
+(!to||date<=to)&&
+(!agent||String(row.agentId||"").toLowerCase().includes(agent))
+);
+});
+
+filteredRows.sort((a,b)=>
+String(b.date||"")
+.localeCompare(String(a.date||""))
+);
+
+renderTable();
+}
+
+function renderTable(){
+
+const body=$("recordsBody");
+
+body.innerHTML="";
+
+if(!filteredRows.length){
+
+body.innerHTML=
+'<tr><td colspan="10" class="empty">No records found</td></tr>';
+
+return;
+}
+
+filteredRows.forEach(row=>{
+
+const tr=document.createElement("tr");
+
+tr.innerHTML=`
+<td>${escapeHtml(row.recordId)}</td>
+<td>${escapeHtml(row.recordType)}</td>
+<td>${escapeHtml(row.shopId)}</td>
+<td>${escapeHtml(row.agentId)}</td>
+<td>${escapeHtml(formatDate(row.date))}</td>
+<td>${statusBadge(row.status)}</td>
+<td>${escapeHtml(formatDate(row.lastAttempt))}</td>
+<td>${escapeHtml(row.retryCount)}</td>
+<td>${escapeHtml(row.error||"")}</td>
+<td>
+<button class="primary view-record" data-id="${escapeHtml(row.recordId)}">View</button>
+</td>
+`;
+
+body.appendChild(tr);
+});
+}
+
+async function updateDashboard(queue){
+
+const products=
+allRows.filter(x=>x.recordType==="Products");
+
+const sales=
+allRows.filter(x=>x.recordType==="Sales");
+
+const gst=
+allRows.filter(x=>x.recordType==="GST");
+
+const activity=
+allRows.filter(x=>x.recordType==="Activity_Log");
+
+const pending=
+queue.filter(x=>
+x.syncStatus==="PENDING"||
+x.syncStatus==="SYNCING"
+);
+
+const sent=
+queue.filter(x=>x.syncStatus==="SENT");
+
+const failed=
+queue.filter(x=>x.syncStatus==="ERROR");
+
+$("productCount").textContent=products.length;
+$("salesCount").textContent=sales.length;
+$("gstCount").textContent=gst.length;
+$("activityCount").textContent=activity.length;
+$("pendingCount").textContent=pending.length;
+$("sentCount").textContent=sent.length;
+$("failedCount").textContent=failed.length;
+
+updateModule(
+"Products",
+products,
+"moduleProductsTotal",
+"moduleProductsSent",
+"moduleProductsPending",
+"moduleProductsFailed"
+);
+
+updateModule(
+"Sales",
+sales,
+"moduleSalesTotal",
+"moduleSalesSent",
+"moduleSalesPending",
+"moduleSalesFailed"
+);
+
+updateModule(
+"GST",
+gst,
+"moduleGstTotal",
+"moduleGstSent",
+"moduleGstPending",
+"moduleGstFailed"
+);
+
+updateModule(
+"Activity_Log",
+activity,
+"moduleActivityTotal",
+"moduleActivitySent",
+"moduleActivityPending",
+"moduleActivityFailed"
+);
+
+$("syncTotal").textContent=pending.length+failed.length;
+$("syncSuccess").textContent=sent.length;
+$("syncProcessing").textContent=
+queue.filter(x=>x.syncStatus==="SYNCING").length;
+$("syncRemaining").textContent=
+pending.length+failed.length;
+$("syncFailed").textContent=failed.length;
+}
+
+function updateModule(
+type,
+rows,
+totalId,
+sentId,
+pendingId,
+failedId
+){
+
+$(totalId).textContent=rows.length;
+
+$(sentId).textContent=
+rows.filter(x=>x.status==="SENT").length;
+
+$(pendingId).textContent=
+rows.filter(x=>
+x.status==="PENDING"||
+x.status==="SYNCING"
+).length;
+
+$(failedId).textContent=
+rows.filter(x=>x.status==="ERROR").length;
+}
+
+function showRecordDetails(row){
+
+selectedQueue=row;
+
+const data=row.data||{};
+
+let content="";
+
+if(row.recordType==="Products"){
+
+content=`
+<div class="detail-grid">
+<div class="detail"><span>Record ID</span><strong>${escapeHtml(row.recordId)}</strong></div>
+<div class="detail"><span>Product ID</span><strong>${escapeHtml(data.productId)}</strong></div>
+<div class="detail"><span>SKU</span><strong>${escapeHtml(data.sku)}</strong></div>
+<div class="detail"><span>Product Name</span><strong>${escapeHtml(data.productName)}</strong></div>
+<div class="detail"><span>Category</span><strong>${escapeHtml(data.category)}</strong></div>
+<div class="detail"><span>Brand</span><strong>${escapeHtml(data.brand)}</strong></div>
+<div class="detail"><span>Purchase Price</span><strong>${money(data.purchasePrice)}</strong></div>
+<div class="detail"><span>Sale Price</span><strong>${money(data.salePrice)}</strong></div>
+<div class="detail"><span>GST Rate</span><strong>${escapeHtml(data.gstRate)}%</strong></div>
+<div class="detail"><span>Unit</span><strong>${escapeHtml(data.unit)}</strong></div>
+<div class="detail"><span>Stock</span><strong>${escapeHtml(data.stock)}</strong></div>
+<div class="detail"><span>Minimum Stock</span><strong>${escapeHtml(data.minimumStock)}</strong></div>
+<div class="detail"><span>Status</span><strong>${escapeHtml(data.status)}</strong></div>
+<div class="detail"><span>Shop ID</span><strong>${escapeHtml(row.shopId)}</strong></div>
+<div class="detail"><span>Agent ID</span><strong>${escapeHtml(row.agentId)}</strong></div>
+<div class="detail"><span>Sync Status</span><strong>${statusBadge(row.status)}</strong></div>
+</div>
+`;
+
+}else if(row.recordType==="Sales"){
+
+content=`
+<div class="detail-grid">
+<div class="detail"><span>Record ID</span><strong>${escapeHtml(row.recordId)}</strong></div>
+<div class="detail"><span>Sale ID</span><strong>${escapeHtml(data.saleId)}</strong></div>
+<div class="detail"><span>Invoice No.</span><strong>${escapeHtml(data.invoiceNo)}</strong></div>
+<div class="detail"><span>Date</span><strong>${escapeHtml(data.date)}</strong></div>
+<div class="detail"><span>Customer</span><strong>${escapeHtml(data.customerName)}</strong></div>
+<div class="detail"><span>Mobile</span><strong>${escapeHtml(data.customerMobile)}</strong></div>
+<div class="detail"><span>Payment Mode</span><strong>${escapeHtml(data.paymentMode)}</strong></div>
+<div class="detail"><span>Subtotal</span><strong>${money(data.subtotal)}</strong></div>
+<div class="detail"><span>Discount</span><strong>${money(data.discount)}</strong></div>
+<div class="detail"><span>Taxable Amount</span><strong>${money(data.taxableAmount)}</strong></div>
+<div class="detail"><span>CGST</span><strong>${money(data.cgst)}</strong></div>
+<div class="detail"><span>SGST</span><strong>${money(data.sgst)}</strong></div>
+<div class="detail"><span>IGST</span><strong>${money(data.igst)}</strong></div>
+<div class="detail"><span>GST Total</span><strong>${money(data.gstTotal)}</strong></div>
+<div class="detail"><span>Grand Total</span><strong>${money(data.grandTotal)}</strong></div>
+<div class="detail"><span>Sync Status</span><strong>${statusBadge(row.status)}</strong></div>
+</div>
+`;
+
+}else if(row.recordType==="GST"){
+
+content=`
+<div class="detail-grid">
+<div class="detail"><span>Record ID</span><strong>${escapeHtml(row.recordId)}</strong></div>
+<div class="detail"><span>GST ID</span><strong>${escapeHtml(data.gstId)}</strong></div>
+<div class="detail"><span>Invoice No.</span><strong>${escapeHtml(data.invoiceNo)}</strong></div>
+<div class="detail"><span>Date</span><strong>${escapeHtml(data.date)}</strong></div>
+<div class="detail"><span>Customer</span><strong>${escapeHtml(data.customerName)}</strong></div>
+<div class="detail"><span>GSTIN</span><strong>${escapeHtml(data.customerGSTIN)}</strong></div>
+<div class="detail"><span>Taxable Amount</span><strong>${money(data.taxableAmount)}</strong></div>
+<div class="detail"><span>CGST</span><strong>${money(data.cgst)}</strong></div>
+<div class="detail"><span>SGST</span><strong>${money(data.sgst)}</strong></div>
+<div class="detail"><span>IGST</span><strong>${money(data.igst)}</strong></div>
+<div class="detail"><span>Total GST</span><strong>${money(data.totalGST)}</strong></div>
+<div class="detail"><span>Invoice Total</span><strong>${money(data.invoiceTotal)}</strong></div>
+<div class="detail"><span>Shop ID</span><strong>${escapeHtml(row.shopId)}</strong></div>
+<div class="detail"><span>Agent ID</span><strong>${escapeHtml(row.agentId)}</strong></div>
+<div class="detail"><span>Created</span><strong>${escapeHtml(formatDate(data.createdAt))}</strong></div>
+<div class="detail"><span>Sync Status</span><strong>${statusBadge(row.status)}</strong></div>
+</div>
+`;
+
+}else{
+
+content=`
+<div class="detail-grid">
+<div class="detail"><span>Activity ID</span><strong>${escapeHtml(data.activityId)}</strong></div>
+<div class="detail"><span>Timestamp</span><strong>${escapeHtml(formatDate(data.timestamp))}</strong></div>
+<div class="detail"><span>User ID</span><strong>${escapeHtml(data.userId)}</strong></div>
+<div class="detail"><span>User Name</span><strong>${escapeHtml(data.userName)}</strong></div>
+<div class="detail"><span>Role</span><strong>${escapeHtml(data.role)}</strong></div>
+<div class="detail"><span>Action</span><strong>${escapeHtml(data.action)}</strong></div>
+<div class="detail"><span>Module</span><strong>${escapeHtml(data.module)}</strong></div>
+<div class="detail"><span>Record ID</span><strong>${escapeHtml(data.recordId)}</strong></div>
+<div class="detail"><span>Status</span><strong>${escapeHtml(data.status)}</strong></div>
+<div class="detail"><span>Shop ID</span><strong>${escapeHtml(data.shopId)}</strong></div>
+<div class="detail"><span>Agent ID</span><strong>${escapeHtml(data.agentId)}</strong></div>
+<div class="detail"><span>Sync Status</span><strong>${statusBadge(row.status)}</strong></div>
+<div class="detail" style="grid-column:1/-1"><span>Details</span><strong>${escapeHtml(data.details)}</strong></div>
+</div>
+`;
+}
+
+content+=`
+<div style="margin-top:15px">
+<div class="detail-grid">
+<div class="detail"><span>Last Attempt</span><strong>${escapeHtml(formatDate(row.lastAttempt))}</strong></div>
+<div class="detail"><span>Retry Count</span><strong>${escapeHtml(row.retryCount)}</strong></div>
+<div class="detail"><span>Last Error</span><strong>${escapeHtml(row.error||"None")}</strong></div>
+</div>
+</div>
+`;
+
+$("detailContent").innerHTML=content;
+$("detailModal").classList.add("show");
+}
+
+function closeModal(){
+$("detailModal").classList.remove("show");
+selectedQueue=null;
+}
+
+async function updateQueue(item){
+item.updatedAt=nowISO();
+await idbPut(QUEUE_STORE,item);
+}
+
+async function sendBatch(batch){
+
+if(
+!SYNC_URL||
+SYNC_URL==="https://script.google.com/macros/s/AKfycbyrS_NNgH1siSwOGdY9wMzfqqUnMZvauKDIAvS6R7s87kDr3ubvTWRCzRhjHPRTAleK8w/exec"
+){
+throw new Error("SYNC_URL is not configured.");
+}
+
+const idToken=await getFirebaseToken();
+
+const requestBody={
+action:"batchSync",
+siteId:"shophariom",
+timestamp:Date.now(),
+nonce:generateId("NONCE"),
+idToken,
+records:batch.map(item=>({
+recordId:item.recordId,
+recordType:item.recordType,
+shopId:item.shopId,
+agentId:item.agentId,
+operation:item.operation,
+payload:item.payload
+}))
+};
+
+const response=await fetch(
+SYNC_URL,
+{
+method:"POST",
+headers:{
+"Content-Type":"text/plain;charset=utf-8"
+},
+body:JSON.stringify(requestBody),
+cache:"no-store"
+}
+);
+
+if(!response.ok){
+throw new Error("HTTP "+response.status);
+}
+
+const responseText=await response.text();
+
+let result;
+
+try{
+result=JSON.parse(responseText);
+}catch{
+throw new Error("Invalid Apps Script response.");
+}
+
+if(!result||result.success!==true){
+throw new Error(
+result?.error||
+result?.message||
+"Server sync failed."
+);
+}
+
+return result;
+}
+
+async function markActivitySent(recordId){
+
+const activity=await idbGetAll(ACTIVITY_STORE);
+
+const record=
+activity.find(x=>
+x.activityId===recordId
+);
+
+if(record){
+record.syncStatus="SENT";
+await idbPut(
+ACTIVITY_STORE,
+record
+);
+}
+}
+
+async function syncQueue(forceRetry=false){
+
+if(syncRunning)return;
+
+if(!navigator.onLine){
+showMessage(
+"Offline. Records remain safely stored in IndexedDB.",
+"info"
+);
+return;
+}
+
+syncRunning=true;
+
+try{
+
+let queue=
+await idbGetAll(QUEUE_STORE);
+
+queue=queue.filter(item=>
+item.shopId===currentProfile.shopId&&
+(
+item.syncStatus==="PENDING"||
+item.syncStatus==="ERROR"||
+item.syncStatus==="SYNCING"
+)
+);
+
+if(forceRetry){
+queue=queue.filter(item=>
+item.syncStatus==="ERROR"||
+item.syncStatus==="PENDING"||
+item.syncStatus==="SYNCING"
+);
+}
+
+if(!queue.length){
+await refreshAll();
+
+showMessage(
+"No pending records to sync.",
+"success"
+);
+
+return;
+}
+
+const total=queue.length;
+
+let success=0;
+let failed=0;
+let processing=0;
+let nextIndex=0;
+
+$("syncTotal").textContent=total;
+$("syncSuccess").textContent=0;
+$("syncProcessing").textContent=0;
+$("syncRemaining").textContent=total;
+$("syncFailed").textContent=0;
+
+setLoading(
+true,
+"Starting sync...",
+0
+);
+
+async function worker(){
+
+while(true){
+
+const index=nextIndex++;
+
+if(index>=queue.length)return;
+
+const item=queue[index];
+
+item.syncStatus="SYNCING";
+item.lastAttempt=nowISO();
+item.retryCount=
+Number(item.retryCount||0)+1;
+item.lastError="";
+item.updatedAt=nowISO();
+
+await updateQueue(item);
+
+processing++;
+
+$("syncProcessing").textContent=processing;
+$("syncCurrent").textContent=item.recordId;
+
+const completed=success+failed;
+
+setLoading(
+true,
+"Syncing "+item.recordId+
+" ("+(completed+1)+"/"+total+")",
+Math.floor((completed/total)*100)
+);
+
+try{
+
+const result=await sendBatch([item]);
+
+const resultItem=
+Array.isArray(result.results)
+?result.results[0]
+:null;
+
+const serverStatus=
+resultItem?.status||
+resultItem?.syncStatus||
+"SENT";
+
+if(
+serverStatus==="SENT"||
+serverStatus==="ALREADY_EXISTS"||
+serverStatus==="SUCCESS"
+){
+
+item.syncStatus="SENT";
+item.syncedAt=nowISO();
+item.lastError="";
+item.updatedAt=nowISO();
+
+await updateQueue(item);
+
+if(item.recordType==="Activity_Log"){
+await markActivitySent(item.recordId);
+}
+
+success++;
+
+}else{
+
+throw new Error(
+resultItem?.error||
+"Server did not confirm success."
+);
+}
+
+}catch(error){
+
+item.syncStatus="ERROR";
+item.lastError=
+String(error.message||error);
+item.updatedAt=nowISO();
+
+await updateQueue(item);
+
+failed++;
+
+}finally{
+
+processing--;
+
+const completedNow=success+failed;
+
+$("syncProcessing").textContent=
+processing;
+
+$("syncSuccess").textContent=
+success;
+
+$("syncFailed").textContent=
+failed;
+
+$("syncRemaining").textContent=
+total-completedNow;
+
+const percent=
+Math.floor((completedNow/total)*100);
+
+$("syncPercent").textContent=
+percent+"%";
+
+$("mainProgress").style.width=
+percent+"%";
+
+$("syncCurrent").textContent=
+item.recordId;
+}
+}
+}
+
+const concurrency=
+Math.min(3,total);
+
+await Promise.all(
+Array.from(
+{length:concurrency},
+()=>worker()
+)
+);
+
+const finalPercent=
+total>0
+?Math.floor((success/total)*100)
+:100;
+
+$("syncPercent").textContent=
+finalPercent+"%";
+
+$("mainProgress").style.width=
+finalPercent+"%";
+
+$("syncRemaining").textContent=
+total-success-failed;
+
+$("syncCurrent").textContent=
+failed?"Completed with errors":"Completed";
+
+$("lastSync").textContent=
+new Date().toLocaleString("en-IN");
+
+setLoading(
+true,
+"Sync finished: "+success+"/"+total,
+finalPercent
+);
+
+await refreshAll();
+
+setTimeout(()=>{
+setLoading(false,"",0);
+},500);
+
+if(failed){
+
+showMessage(
+success+
+" records synced, "+
+failed+
+" failed. Failed records remain in the queue.",
+"error"
+);
+
+}else{
+
+showMessage(
+"All "+success+
+" records confirmed successfully.",
+"success"
+);
+}
+
+}catch(error){
+
+setLoading(false,"",0);
+
+showMessage(
+error.message||"Sync failed.",
+"error"
+);
+
+}finally{
+
+syncRunning=false;
+}
+}
+
+async function refreshAll(){
+
+const queue=await loadQueue();
+
+await updateDashboard(queue);
+
+applyFilters();
+
+}
+
+function csvValue(value){
+return '"'+
+String(value??"")
+.replace(/"/g,'""')+
+'"';
+}
+
+async function buildExportData(){
+
+const [
+products,
+sales,
+gst,
+activity
+]=await Promise.all([
+idbGetAll(PRODUCT_STORE),
+idbGetAll(SALES_STORE),
+idbGetAll(GST_STORE),
+idbGetAll(ACTIVITY_STORE)
+]);
+
+const queue=
+await loadQueue();
+
+const getStatus=recordId=>{
+const item=
+queue.find(x=>x.recordId===recordId);
+
+return item?.syncStatus||"LOCAL";
+};
+
+return{
+Products:products
+.filter(x=>x.shopId===currentProfile.shopId)
+.map(x=>({
+...x,
+syncStatus:getStatus(x.recordId)
+})),
+
+Sales:sales
+.filter(x=>x.shopId===currentProfile.shopId)
+.map(x=>({
+...x,
+syncStatus:getStatus(x.recordId)
+})),
+
+GST:gst
+.filter(x=>x.shopId===currentProfile.shopId)
+.map(x=>({
+...x,
+syncStatus:getStatus(x.recordId)
+})),
+
+Activity_Log:activity
+.filter(x=>x.shopId===currentProfile.shopId)
+.map(x=>({
+...x,
+syncStatus:getStatus(x.activityId)
+}))
+};
+}
+
+function csvFromObjects(records){
+
+if(!records.length)return"";
+
+const keys=[
+...new Set(
+records.flatMap(record=>
+Object.keys(record)
+)
+)
+];
+
+const rows=[
+keys.map(csvValue).join(",")
+];
+
+records.forEach(record=>{
+rows.push(
+keys.map(key=>{
+const value=record[key];
+
+if(
+typeof value==="object"&&
+value!==null
+){
+return csvValue(
+JSON.stringify(value)
+);
+}
+
+return csvValue(value);
+}).join(",")
+);
+});
+
+return"\uFEFF"+rows.join("\r\n");
+}
+
+function createExportFiles(data){
+
+return[
+{
+name:"Products.csv",
+blob:new Blob(
+[csvFromObjects(data.Products)],
+{type:"text/csv;charset=utf-8"}
+)
+},
+{
+name:"Sales.csv",
+blob:new Blob(
+[csvFromObjects(data.Sales)],
+{type:"text/csv;charset=utf-8"}
+)
+},
+{
+name:"GST.csv",
+blob:new Blob(
+[csvFromObjects(data.GST)],
+{type:"text/csv;charset=utf-8"}
+)
+},
+{
+name:"Activity_Log.csv",
+blob:new Blob(
+[csvFromObjects(data.Activity_Log)],
+{type:"text/csv;charset=utf-8"}
+)
+}
+];
+}
+
+async function exportAll(){
+
+setLoading(
+true,
+"Preparing export...",
+10
+);
+
+try{
+
+const data=
+await buildExportData();
+
+const files=
+createExportFiles(data);
+
+const total=
+data.Products.length+
+data.Sales.length+
+data.GST.length+
+data.Activity_Log.length;
+
+if(!total){
+
+setLoading(false);
+
+showMessage(
+"No local records available.",
+"info"
+);
+
+return;
+}
+
+if(
+navigator.share&&
+navigator.canShare
+){
+
+const shareFiles=
+files.map(file=>
+new File(
+[file.blob],
+file.name,
+{type:"text/csv"}
+)
+);
+
+if(
+navigator.canShare({files:shareFiles})
+){
+
+setLoading(
+true,
+"Preparing share...",
+80
+);
+
+try{
+
+await navigator.share({
+title:"Shop Data Export",
+text:"Shop Management exported data",
+files:shareFiles
+});
+
+await addActivity(
+"Share",
+"Records",
+"",
+"SUCCESS",
+{total}
+);
+
+setLoading(false);
+
+showMessage(
+"Export shared successfully.",
+"success"
+);
+
+return;
+
+}catch(error){
+
+if(error.name==="AbortError"){
+setLoading(false);
+return;
+}
+}
+}
+}
+
+setLoading(
+true,
+"Creating download files...",
+90
+);
+
+files.forEach(file=>{
+
+const url=
+URL.createObjectURL(file.blob);
+
+const a=
+document.createElement("a");
+
+a.href=url;
+a.download=
+currentProfile.shopId+
+"_"+file.name;
+
+document.body.appendChild(a);
+
+a.click();
+
+a.remove();
+
+setTimeout(()=>{
+URL.revokeObjectURL(url);
+},1500);
+});
+
+await addActivity(
+"Export",
+"Records",
+"",
+"SUCCESS",
+{total}
+);
+
+setLoading(false);
+
+showMessage(
+"All local records exported. Local IndexedDB data was not deleted.",
+"success"
+);
+
+}catch(error){
+
+setLoading(false);
+
+showMessage(
+error.message||"Export failed.",
+"error"
+);
+}
+}
+
+function clearFilters(){
+
+$("searchInput").value="";
+$("typeFilter").value="";
+$("statusFilter").value="";
+$("fromDate").value="";
+$("toDate").value="";
+$("agentFilter").value="";
+
+applyFilters();
+}
+
+function setupEvents(){
+
+document
+.querySelectorAll(".nav button[data-tab]")
+.forEach(button=>{
+
+button.addEventListener("click",()=>{
+
+document
+.querySelectorAll(".nav button[data-tab]")
+.forEach(x=>
+x.classList.remove("active")
+);
+
+button.classList.add("active");
+
+activeTab=
+button.dataset.tab;
+
+const titles={
+all:"All Records",
+products:"Products",
+sales:"Sales",
+gst:"GST",
+activity:"Activity Log",
+pending:"Pending Records",
+sent:"Sent Records",
+failed:"Failed Records"
+};
+
+$("tableTitle").textContent=
+titles[activeTab]||"Records";
+
+applyFilters();
+});
+});
+
+$("shopBtn").addEventListener("click",()=>{
+location.replace("shop.html");
+});
+
+$("gstBtn").addEventListener("click",()=>{
+location.replace("gst.html");
+});
+
+$("refreshBtn").addEventListener(
+"click",
+async()=>{
+await refreshAll();
+
+showMessage(
+"Records refreshed.",
+"success"
+);
+}
+);
+
+$("syncNowBtn").addEventListener(
+"click",
+()=>syncQueue(false)
+);
+
+$("retryBtn").addEventListener(
+"click",
+()=>syncQueue(true)
+);
+
+$("exportBtn").addEventListener(
+"click",
+exportAll
+);
+
+$("clearFiltersBtn").addEventListener(
+"click",
+clearFilters
+);
+
+$("searchInput").addEventListener(
+"input",
+applyFilters
+);
+
+$("typeFilter").addEventListener(
+"change",
+applyFilters
+);
+
+$("statusFilter").addEventListener(
+"change",
+applyFilters
+);
+
+$("fromDate").addEventListener(
+"change",
+applyFilters
+);
+
+$("toDate").addEventListener(
+"change",
+applyFilters
+);
+
+$("agentFilter").addEventListener(
+"input",
+applyFilters
+);
+
+$("recordsBody").addEventListener(
+"click",
+async event=>{
+
+const button=
+event.target.closest(".view-record");
+
+if(!button)return;
+
+const row=
+allRows.find(
+x=>x.recordId===button.dataset.id
+);
+
+if(row){
+showRecordDetails(row);
+}
+}
+);
+
+$("closeModalBtn").addEventListener(
+"click",
+closeModal
+);
+
+$("detailModal").addEventListener(
+"click",
+event=>{
+if(event.target===$("detailModal")){
+closeModal();
+}
+}
+);
+
+$("logoutBtn").addEventListener(
+"click",
+async()=>{
+
+try{
+
+await addActivity(
+"Logout",
+"Authentication",
+"",
+"SUCCESS",
+{}
+);
+
+}catch{}
+
+await auth.signOut();
+
+location.replace("index.html");
+}
+);
+
+window.addEventListener(
+"online",
+()=>{
+
+updateConnection();
+
+showMessage(
+"Internet restored. Sync starting.",
+"success"
+);
+
+syncQueue(false);
+}
+);
+
+window.addEventListener(
+"offline",
+()=>{
+
+updateConnection();
+
+showMessage(
+"Offline mode. Local records remain available.",
+"info"
+);
+}
+);
+
+document.addEventListener(
+"visibilitychange",
+()=>{
+
+if(
+document.visibilityState==="visible"
+){
+
+refreshAll();
+
+if(navigator.onLine){
+syncQueue(false);
+}
+}
+}
+);
+}
+
+async function addActivity(
+action,
+module,
+recordId,
+status,
+details
+){
+
+const timestamp=nowISO();
+
+const activityId=
+generateId("ACT");
+
+const record={
+id:activityId,
+activityId,
+timestamp,
+date:timestamp.slice(0,10),
+time:timestamp.slice(11,19),
+shopId:currentProfile?.shopId||"",
+agentId:currentProfile?.agentId||"",
+userId:currentUser?.uid||"",
+userName:
+currentProfile?.name||
+currentUser?.email||
+"",
+role:currentProfile?.role||"",
+action,
+module,
+recordId:recordId||"",
+status,
+details:
+typeof details==="string"
+?details
+:JSON.stringify(details||{}),
+syncStatus:"PENDING"
+};
+
+await idbPut(
+ACTIVITY_STORE,
+record
+);
+
+const queue={
+id:activityId,
+recordId:activityId,
+recordType:"Activity_Log",
+shopId:record.shopId,
+agentId:record.agentId,
+operation:"CREATE",
+payload:record,
+syncStatus:"PENDING",
+retryCount:0,
+lastAttempt:"",
+lastError:"",
+createdAt:timestamp,
+updatedAt:timestamp,
+syncedAt:""
+};
+
+await idbPut(
+QUEUE_STORE,
+queue
+);
+
+return record;
+}
+
+async function initialize(){
+
+updateConnection();
+
+setLoading(
+true,
+"Opening local database...",
+5
+);
+
+try{
+
+await openDB();
+
+await auth.setPersistence(
+firebase.auth.Auth.Persistence.SESSION
+);
+
+auth.onAuthStateChanged(
+async user=>{
+
+if(!user){
+
+location.replace("index.html");
+
+return;
+}
+
+try{
+
+currentUser=user;
+
+setLoading(
+true,
+"Checking authorization...",
+20
+);
+
+const valid=
+await validateAccess();
+
+if(!valid){
+
+setLoading(false);
+
+return;
+}
+
+setLoading(
+true,
+"Loading local records...",
+50
+);
+
+setupEvents();
+
+await refreshAll();
+
+setLoading(
+true,
+"Checking sync queue...",
+80
+);
+
+if(navigator.onLine){
+
+setTimeout(()=>{
+syncQueue(false);
+},500);
+}
+
+setLoading(false);
+
+}catch(error){
+
+setLoading(false);
+
+showMessage(
+error.message||
+"Records initialization failed.",
+"error"
+);
+}
+}
+);
+
+}catch(error){
+
+setLoading(false);
+
+showMessage(
+error.message||
+"IndexedDB initialization failed.",
+"error"
+);
+}
+}
+
+initialize();
+</script>
+
+</body>
+</html>
