@@ -1,0 +1,1541 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Shop Management - Login</title>
+<style>
+*{
+    box-sizing:border-box;
+}
+html,body{
+    margin:0;
+    padding:0;
+    width:100%;
+    min-height:100%;
+    font-family:Arial,sans-serif;
+    background:#f4f6f8;
+    color:#1f2937;
+}
+body{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    min-height:100vh;
+}
+.container{
+    width:100%;
+    max-width:430px;
+    padding:20px;
+}
+.card{
+    background:#fff;
+    border:1px solid #e5e7eb;
+    border-radius:16px;
+    padding:28px;
+    box-shadow:0 8px 30px rgba(0,0,0,.08);
+}
+.logo{
+    width:64px;
+    height:64px;
+    margin:0 auto 16px;
+    border-radius:16px;
+    background:#2563eb;
+    color:#fff;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:28px;
+    font-weight:700;
+}
+h1{
+    margin:0;
+    text-align:center;
+    font-size:25px;
+}
+.subtitle{
+    text-align:center;
+    color:#6b7280;
+    margin:8px 0 24px;
+    font-size:14px;
+}
+.form-group{
+    margin-bottom:16px;
+}
+label{
+    display:block;
+    font-size:14px;
+    font-weight:600;
+    margin-bottom:7px;
+}
+input{
+    width:100%;
+    height:46px;
+    border:1px solid #d1d5db;
+    border-radius:9px;
+    padding:0 13px;
+    font-size:15px;
+    outline:none;
+}
+input:focus{
+    border-color:#2563eb;
+    box-shadow:0 0 0 3px rgba(37,99,235,.1);
+}
+.password-wrap{
+    position:relative;
+}
+.password-wrap input{
+    padding-right:48px;
+}
+.password-toggle{
+    position:absolute;
+    right:8px;
+    top:7px;
+    width:32px;
+    height:32px;
+    border:0;
+    background:transparent;
+    cursor:pointer;
+    font-size:16px;
+}
+button{
+    width:100%;
+    height:46px;
+    border:0;
+    border-radius:9px;
+    background:#2563eb;
+    color:#fff;
+    font-size:15px;
+    font-weight:700;
+    cursor:pointer;
+}
+button:hover{
+    background:#1d4ed8;
+}
+button:disabled{
+    opacity:.6;
+    cursor:not-allowed;
+}
+.status{
+    margin-top:16px;
+    padding:11px 13px;
+    border-radius:9px;
+    font-size:13px;
+    display:none;
+    line-height:1.45;
+}
+.status.show{
+    display:block;
+}
+.status.info{
+    background:#eff6ff;
+    color:#1d4ed8;
+    border:1px solid #bfdbfe;
+}
+.status.success{
+    background:#f0fdf4;
+    color:#15803d;
+    border:1px solid #bbf7d0;
+}
+.status.error{
+    background:#fef2f2;
+    color:#b91c1c;
+    border:1px solid #fecaca;
+}
+.status.warning{
+    background:#fffbeb;
+    color:#b45309;
+    border:1px solid #fde68a;
+}
+.connection{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:7px;
+    margin-top:18px;
+    font-size:12px;
+    color:#6b7280;
+}
+.dot{
+    width:8px;
+    height:8px;
+    border-radius:50%;
+    background:#9ca3af;
+}
+.dot.online{
+    background:#16a34a;
+}
+.dot.offline{
+    background:#dc2626;
+}
+.footer{
+    text-align:center;
+    margin-top:18px;
+    color:#9ca3af;
+    font-size:11px;
+}
+.hidden{
+    display:none!important;
+}
+.loading{
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    gap:8px;
+}
+.spinner{
+    width:16px;
+    height:16px;
+    border:2px solid rgba(255,255,255,.45);
+    border-top-color:#fff;
+    border-radius:50%;
+    animation:spin .7s linear infinite;
+}
+@keyframes spin{
+    to{
+        transform:rotate(360deg);
+    }
+}
+@media(max-width:480px){
+    .container{
+        padding:14px;
+    }
+    .card{
+        padding:22px;
+    }
+}
+</style>
+</head>
+<body>
+
+<div class="container">
+    <div class="card">
+        <div class="logo">SM</div>
+
+        <h1>Shop Management</h1>
+        <div class="subtitle">Secure Login</div>
+
+        <form id="loginForm">
+            <div class="form-group">
+                <label for="email">Email</label>
+                <input
+                    id="email"
+                    type="email"
+                    autocomplete="username"
+                    placeholder="Enter email"
+                    required
+                >
+            </div>
+
+            <div class="form-group">
+                <label for="password">Password</label>
+                <div class="password-wrap">
+                    <input
+                        id="password"
+                        type="password"
+                        autocomplete="current-password"
+                        placeholder="Enter password"
+                        required
+                    >
+                    <button
+                        type="button"
+                        id="passwordToggle"
+                        class="password-toggle"
+                        aria-label="Show password"
+                    >👁</button>
+                </div>
+            </div>
+
+            <button type="submit" id="loginButton">
+                Login
+            </button>
+        </form>
+
+        <div id="status" class="status"></div>
+
+        <div class="connection">
+            <span id="connectionDot" class="dot"></span>
+            <span id="connectionText">Checking connection...</span>
+        </div>
+
+        <div class="footer">
+            Offline-first Shop Management System
+        </div>
+    </div>
+</div>
+
+<script type="module">
+import {
+    initializeApp
+} from "https://www.gstatic.com/firebasejs/12.2.1/firebase-app.js";
+
+import {
+    getAuth,
+    setPersistence,
+    browserSessionPersistence,
+    signInWithEmailAndPassword,
+    onAuthStateChanged,
+    signOut
+} from "https://www.gstatic.com/firebasejs/12.2.1/firebase-auth.js";
+
+import {
+    getDatabase,
+    ref,
+    get
+} from "https://www.gstatic.com/firebasejs/12.2.1/firebase-database.js";
+
+const firebaseConfig = {
+    apiKey: "AIzaSyApCoYU29E90_fORBdOKnR8BroSlURI_20",
+    authDomain: "shop-management-system-909d3.firebaseapp.com",
+    databaseURL: "https://shop-management-system-909d3-default-rtdb.asia-southeast1.firebasedatabase.app/",
+    projectId: "shop-management-system-909d3",
+    storageBucket: "shop-management-system-909d3.firebasestorage.app",
+    messagingSenderId: "108966486935",
+    appId: "1:108966486935:web:47ffa7b9eb7b6d69a81ad2"
+};
+
+const APP_CONFIG = {
+    SITE_ID: "shophariom",
+    APPS_SCRIPT_URL: "https://script.google.com/macros/s/AKfycbyrS_NNgH1siSwOGdY9wMzfqqUnMZvauKDIAvS6R7s87kDr3ubvTWRCzRhjHPRTAleK8w/exec",
+    DATABASE_NAME: "ShopManagementDB",
+    DATABASE_VERSION: 1
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const database = getDatabase(app);
+
+const loginForm = document.getElementById("loginForm");
+const emailInput = document.getElementById("email");
+const passwordInput = document.getElementById("password");
+const loginButton = document.getElementById("loginButton");
+const passwordToggle = document.getElementById("passwordToggle");
+const statusBox = document.getElementById("status");
+const connectionDot = document.getElementById("connectionDot");
+const connectionText = document.getElementById("connectionText");
+
+let redirecting = false;
+
+function setStatus(message, type) {
+    statusBox.textContent = message;
+    statusBox.className = "status show " + type;
+}
+
+function clearStatus() {
+    statusBox.textContent = "";
+    statusBox.className = "status";
+}
+
+function setConnectionStatus() {
+    if (navigator.onLine) {
+        connectionDot.className = "dot online";
+        connectionText.textContent = "Online";
+    } else {
+        connectionDot.className = "dot offline";
+        connectionText.textContent = "Offline";
+    }
+}
+
+function setLoginLoading(loading) {
+    loginButton.disabled = loading;
+
+    if (loading) {
+        loginButton.innerHTML =
+            '<span class="loading"><span class="spinner"></span>Signing in...</span>';
+    } else {
+        loginButton.textContent = "Login";
+    }
+}
+
+function generateId(prefix) {
+    const randomPart =
+        crypto.randomUUID
+            ? crypto.randomUUID().replace(/-/g, "")
+            : Date.now().toString(36) + Math.random().toString(36).slice(2);
+
+    return prefix + "-" + Date.now() + "-" + randomPart;
+}
+
+function generateNonce() {
+    if (crypto.randomUUID) {
+        return crypto.randomUUID() + "-" + crypto.randomUUID();
+    }
+
+    const array = new Uint8Array(32);
+    crypto.getRandomValues(array);
+
+    return Array.from(array)
+        .map(value => value.toString(16).padStart(2, "0"))
+        .join("");
+}
+
+function openDatabase() {
+    return new Promise((resolve, reject) => {
+        const request = indexedDB.open(
+            APP_CONFIG.DATABASE_NAME,
+            APP_CONFIG.DATABASE_VERSION
+        );
+
+        request.onupgradeneeded = event => {
+            const db = event.target.result;
+
+            if (!db.objectStoreNames.contains("products")) {
+                const store = db.createObjectStore("products", {
+                    keyPath: "recordId"
+                });
+
+                store.createIndex("id", "id", {
+                    unique: false
+                });
+
+                store.createIndex("shopId", "shopId", {
+                    unique: false
+                });
+
+                store.createIndex("agentId", "agentId", {
+                    unique: false
+                });
+
+                store.createIndex("createdAt", "createdAt", {
+                    unique: false
+                });
+
+                store.createIndex("updatedAt", "updatedAt", {
+                    unique: false
+                });
+
+                store.createIndex("syncStatus", "syncStatus", {
+                    unique: false
+                });
+            }
+
+            if (!db.objectStoreNames.contains("sales")) {
+                const store = db.createObjectStore("sales", {
+                    keyPath: "recordId"
+                });
+
+                store.createIndex("id", "id", {
+                    unique: false
+                });
+
+                store.createIndex("shopId", "shopId", {
+                    unique: false
+                });
+
+                store.createIndex("agentId", "agentId", {
+                    unique: false
+                });
+
+                store.createIndex("createdAt", "createdAt", {
+                    unique: false
+                });
+
+                store.createIndex("syncStatus", "syncStatus", {
+                    unique: false
+                });
+            }
+
+            if (!db.objectStoreNames.contains("gst_records")) {
+                const store = db.createObjectStore("gst_records", {
+                    keyPath: "recordId"
+                });
+
+                store.createIndex("id", "id", {
+                    unique: false
+                });
+
+                store.createIndex("shopId", "shopId", {
+                    unique: false
+                });
+
+                store.createIndex("agentId", "agentId", {
+                    unique: false
+                });
+
+                store.createIndex("createdAt", "createdAt", {
+                    unique: false
+                });
+
+                store.createIndex("syncStatus", "syncStatus", {
+                    unique: false
+                });
+            }
+
+            if (!db.objectStoreNames.contains("activity_logs")) {
+                const store = db.createObjectStore("activity_logs", {
+                    keyPath: "activityId"
+                });
+
+                store.createIndex("timestamp", "timestamp", {
+                    unique: false
+                });
+
+                store.createIndex("shopId", "shopId", {
+                    unique: false
+                });
+
+                store.createIndex("agentId", "agentId", {
+                    unique: false
+                });
+
+                store.createIndex("recordId", "recordId", {
+                    unique: false
+                });
+
+                store.createIndex("syncStatus", "syncStatus", {
+                    unique: false
+                });
+            }
+
+            if (!db.objectStoreNames.contains("sync_queue")) {
+                const store = db.createObjectStore("sync_queue", {
+                    keyPath: "recordId"
+                });
+
+                store.createIndex("recordType", "recordType", {
+                    unique: false
+                });
+
+                store.createIndex("shopId", "shopId", {
+                    unique: false
+                });
+
+                store.createIndex("agentId", "agentId", {
+                    unique: false
+                });
+
+                store.createIndex("syncStatus", "syncStatus", {
+                    unique: false
+                });
+
+                store.createIndex("createdAt", "createdAt", {
+                    unique: false
+                });
+
+                store.createIndex("updatedAt", "updatedAt", {
+                    unique: false
+                });
+
+                store.createIndex("lastAttempt", "lastAttempt", {
+                    unique: false
+                });
+            }
+
+            if (!db.objectStoreNames.contains("shops")) {
+                const store = db.createObjectStore("shops", {
+                    keyPath: "shopId"
+                });
+
+                store.createIndex("status", "status", {
+                    unique: false
+                });
+            }
+
+            if (!db.objectStoreNames.contains("agents")) {
+                const store = db.createObjectStore("agents", {
+                    keyPath: "agentId"
+                });
+
+                store.createIndex("shopId", "shopId", {
+                    unique: false
+                });
+
+                store.createIndex("status", "status", {
+                    unique: false
+                });
+            }
+
+            if (!db.objectStoreNames.contains("settings")) {
+                db.createObjectStore("settings", {
+                    keyPath: "key"
+                });
+            }
+        };
+
+        request.onsuccess = event => {
+            resolve(event.target.result);
+        };
+
+        request.onerror = () => {
+            reject(request.error || new Error("INDEXEDDB_OPEN_FAILED"));
+        };
+    });
+}
+
+function putLocal(storeName, value) {
+    return openDatabase().then(db => {
+        return new Promise((resolve, reject) => {
+            const transaction = db.transaction(
+                storeName,
+                "readwrite"
+            );
+
+            const store = transaction.objectStore(storeName);
+
+            store.put(value);
+
+            transaction.oncomplete = () => {
+                db.close();
+                resolve();
+            };
+
+            transaction.onerror = () => {
+                db.close();
+                reject(
+                    transaction.error ||
+                    new Error("INDEXEDDB_WRITE_FAILED")
+                );
+            };
+
+            transaction.onabort = () => {
+                db.close();
+                reject(
+                    transaction.error ||
+                    new Error("INDEXEDDB_TRANSACTION_ABORTED")
+                );
+            };
+        });
+    });
+}
+
+async function saveLoginActivity(user, profile) {
+    const now = Date.now();
+
+    const activityId = generateId("ACTIVITY");
+
+    const activity = {
+        activityId: activityId,
+        timestamp: now,
+        date: new Date(now).toISOString().slice(0, 10),
+        time: new Date(now).toTimeString().slice(0, 8),
+        shopId: profile.shopId || "",
+        agentId: profile.role === "agent" ? user.uid : "",
+        userId: user.uid,
+        userName: profile.name || user.email || "",
+        role: profile.role || "",
+        action: "Login",
+        module: "Authentication",
+        recordId: activityId,
+        status: "SUCCESS",
+        details: "User login successful",
+        syncStatus: "PENDING"
+    };
+
+    await putLocal("activity_logs", activity);
+
+    await putLocal("sync_queue", {
+        recordId: activityId,
+        recordType: "ACTIVITY_LOG",
+        shopId: profile.shopId || "",
+        agentId: profile.role === "agent" ? user.uid : "",
+        operation: "CREATE",
+        payload: activity,
+        syncStatus: "PENDING",
+        retryCount: 0,
+        lastAttempt: 0,
+        lastError: "",
+        createdAt: now,
+        updatedAt: now,
+        syncedAt: 0
+    });
+}
+
+async function saveSessionSettings(user, profile) {
+    await putLocal("settings", {
+        key: "currentUser",
+        value: {
+            uid: user.uid,
+            email: user.email || "",
+            name: profile.name || "",
+            role: profile.role || "",
+            shopId: profile.shopId || "",
+            status: profile.status || "",
+            lastLogin: Date.now()
+        },
+        updatedAt: Date.now()
+    });
+
+    await putLocal("settings", {
+        key: "sessionStartedAt",
+        value: Date.now(),
+        updatedAt: Date.now()
+    });
+}
+
+async function getUserProfile(uid) {
+    const snapshot = await get(
+        ref(database, "users/" + uid)
+    );
+
+    if (!snapshot.exists()) {
+        throw new Error("USER_PROFILE_NOT_FOUND");
+    }
+
+    const data = snapshot.val();
+
+    if (!data || typeof data !== "object") {
+        throw new Error("INVALID_USER_PROFILE");
+    }
+
+    const role = String(data.role || "").toLowerCase();
+    const status = String(data.status || "").toLowerCase();
+
+    if (role !== "admin" && role !== "agent") {
+        throw new Error("INVALID_USER_ROLE");
+    }
+
+    if (status !== "active") {
+        throw new Error("USER_ACCOUNT_DISABLED");
+    }
+
+    if (role === "agent" && !data.shopId) {
+        throw new Error("AGENT_SHOP_NOT_ASSIGNED");
+    }
+
+    return {
+        name: String(data.name || ""),
+        email: String(data.email || ""),
+        role: role,
+        shopId: String(data.shopId || ""),
+        status: status,
+        createdAt: Number(data.createdAt || 0),
+        lastLogin: Number(data.lastLogin || 0)
+    };
+}
+
+async function updateLastLogin(uid, profile) {
+    const now = Date.now();
+
+    const response = await fetch(
+        APP_CONFIG.APPS_SCRIPT_URL,
+        {
+            method: "POST",
+            headers: {
+                "Content-Type": "text/plain;charset=utf-8"
+            },
+            body: JSON.stringify({
+                action: "init",
+                siteId: APP_CONFIG.SITE_ID,
+                timestamp: now,
+                nonce: generateNonce(),
+                idToken: await auth.currentUser.getIdToken(true),
+                userId: uid,
+                shopId: profile.shopId || "",
+                agentId: profile.role === "agent" ? uid : ""
+            })
+        }
+    );
+
+    const text = await response.text();
+
+    let data;
+
+    try {
+        data = JSON.parse(text);
+    } catch (error) {
+        throw new Error("APPS_SCRIPT_INVALID_RESPONSE");
+    }
+
+    if (!response.ok || !data.success) {
+        throw new Error(
+            data && data.error
+                ? String(data.error)
+                : "APPS_SCRIPT_INIT_FAILED"
+        );
+    }
+
+    return data;
+}
+
+async function recoverSyncQueue() {
+    const db = await openDatabase();
+
+    return new Promise((resolve, reject) => {
+        const transaction = db.transaction(
+            "sync_queue",
+            "readwrite"
+        );
+
+        const store = transaction.objectStore("sync_queue");
+        const request = store.openCursor();
+
+        request.onsuccess = event => {
+            const cursor = event.target.result;
+
+            if (!cursor) {
+                return;
+            }
+
+            const item = cursor.value;
+
+            if (item.syncStatus === "SYNCING") {
+                item.syncStatus = "PENDING";
+                item.updatedAt = Date.now();
+                item.lastError = "RECOVERED_AFTER_INTERRUPTED_SYNC";
+
+                cursor.update(item);
+            }
+
+            cursor.continue();
+        };
+
+        transaction.oncomplete = () => {
+            db.close();
+            resolve();
+        };
+
+        transaction.onerror = () => {
+            db.close();
+            reject(
+                transaction.error ||
+                new Error("SYNC_QUEUE_RECOVERY_FAILED")
+            );
+        };
+    });
+}
+
+async function syncPendingRecords() {
+    if (!navigator.onLine) {
+        return;
+    }
+
+    if (
+        !APP_CONFIG.APPS_SCRIPT_URL ||
+        APP_CONFIG.APPS_SCRIPT_URL === "YOUR_APPS_SCRIPT_WEB_APP_URL"
+    ) {
+        return;
+    }
+
+    const currentUser = auth.currentUser;
+
+    if (!currentUser) {
+        return;
+    }
+
+    const db = await openDatabase();
+
+    const items = await new Promise((resolve, reject) => {
+        const transaction = db.transaction(
+            "sync_queue",
+            "readonly"
+        );
+
+        const store = transaction.objectStore("sync_queue");
+        const request = store.openCursor();
+        const result = [];
+
+        request.onsuccess = event => {
+            const cursor = event.target.result;
+
+            if (!cursor) {
+                resolve(result);
+                return;
+            }
+
+            const item = cursor.value;
+
+            if (
+                item.syncStatus === "PENDING" ||
+                item.syncStatus === "ERROR" ||
+                item.syncStatus === "SYNCING"
+            ) {
+                result.push(item);
+            }
+
+            cursor.continue();
+        };
+
+        request.onerror = () => {
+            reject(
+                request.error ||
+                new Error("SYNC_QUEUE_READ_FAILED")
+            );
+        };
+    });
+
+    db.close();
+
+    if (!items.length) {
+        return;
+    }
+
+    let token;
+
+    try {
+        token = await currentUser.getIdToken(true);
+    } catch (error) {
+        return;
+    }
+
+    const batchSize = 20;
+
+    for (let i = 0; i < items.length; i += batchSize) {
+        const batch = items.slice(i, i + batchSize);
+
+        const now = Date.now();
+
+        await updateQueueStatus(
+            batch.map(item => item.recordId),
+            "SYNCING",
+            now,
+            ""
+        );
+
+        const records = batch.map(item => ({
+            recordId: item.recordId,
+            recordType: item.recordType,
+            shopId: item.shopId,
+            agentId: item.agentId,
+            operation: item.operation,
+            payload: item.payload
+        }));
+
+        try {
+            const response = await fetch(
+                APP_CONFIG.APPS_SCRIPT_URL,
+                {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "text/plain;charset=utf-8"
+                    },
+                    body: JSON.stringify({
+                        action: "batchSync",
+                        siteId: APP_CONFIG.SITE_ID,
+                        timestamp: Date.now(),
+                        nonce: generateNonce(),
+                        idToken: token,
+                        shopId: batch[0].shopId || "",
+                        agentId: batch[0].agentId || "",
+                        records: records
+                    })
+                }
+            );
+
+            const text = await response.text();
+
+            let data;
+
+            try {
+                data = JSON.parse(text);
+            } catch (error) {
+                throw new Error(
+                    "APPS_SCRIPT_INVALID_RESPONSE"
+                );
+            }
+
+            if (!response.ok || !data.results) {
+                throw new Error(
+                    data && data.error
+                        ? String(data.error)
+                        : "BATCH_SYNC_FAILED"
+                );
+            }
+
+            await applySyncResults(data.results);
+        } catch (error) {
+            const message = error && error.message
+                ? error.message
+                : String(error);
+
+            await updateQueueErrors(
+                batch.map(item => item.recordId),
+                message
+            );
+        }
+    }
+}
+
+async function updateQueueStatus(
+    recordIds,
+    status,
+    timestamp,
+    errorMessage
+) {
+    const db = await openDatabase();
+
+    await new Promise((resolve, reject) => {
+        const transaction = db.transaction(
+            "sync_queue",
+            "readwrite"
+        );
+
+        const store = transaction.objectStore(
+            "sync_queue"
+        );
+
+        recordIds.forEach(recordId => {
+            const request = store.get(recordId);
+
+            request.onsuccess = () => {
+                const item = request.result;
+
+                if (!item) {
+                    return;
+                }
+
+                item.syncStatus = status;
+                item.lastAttempt = timestamp;
+                item.updatedAt = timestamp;
+
+                if (errorMessage) {
+                    item.lastError = errorMessage;
+                }
+
+                if (status === "SYNCING") {
+                    item.lastError = "";
+                }
+
+                store.put(item);
+            };
+        });
+
+        transaction.oncomplete = () => {
+            resolve();
+        };
+
+        transaction.onerror = () => {
+            reject(
+                transaction.error ||
+                new Error("QUEUE_STATUS_UPDATE_FAILED")
+            );
+        };
+    });
+
+    db.close();
+}
+
+async function updateQueueErrors(recordIds, errorMessage) {
+    const db = await openDatabase();
+
+    await new Promise((resolve, reject) => {
+        const transaction = db.transaction(
+            "sync_queue",
+            "readwrite"
+        );
+
+        const store = transaction.objectStore(
+            "sync_queue"
+        );
+
+        recordIds.forEach(recordId => {
+            const request = store.get(recordId);
+
+            request.onsuccess = () => {
+                const item = request.result;
+
+                if (!item) {
+                    return;
+                }
+
+                item.syncStatus = "ERROR";
+                item.retryCount =
+                    Number(item.retryCount || 0) + 1;
+                item.lastAttempt = Date.now();
+                item.updatedAt = Date.now();
+                item.lastError = errorMessage;
+
+                store.put(item);
+            };
+        });
+
+        transaction.oncomplete = () => {
+            resolve();
+        };
+
+        transaction.onerror = () => {
+            reject(
+                transaction.error ||
+                new Error("QUEUE_ERROR_UPDATE_FAILED")
+            );
+        };
+    });
+
+    db.close();
+}
+
+async function applySyncResults(results) {
+    const db = await openDatabase();
+
+    await new Promise((resolve, reject) => {
+        const transaction = db.transaction(
+            ["sync_queue", "products", "sales", "gst_records", "activity_logs"],
+            "readwrite"
+        );
+
+        const queueStore = transaction.objectStore(
+            "sync_queue"
+        );
+
+        const stores = {
+            PRODUCT: transaction.objectStore("products"),
+            PRODUCTS: transaction.objectStore("products"),
+            SALE: transaction.objectStore("sales"),
+            SALES: transaction.objectStore("sales"),
+            GST: transaction.objectStore("gst_records"),
+            GST_RECORD: transaction.objectStore("gst_records"),
+            ACTIVITY: transaction.objectStore("activity_logs"),
+            ACTIVITY_LOG: transaction.objectStore("activity_logs")
+        };
+
+        results.forEach(result => {
+            if (!result || !result.recordId) {
+                return;
+            }
+
+            const queueRequest =
+                queueStore.get(String(result.recordId));
+
+            queueRequest.onsuccess = () => {
+                const queueItem = queueRequest.result;
+
+                if (!queueItem) {
+                    return;
+                }
+
+                if (result.success) {
+                    queueItem.syncStatus = "SENT";
+                    queueItem.syncedAt = Date.now();
+                    queueItem.updatedAt = Date.now();
+                    queueItem.lastAttempt = Date.now();
+                    queueItem.lastError = "";
+
+                    queueStore.put(queueItem);
+
+                    const type =
+                        String(
+                            queueItem.recordType || ""
+                        ).toUpperCase();
+
+                    const businessStore =
+                        stores[type];
+
+                    if (businessStore) {
+                        const businessRequest =
+                            businessStore.get(
+                                String(result.recordId)
+                            );
+
+                        businessRequest.onsuccess = () => {
+                            const localRecord =
+                                businessRequest.result;
+
+                            if (localRecord) {
+                                localRecord.syncStatus =
+                                    "SENT";
+
+                                localRecord.syncedAt =
+                                    Date.now();
+
+                                localRecord.updatedAt =
+                                    Date.now();
+
+                                businessStore.put(
+                                    localRecord
+                                );
+                            }
+                        };
+                    }
+                } else {
+                    queueItem.syncStatus = "ERROR";
+                    queueItem.retryCount =
+                        Number(queueItem.retryCount || 0) + 1;
+                    queueItem.lastAttempt = Date.now();
+                    queueItem.updatedAt = Date.now();
+                    queueItem.lastError =
+                        String(
+                            result.message ||
+                            "REMOTE_SYNC_FAILED"
+                        );
+
+                    queueStore.put(queueItem);
+
+                    const type =
+                        String(
+                            queueItem.recordType || ""
+                        ).toUpperCase();
+
+                    const businessStore =
+                        stores[type];
+
+                    if (businessStore) {
+                        const businessRequest =
+                            businessStore.get(
+                                String(result.recordId)
+                            );
+
+                        businessRequest.onsuccess = () => {
+                            const localRecord =
+                                businessRequest.result;
+
+                            if (localRecord) {
+                                localRecord.syncStatus =
+                                    "ERROR";
+
+                                localRecord.updatedAt =
+                                    Date.now();
+
+                                localRecord.lastError =
+                                    queueItem.lastError;
+
+                                businessStore.put(
+                                    localRecord
+                                );
+                            }
+                        };
+                    }
+                }
+            };
+        });
+
+        transaction.oncomplete = () => {
+            resolve();
+        };
+
+        transaction.onerror = () => {
+            reject(
+                transaction.error ||
+                new Error("SYNC_RESULT_APPLY_FAILED")
+            );
+        };
+    });
+
+    db.close();
+}
+
+async function initializeAfterLogin(user, profile) {
+    setStatus(
+        "Login successful. Checking authorization...",
+        "info"
+    );
+
+    await openDatabase();
+
+    await recoverSyncQueue();
+
+    await saveSessionSettings(
+        user,
+        profile
+    );
+
+    try {
+        await updateLastLogin(
+            user.uid,
+            profile
+        );
+    } catch (error) {
+        if (navigator.onLine) {
+            throw error;
+        }
+    }
+
+    await saveLoginActivity(
+        user,
+        profile
+    );
+
+    try {
+        await syncPendingRecords();
+    } catch (error) {
+    }
+
+    if (profile.role === "admin") {
+        window.location.replace("admin.html");
+        return;
+    }
+
+    if (profile.role === "agent") {
+        window.location.replace("shop.html");
+        return;
+    }
+
+    throw new Error("UNSUPPORTED_ROLE");
+}
+
+async function handleLogin(email, password) {
+    if (!navigator.onLine) {
+        setStatus(
+            "Internet connection is required for login. Your previously saved local business data remains available after successful session recovery.",
+            "warning"
+        );
+        return;
+    }
+
+    setLoginLoading(true);
+    clearStatus();
+
+    try {
+        const credential =
+            await signInWithEmailAndPassword(
+                auth,
+                email,
+                password
+            );
+
+        const user = credential.user;
+
+        const profile =
+            await getUserProfile(user.uid);
+
+        await initializeAfterLogin(
+            user,
+            profile
+        );
+    } catch (error) {
+        let message =
+            error && error.message
+                ? error.message
+                : String(error);
+
+        if (
+            message.includes("auth/invalid-credential") ||
+            message.includes("auth/invalid-login-credentials")
+        ) {
+            message = "Email or password is incorrect.";
+        } else if (
+            message.includes("auth/user-disabled")
+        ) {
+            message = "This Firebase account is disabled.";
+        } else if (
+            message.includes("auth/too-many-requests")
+        ) {
+            message = "Too many login attempts. Please try again later.";
+        } else if (
+            message === "USER_PROFILE_NOT_FOUND"
+        ) {
+            message = "Firebase login succeeded, but user authorization profile was not found.";
+        } else if (
+            message === "USER_ACCOUNT_DISABLED"
+        ) {
+            message = "Your account is disabled.";
+        } else if (
+            message === "INVALID_USER_ROLE"
+        ) {
+            message = "Your account has an invalid role.";
+        } else if (
+            message === "AGENT_SHOP_NOT_ASSIGNED"
+        ) {
+            message = "This agent is not assigned to a shop.";
+        } else if (
+            message === "APPS_SCRIPT_INIT_FAILED"
+        ) {
+            message = "Remote sync gateway initialization failed.";
+        } else if (
+            message === "APPS_SCRIPT_INVALID_RESPONSE"
+        ) {
+            message = "Remote sync gateway returned an invalid response.";
+        }
+
+        try {
+            await signOut(auth);
+        } catch (signOutError) {
+        }
+
+        setStatus(
+            message,
+            "error"
+        );
+    } finally {
+        setLoginLoading(false);
+    }
+}
+
+passwordToggle.addEventListener(
+    "click",
+    () => {
+        const isPassword =
+            passwordInput.type === "password";
+
+        passwordInput.type =
+            isPassword ? "text" : "password";
+
+        passwordToggle.textContent =
+            isPassword ? "🙈" : "👁";
+
+        passwordToggle.setAttribute(
+            "aria-label",
+            isPassword
+                ? "Hide password"
+                : "Show password"
+        );
+    }
+);
+
+loginForm.addEventListener(
+    "submit",
+    async event => {
+        event.preventDefault();
+
+        const email =
+            emailInput.value.trim();
+
+        const password =
+            passwordInput.value;
+
+        if (!email || !password) {
+            setStatus(
+                "Please enter email and password.",
+                "error"
+            );
+            return;
+        }
+
+        await handleLogin(
+            email,
+            password
+        );
+    }
+);
+
+window.addEventListener(
+    "online",
+    () => {
+        setConnectionStatus();
+
+        if (auth.currentUser) {
+            recoverSyncQueue()
+                .then(syncPendingRecords)
+                .catch(() => {});
+        }
+    }
+);
+
+window.addEventListener(
+    "offline",
+    () => {
+        setConnectionStatus();
+    }
+);
+
+document.addEventListener(
+    "visibilitychange",
+    () => {
+        if (
+            document.visibilityState === "visible" &&
+            auth.currentUser &&
+            navigator.onLine
+        ) {
+            recoverSyncQueue()
+                .then(syncPendingRecords)
+                .catch(() => {});
+        }
+    }
+);
+
+setConnectionStatus();
+
+async function initializeFirebaseSession() {
+    try {
+        await setPersistence(
+            auth,
+            browserSessionPersistence
+        );
+    } catch (error) {
+        setStatus(
+            "Unable to initialize secure browser session.",
+            "error"
+        );
+        return;
+    }
+
+    onAuthStateChanged(
+        auth,
+        async user => {
+            if (!user || redirecting) {
+                return;
+            }
+
+            redirecting = true;
+
+            try {
+                const profile =
+                    await getUserProfile(
+                        user.uid
+                    );
+
+                if (
+                    profile.status !== "active"
+                ) {
+                    await signOut(auth);
+                    redirecting = false;
+
+                    setStatus(
+                        "Your account is disabled.",
+                        "error"
+                    );
+
+                    return;
+                }
+
+                await openDatabase();
+
+                await recoverSyncQueue();
+
+                await saveSessionSettings(
+                    user,
+                    profile
+                );
+
+                if (navigator.onLine) {
+                    try {
+                        await updateLastLogin(
+                            user.uid,
+                            profile
+                        );
+                    } catch (error) {
+                    }
+
+                    try {
+                        await syncPendingRecords();
+                    } catch (error) {
+                    }
+                }
+
+                if (profile.role === "admin") {
+                    window.location.replace(
+                        "admin.html"
+                    );
+                    return;
+                }
+
+                if (profile.role === "agent") {
+                    window.location.replace(
+                        "shop.html"
+                    );
+                    return;
+                }
+
+                await signOut(auth);
+
+                redirecting = false;
+
+                setStatus(
+                    "Invalid account role.",
+                    "error"
+                );
+            } catch (error) {
+                try {
+                    await signOut(auth);
+                } catch (signOutError) {
+                }
+
+                redirecting = false;
+
+                setStatus(
+                    "Authorization failed: " +
+                    (
+                        error && error.message
+                            ? error.message
+                            : "Unknown error"
+                    ),
+                    "error"
+                );
+            }
+        }
+    );
+}
+
+initializeFirebaseSession();
+</script>
+
+</body>
+</html>
