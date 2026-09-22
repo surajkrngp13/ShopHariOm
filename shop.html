@@ -617,7 +617,7 @@ async function validateAccess(){
 const user=auth.currentUser;
 
 if(!user){
-location.replace("index.html");
+location.replace("./index.html");
 return false;
 }
 
@@ -628,19 +628,19 @@ const profile=snapshot.val();
 
 if(!profile){
 await auth.signOut();
-location.replace("index.html");
+location.replace("./index.html");
 return false;
 }
 
 if(profile.status!=="ACTIVE"){
 await auth.signOut();
-location.replace("index.html");
+location.replace("./index.html");
 return false;
 }
 
 if(profile.role!=="agent"){
 showMessage("This page is available for Agent accounts.","error");
-setTimeout(()=>location.replace("index.html"),1200);
+setTimeout(()=>location.replace("./index.html"),1200);
 return false;
 }
 
@@ -654,7 +654,7 @@ const access=accessSnapshot.val();
 
 if(!access||access.status!=="ACTIVE"||access.shopId!==profile.shopId||access.uid!==user.uid){
 await auth.signOut();
-location.replace("index.html");
+location.replace("./index.html");
 return false;
 }
 
@@ -1738,7 +1738,7 @@ try{
 await addActivity("Logout","Authentication","", "SUCCESS",{});
 }catch{}
 await auth.signOut();
-location.replace("index.html");
+location.replace("./index.html");
 });
 
 $("productForm").addEventListener("submit",saveProduct);
@@ -1841,7 +1841,7 @@ const persistence=await auth.setPersistence(firebase.auth.Auth.Persistence.SESSI
 
 auth.onAuthStateChanged(async user=>{
 if(!user){
-location.replace("index.html");
+location.replace("./index.html");
 return;
 }
 
