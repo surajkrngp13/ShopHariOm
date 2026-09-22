@@ -684,7 +684,7 @@ async function validateAccess(){
 const user=auth.currentUser;
 
 if(!user){
-location.replace("index.html");
+location.replace("./index.html");
 return false;
 }
 
@@ -699,13 +699,13 @@ const profile=snapshot.val();
 
 if(!profile){
 await auth.signOut();
-location.replace("index.html");
+location.replace("./index.html");
 return false;
 }
 
 if(profile.status!=="ACTIVE"){
 await auth.signOut();
-location.replace("index.html");
+location.replace("./index.html");
 return false;
 }
 
@@ -716,7 +716,7 @@ showMessage(
 );
 
 setTimeout(()=>{
-location.replace("index.html");
+location.replace("./index.html");
 },1200);
 
 return false;
@@ -745,7 +745,7 @@ access.uid!==user.uid||
 access.shopId!==profile.shopId
 ){
 await auth.signOut();
-location.replace("index.html");
+location.replace("./index.html");
 return false;
 }
 
@@ -1957,11 +1957,11 @@ applyFilters();
 });
 
 $("shopBtn").addEventListener("click",()=>{
-location.replace("shop.html");
+location.replace("./shop.html");
 });
 
 $("gstBtn").addEventListener("click",()=>{
-location.replace("gst.html");
+location.replace("./gst.html");
 });
 
 $("refreshBtn").addEventListener(
@@ -2078,7 +2078,7 @@ await addActivity(
 
 await auth.signOut();
 
-location.replace("index.html");
+location.replace("./index.html");
 }
 );
 
@@ -2219,7 +2219,7 @@ async user=>{
 
 if(!user){
 
-location.replace("index.html");
+location.replace("./index.html");
 
 return;
 }
