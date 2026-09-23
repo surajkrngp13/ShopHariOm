@@ -4,266 +4,47 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
-<title>Shop Management</title>
+<title>Shop Login Test</title>
 <script src="https://www.gstatic.com/firebasejs/11.10.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/11.10.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/11.10.0/firebase-database-compat.js"></script>
 <style>
 *{box-sizing:border-box}
-body{margin:0;font-family:Arial,sans-serif;background:#f5f7fb;color:#1f2937}
-button,input,select,textarea{font:inherit}
-button{cursor:pointer}
-.topbar{height:64px;background:#111827;color:#fff;display:flex;align-items:center;justify-content:space-between;padding:0 24px}
-.topbar h1{font-size:20px;margin:0}
-.topbar-right{display:flex;align-items:center;gap:12px;font-size:13px}
-.status-dot{width:9px;height:9px;border-radius:50%;background:#ef4444;display:inline-block}
-.status-dot.online{background:#22c55e}
-.container{max-width:1400px;margin:auto;padding:20px}
-.nav{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:20px}
-.nav button{border:0;background:#fff;padding:11px 18px;border-radius:8px;box-shadow:0 1px 4px #0001}
-.nav button.active{background:#2563eb;color:#fff}
-.page{display:none}
-.page.active{display:block}
-.cards{display:grid;grid-template-columns:repeat(4,1fr);gap:15px;margin-bottom:20px}
-.card{background:#fff;border-radius:12px;padding:18px;box-shadow:0 2px 8px #0000000b}
-.card-title{font-size:13px;color:#6b7280;margin-bottom:8px}
-.card-value{font-size:26px;font-weight:700}
-.panel{background:#fff;border-radius:12px;padding:20px;box-shadow:0 2px 8px #0000000b;margin-bottom:20px}
-.panel h2{margin:0 0 16px;font-size:18px}
-.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
-.field{display:flex;flex-direction:column;gap:6px}
-.field label{font-size:13px;font-weight:600}
-.field input,.field select,.field textarea{width:100%;border:1px solid #d1d5db;border-radius:7px;padding:10px;background:#fff}
-.field textarea{min-height:80px;resize:vertical}
-.full{grid-column:1/-1}
-.actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:16px}
-.btn{border:0;border-radius:7px;padding:10px 16px}
-.btn-primary{background:#2563eb;color:#fff}
-.btn-success{background:#16a34a;color:#fff}
-.btn-danger{background:#dc2626;color:#fff}
-.btn-secondary{background:#e5e7eb;color:#111827}
-.btn-warning{background:#f59e0b;color:#fff}
-.search{margin-bottom:15px}
-.search input{width:100%;padding:11px;border:1px solid #d1d5db;border-radius:7px}
-.table-wrap{overflow:auto}
-table{width:100%;border-collapse:collapse;min-width:800px}
-th,td{padding:10px;border-bottom:1px solid #e5e7eb;text-align:left;font-size:13px}
-th{background:#f9fafb}
-.badge{display:inline-block;padding:4px 8px;border-radius:20px;font-size:11px}
-.badge-success{background:#dcfce7;color:#166534}
-.badge-error{background:#fee2e2;color:#991b1b}
-.badge-pending{background:#fef3c7;color:#92400e}
-.product-results{max-height:280px;overflow:auto;border:1px solid #e5e7eb;border-radius:8px;margin-top:8px}
-.product-result{padding:10px;border-bottom:1px solid #eee;cursor:pointer}
-.product-result:hover{background:#f3f4f6}
-.cart-table input{width:70px;padding:6px}
-.summary{margin-top:15px;margin-left:auto;max-width:420px}
-.summary-row{display:flex;justify-content:space-between;padding:7px 0}
-.summary-row.total{font-size:20px;font-weight:700;border-top:1px solid #ddd;margin-top:5px;padding-top:12px}
-.empty{padding:30px;text-align:center;color:#6b7280}
-.message{padding:10px 12px;border-radius:7px;margin-bottom:12px;display:none}
-.message.show{display:block}
-.message.success{background:#dcfce7;color:#166534}
-.message.error{background:#fee2e2;color:#991b1b}
-.message.info{background:#dbeafe;color:#1e40af}
-.log-box{max-height:400px;overflow:auto;background:#111827;color:#d1d5db;padding:15px;border-radius:8px;font-family:monospace;font-size:12px;white-space:pre-wrap}
-@media(max-width:1000px){.cards{grid-template-columns:repeat(2,1fr)}.grid{grid-template-columns:repeat(2,1fr)}}
-@media(max-width:650px){.cards{grid-template-columns:1fr}.grid{grid-template-columns:1fr}.container{padding:10px}.topbar{padding:0 12px}}
+body{margin:0;font-family:Arial,sans-serif;background:#f3f4f6;color:#111827}
+.container{width:min(600px,94%);margin:40px auto}
+.card{background:#fff;border-radius:12px;padding:24px;box-shadow:0 4px 18px rgba(0,0,0,.08)}
+h1{margin:0 0 20px;font-size:24px}
+input{width:100%;padding:12px;margin:6px 0;border:1px solid #d1d5db;border-radius:8px;font-size:15px}
+button{width:100%;padding:12px;margin-top:10px;border:0;border-radius:8px;background:#2563eb;color:#fff;font-size:15px;cursor:pointer}
+button:disabled{opacity:.6;cursor:not-allowed}
+.status{margin-top:18px;padding:14px;border-radius:8px;background:#111827;color:#fff;white-space:pre-wrap;word-break:break-word;font-family:monospace;font-size:13px;line-height:1.5}
+.success{background:#166534}
+.error{background:#991b1b}
+.info{background:#1e3a8a}
+.hidden{display:none}
+hr{border:0;border-top:1px solid #e5e7eb;margin:20px 0}
 </style>
 </head>
 <body>
 
-<header class="topbar">
-<h1>Shop Management</h1>
-<div class="topbar-right">
-<span id="connectionDot" class="status-dot"></span>
-<span id="connectionText">Offline</span>
-<span id="userText">Not signed in</span>
-</div>
-</header>
-
 <div class="container">
-
-<div class="nav">
-<button class="active" data-page="dashboardPage">Dashboard</button>
-<button data-page="productsPage">Products</button>
-<button data-page="salePage">New Sale</button>
-<button data-page="salesPage">Sales</button>
-<button id="syncBtn" class="btn-success">Sync Now</button>
-<button id="retryBtn" class="btn-warning">Retry Failed</button>
-</div>
-
-<div id="globalMessage" class="message"></div>
-
-<section id="dashboardPage" class="page active">
-<div class="cards">
 <div class="card">
-<div class="card-title">Products</div>
-<div id="dashboardProducts" class="card-value">0</div>
-</div>
-<div class="card">
-<div class="card-title">Stock</div>
-<div id="dashboardStock" class="card-value">0</div>
-</div>
-<div class="card">
-<div class="card-title">Sales</div>
-<div id="dashboardSales" class="card-value">0</div>
-</div>
-<div class="card">
-<div class="card-title">Pending Sync</div>
-<div id="dashboardPending" class="card-value">0</div>
-</div>
+
+<h1>Shop Login Test</h1>
+
+<div id="loginBox">
+<input id="email" type="email" placeholder="Email">
+<input id="password" type="password" placeholder="Password">
+<button id="loginBtn">Login</button>
 </div>
 
-<div class="panel">
-<h2>Activity Log</h2>
-<div id="dashboardLog" class="log-box">No activity</div>
-</div>
-</section>
+<button id="logoutBtn" class="hidden">Logout</button>
 
-<section id="productsPage" class="page">
-<div class="panel">
-<h2>Products</h2>
-<div class="search">
-<input id="productListSearch" placeholder="Search product, SKU, category or product ID">
-</div>
-<div class="table-wrap">
-<table>
-<thead>
-<tr>
-<th>Product</th>
-<th>SKU</th>
-<th>Category</th>
-<th>Sale Price</th>
-<th>GST</th>
-<th>Stock</th>
-<th>Status</th>
-</tr>
-</thead>
-<tbody id="productTableBody"></tbody>
-</table>
-</div>
-</div>
-</section>
+<hr>
 
-<section id="salePage" class="page">
+<div id="status" class="status info">Initializing Firebase...</div>
 
-<div class="panel">
-<h2>New Sale</h2>
-
-<div class="grid">
-<div class="field full">
-<label>Product Search</label>
-<input id="saleProductSearch" placeholder="Search product by name, SKU, product ID or barcode">
-<div id="productResults" class="product-results"></div>
 </div>
-
-<div class="field">
-<label>GST Mode</label>
-<select id="gstMode">
-<option value="INTRA">INTRA</option>
-<option value="INTER">INTER</option>
-</select>
-</div>
-
-<div class="field">
-<label>Customer Name</label>
-<input id="customerName">
-</div>
-
-<div class="field">
-<label>Customer Mobile / Customer ID</label>
-<input id="customerMobile">
-</div>
-
-<div class="field">
-<label>Payment Mode</label>
-<select id="paymentMode">
-<option value="CASH">CASH</option>
-<option value="UPI">UPI</option>
-<option value="CARD">CARD</option>
-<option value="BANK">BANK</option>
-<option value="OTHER">OTHER</option>
-</select>
-</div>
-
-<div class="field">
-<label>Discount</label>
-<input id="discount" type="number" min="0" step="0.01" value="0">
-</div>
-</div>
-</div>
-
-<div class="panel">
-<h2>Cart</h2>
-<div class="table-wrap">
-<table class="cart-table">
-<thead>
-<tr>
-<th>Product</th>
-<th>SKU</th>
-<th>Rate</th>
-<th>GST %</th>
-<th>Qty</th>
-<th>Total</th>
-<th>Action</th>
-</tr>
-</thead>
-<tbody id="cartBody"></tbody>
-</table>
-</div>
-
-<div id="cartEmpty" class="empty">Cart is empty</div>
-
-<div class="summary">
-<div class="summary-row"><span>Subtotal</span><strong id="summarySubtotal">₹0.00</strong></div>
-<div class="summary-row"><span>Discount</span><strong id="summaryDiscount">₹0.00</strong></div>
-<div class="summary-row"><span>Taxable Amount</span><strong id="summaryTaxable">₹0.00</strong></div>
-<div class="summary-row"><span>CGST</span><strong id="summaryCgst">₹0.00</strong></div>
-<div class="summary-row"><span>SGST</span><strong id="summarySgst">₹0.00</strong></div>
-<div class="summary-row"><span>IGST</span><strong id="summaryIgst">₹0.00</strong></div>
-<div class="summary-row"><span>GST Total</span><strong id="summaryGst">₹0.00</strong></div>
-<div class="summary-row total"><span>Grand Total</span><strong id="summaryGrand">₹0.00</strong></div>
-</div>
-
-<div class="actions">
-<button id="completeSaleBtn" class="btn btn-primary">Complete Sale</button>
-<button id="clearCartBtn" class="btn btn-secondary">Clear Cart</button>
-</div>
-</div>
-
-</section>
-
-<section id="salesPage" class="page">
-<div class="panel">
-<h2>Sales</h2>
-<div class="search">
-<input id="salesSearch" placeholder="Search invoice, customer, mobile or sale ID">
-</div>
-<div class="table-wrap">
-<table>
-<thead>
-<tr>
-<th>Invoice</th>
-<th>Date</th>
-<th>Customer</th>
-<th>Payment</th>
-<th>Items</th>
-<th>Total</th>
-<th>Sync</th>
-</tr>
-</thead>
-<tbody id="salesTableBody"></tbody>
-</table>
-</div>
-</div>
-
-<div class="panel">
-<h2>Sync Activity</h2>
-<div id="activityLog" class="log-box">No activity</div>
-</div>
-</section>
-
 </div>
 
 <script>
@@ -277,1161 +58,332 @@ messagingSenderId:"108966486935",
 appId:"1:108966486935:web:47ffa7b9eb7b6d69a81ad2"
 };
 
-const SYNC_URL="https://script.google.com/macros/s/AKfycbyrS_NNgH1siSwOGdY9wMzfqqUnMZvauKDIAvS6R7s87kDr3ubvTWRCzRhjHPRTAleK8w/exec";
-const SALE_SYNC_URL="https://script.google.com/macros/s/AKfycbz-6o0RGbzDpvz11GaHLhXClpNvM5aCHMSqUw-FzCP49AQnxbo_sVRpsK7Ep_mOMnPL9w/exec";
-
-const DB_NAME="ShopManagementDB";
-const DB_VERSION=1;
-const SHOP_STORE="shops";
-const AGENT_STORE="agents";
-const PRODUCT_STORE="products";
-const SALES_STORE="sales";
-const GST_STORE="gst_records";
-const ACTIVITY_STORE="activity_logs";
-const QUEUE_STORE="sync_queue";
-const SETTINGS_STORE="settings";
-
-let db=null;
-let currentUser=null;
-let currentProfile={};
-let products=[];
-let sales=[];
-let cart=[];
-let syncing=false;
-
-const $=id=>document.getElementById(id);
-
-function generateId(prefix){
-return prefix+"_"+Date.now()+"_"+Math.random().toString(36).slice(2,10);
-}
-
-function timestamp(){
-return new Date().toISOString();
-}
-
-function today(){
-return new Date().toISOString().slice(0,10);
-}
-
-function normalizeNumber(value){
-const n=Number(value);
-return Number.isFinite(n)?n:0;
-}
-
-function money(value){
-return "₹"+normalizeNumber(value).toFixed(2);
-}
-
-function escapeHtml(value){
-return String(value??"")
-.replace(/&/g,"&amp;")
-.replace(/</g,"&lt;")
-.replace(/>/g,"&gt;")
-.replace(/"/g,"&quot;")
-.replace(/'/g,"&#039;");
-}
-
-function showMessage(message,type="info"){
-const el=$("globalMessage");
-el.textContent=message;
-el.className="message show "+type;
-clearTimeout(showMessage.timer);
-showMessage.timer=setTimeout(()=>{
-el.className="message";
-},7000);
-}
-
-function setConnection(){
-const online=navigator.onLine;
-$("connectionDot").classList.toggle("online",online);
-$("connectionText").textContent=online?"Online":"Offline";
-}
-
-function openDatabase(){
-return new Promise((resolve,reject)=>{
-const request=indexedDB.open(DB_NAME,DB_VERSION);
-
-request.onupgradeneeded=e=>{
-const database=e.target.result;
-
-if(!database.objectStoreNames.contains(SHOP_STORE))
-database.createObjectStore(SHOP_STORE,{keyPath:"id"});
-
-if(!database.objectStoreNames.contains(AGENT_STORE))
-database.createObjectStore(AGENT_STORE,{keyPath:"id"});
-
-if(!database.objectStoreNames.contains(PRODUCT_STORE))
-database.createObjectStore(PRODUCT_STORE,{keyPath:"id"});
-
-if(!database.objectStoreNames.contains(SALES_STORE))
-database.createObjectStore(SALES_STORE,{keyPath:"id"});
-
-if(!database.objectStoreNames.contains(GST_STORE))
-database.createObjectStore(GST_STORE,{keyPath:"id"});
-
-if(!database.objectStoreNames.contains(ACTIVITY_STORE))
-database.createObjectStore(ACTIVITY_STORE,{keyPath:"id"});
-
-if(!database.objectStoreNames.contains(QUEUE_STORE))
-database.createObjectStore(QUEUE_STORE,{keyPath:"id"});
-
-if(!database.objectStoreNames.contains(SETTINGS_STORE))
-database.createObjectStore(SETTINGS_STORE,{keyPath:"id"});
-};
-
-request.onsuccess=e=>{
-db=e.target.result;
-resolve(db);
-};
-
-request.onerror=()=>reject(request.error);
-});
-}
-
-function idbPut(store,value){
-return new Promise((resolve,reject)=>{
-const tx=db.transaction(store,"readwrite");
-tx.objectStore(store).put(value);
-tx.oncomplete=()=>resolve(value);
-tx.onerror=()=>reject(tx.error);
-});
-}
-
-function idbGetAll(store){
-return new Promise((resolve,reject)=>{
-const tx=db.transaction(store,"readonly");
-const request=tx.objectStore(store).getAll();
-request.onsuccess=()=>resolve(request.result||[]);
-request.onerror=()=>reject(request.error);
-});
-}
-
-function idbDelete(store,key){
-return new Promise((resolve,reject)=>{
-const tx=db.transaction(store,"readwrite");
-tx.objectStore(store).delete(key);
-tx.oncomplete=()=>resolve();
-tx.onerror=()=>reject(tx.error);
-});
-}
-
-function idbGet(store,key){
-return new Promise((resolve,reject)=>{
-const tx=db.transaction(store,"readonly");
-const request=tx.objectStore(store).get(key);
-request.onsuccess=()=>resolve(request.result);
-request.onerror=()=>reject(request.error);
-});
-}
-
-async function loadLocalData(){
-products=await idbGetAll(PRODUCT_STORE);
-sales=await idbGetAll(SALES_STORE);
-renderProducts();
-renderSales();
-renderDashboard();
-}
-
-async function saveActivity(action,status,result,error=""){
-const item={
-id:generateId("ACT"),
-action,
-status,
-result:result||"",
-error:error||"",
-dateTime:timestamp()
-};
-
-await idbPut(ACTIVITY_STORE,item);
-
-await idbPut(QUEUE_STORE,{
-id:generateId("QUEUE"),
-recordId:item.id,
-recordType:"Activity_Log",
-shopId:currentProfile.shopId||"",
-agentId:currentProfile.agentId||"",
-operation:"CREATE",
-payload:item,
-status:"PENDING",
-createdAt:timestamp(),
-updatedAt:timestamp()
-});
-
-renderActivity();
-}
-
-async function renderActivity(){
-const logs=await idbGetAll(ACTIVITY_STORE);
-logs.sort((a,b)=>String(b.dateTime).localeCompare(String(a.dateTime)));
-
-const text=logs.slice(0,100).map(x=>{
-return [
-"DATE: "+x.dateTime,
-"ACTION: "+x.action,
-"STATUS: "+x.status,
-"RESULT: "+x.result,
-"ERROR: "+x.error,
-"----------------------------------------"
-].join("\n");
-}).join("\n");
-
-$("activityLog").textContent=text||"No activity";
-$("dashboardLog").textContent=text||"No activity";
-}
-
-function getProfileValue(...keys){
-for(const key of keys){
-if(currentProfile&&currentProfile[key]!==undefined&&currentProfile[key]!==null&&String(currentProfile[key]).trim()!=="")
-return currentProfile[key];
-}
-return "";
-}
-
-function formatLoginDate(){
-if(currentUser&&currentUser.metadata&&currentUser.metadata.lastSignInTime)
-return new Date(currentUser.metadata.lastSignInTime).toISOString();
-return timestamp();
-}
-
-function getCategoryId(product){
-return String(
-product.categoryId||
-product.productCategoryId||
-product.category||
-"NA"
-).trim()||"NA";
-}
-
-function getBarcode(product,item){
-return String(
-product.barcode||
-product.productLineBarcode||
-item.barcode||
-item.productLineBarcode||
-product.productId||
-item.productId||
-"NA"
-).trim()||"NA";
-}
-
-function getGstin(){
-return String(
-getProfileValue("gstin","GSTIN","gstinNumber","GSTINNumber")||
-"NA"
-).trim()||"NA";
-}
-
-function getCustomerId(sale){
-return String(
-sale.customerMobile||
-sale.customerName||
-"WALKIN"
-).trim()||"WALKIN";
-}
-
-function buildSale13Fields(sale,item,index){
-const product=products.find(p=>String(p.id)===String(item.id))||
-products.find(p=>String(p.productId)===String(item.productId))||
-{};
-
-const categoryId=getCategoryId(product);
-const barcode=getBarcode(product,item);
-const shopId=String(sale.shopId||currentProfile.shopId||"NA");
-const firebaseClientId=String(currentUser?.uid||"NA");
-const sku=String(item.sku||product.sku||"NA");
-const loginDateTime=formatLoginDate();
-const notes=[
-"Payment:"+String(sale.paymentMode||"NA"),
-"Customer:"+String(sale.customerName||"WALKIN"),
-"Mobile:"+String(sale.customerMobile||"")
-].join(" | ");
-const invoiceNo=String(sale.invoiceNo||"NA");
-const gstin=getGstin();
-const customerId=getCustomerId(sale);
-const rate=normalizeNumber(item.salePrice);
-const receiveAmount=normalizeNumber(item.lineTotal);
-const transactionId=String(
-sale.recordId+
-"-LINE-"+
-String(index+1).padStart(4,"0")
-);
-
-return [
-categoryId,
-barcode,
-shopId,
-firebaseClientId,
-sku,
-loginDateTime,
-notes,
-invoiceNo,
-gstin,
-customerId,
-rate,
-receiveAmount,
-transactionId
-];
-}
-
-function validateSalePayload(payload){
-if(!payload||payload.action!=="addSale")
-throw new Error("Invalid sale action");
-
-if(!Array.isArray(payload.sale))
-throw new Error("Sale must be an array");
-
-if(payload.sale.length!==13)
-throw new Error("Sale must contain exactly 13 fields");
-
-for(let i=0;i<payload.sale.length;i++){
-if(payload.sale[i]===undefined||
-payload.sale[i]===null||
-String(payload.sale[i]).trim()==="")
-throw new Error("Sale field "+(i+1)+" is empty");
-}
-
-return true;
-}
-
-async function sendSaleAddRequest(payload){
-validateSalePayload(payload);
-
-const response=await fetch(SALE_SYNC_URL,{
-method:"POST",
-headers:{
-"Content-Type":"text/plain;charset=utf-8"
-},
-body:JSON.stringify(payload),
-redirect:"follow",
-cache:"no-store"
-});
-
-const text=await response.text();
-
-let data;
-
-try{
-data=JSON.parse(text);
-}catch(e){
-throw new Error("Invalid JSON response: "+text.slice(0,500));
-}
-
-if(!response.ok)
-throw new Error(
-data.message||
-data.error||
-"HTTP "+response.status
-);
-
-if(!data.ok)
-throw new Error(
-data.message||
-data.error||
-"Sale sync failed"
-);
-
-return data;
-}
-
-async function queueSaleLine(sale,item,index){
-const payload={
-action:"addSale",
-sale:buildSale13Fields(sale,item,index)
-};
-
-validateSalePayload(payload);
-
-const queue={
-id:generateId("QUEUE"),
-recordId:sale.recordId+"-LINE-"+String(index+1).padStart(4,"0"),
-recordType:"Sale_Add",
-shopId:sale.shopId||"",
-agentId:sale.agentId||"",
-operation:"CREATE",
-payload,
-status:"PENDING",
-createdAt:timestamp(),
-updatedAt:timestamp()
-};
-
-await idbPut(QUEUE_STORE,queue);
-return queue;
-}
-
-async function completeSale(){
-if(cart.length===0){
-showMessage("Cart is empty","error");
-return;
-}
-
-const summary=calculateSummary();
-
-const saleId=generateId("SALE");
-const invoiceNo="INV-"+new Date().getTime();
-
-const sale={
-id:saleId,
-recordId:saleId,
-shopId:currentProfile.shopId||"NA",
-agentId:currentProfile.agentId||currentUser?.uid||"NA",
-saleId,
-invoiceNo,
-date:today(),
-customerName:$("customerName").value.trim(),
-customerMobile:$("customerMobile").value.trim(),
-paymentMode:$("paymentMode").value,
-subtotal:summary.subtotal,
-discount:summary.discount,
-taxableAmount:summary.taxable,
-cgst:summary.cgst,
-sgst:summary.sgst,
-igst:summary.igst,
-gstTotal:summary.gstTotal,
-grandTotal:summary.grandTotal,
-items:cart.map(x=>({
-productId:x.productId,
-sku:x.sku,
-productName:x.productName,
-salePrice:x.salePrice,
-gstRate:x.gstRate,
-qty:x.qty,
-lineTotal:x.salePrice*x.qty,
-id:x.id
-})),
-createdAt:timestamp(),
-remoteSyncStatus:"PENDING"
-};
-
-try{
-await idbPut(SALES_STORE,sale);
-
-for(const item of cart){
-const product=products.find(p=>String(p.id)===String(item.id));
-if(product){
-product.stock=Math.max(
-0,
-normalizeNumber(product.stock)-normalizeNumber(item.qty)
-);
-product.updatedAt=timestamp();
-await idbPut(PRODUCT_STORE,product);
-}
-}
-
-for(let i=0;i<sale.items.length;i++){
-await queueSaleLine(sale,sale.items[i],i);
-}
-
-await idbPut(GST_STORE,{
-id:generateId("GST"),
-recordId:sale.recordId,
-saleId:sale.saleId,
-invoiceNo:sale.invoiceNo,
-shopId:sale.shopId,
-gstMode:$("gstMode").value,
-cgst:sale.cgst,
-sgst:sale.sgst,
-igst:sale.igst,
-gstTotal:sale.gstTotal,
-grandTotal:sale.grandTotal,
-createdAt:sale.createdAt
-});
-
-await saveActivity(
-"SALE_CREATE",
-"SUCCESS",
-"Local sale created: "+sale.invoiceNo+
-" | Lines: "+sale.items.length+
-" | Total: "+money(sale.grandTotal)
-);
-
-cart=[];
-renderCart();
-await loadLocalData();
-
-showMessage(
-"Sale "+sale.invoiceNo+" saved locally. "+sale.items.length+" sale line(s) queued for sync.",
-"success"
-);
-
-if(navigator.onLine)
-await syncPending();
-
-}catch(error){
-await saveActivity(
-"SALE_CREATE",
-"ERROR",
-"",
-error.message
-);
-showMessage("Sale creation failed: "+error.message,"error");
-}
-}
-
-async function sendBatch(items){
-const body={
-action:"batchSync",
-siteId:"shophariom",
-timestamp:Date.now(),
-nonce:generateId("NONCE"),
-idToken:currentUser?await currentUser.getIdToken():null,
-records:items.map(x=>({
-recordId:x.recordId,
-recordType:x.recordType,
-shopId:x.shopId,
-agentId:x.agentId,
-operation:x.operation,
-payload:x.payload
-}))
-};
-
-const response=await fetch(SYNC_URL,{
-method:"POST",
-headers:{
-"Content-Type":"text/plain;charset=utf-8"
-},
-body:JSON.stringify(body),
-cache:"no-store"
-});
-
-const text=await response.text();
-
-let data;
-
-try{
-data=JSON.parse(text);
-}catch(e){
-throw new Error("Invalid batch JSON response");
-}
-
-if(!response.ok||data.ok===false)
-throw new Error(data.message||data.error||"Batch sync failed");
-
-return data;
-}
-
-async function applyDirectSaleSyncResult(item,data){
-item.status="SENT";
-item.serverResponse=data;
-item.updatedAt=timestamp();
-
-await idbPut(QUEUE_STORE,item);
-
-const salesList=await idbGetAll(SALES_STORE);
-const sale=salesList.find(x=>String(x.recordId)===String(item.recordId).split("-LINE-")[0]);
-
-if(sale){
-const all=await idbGetAll(QUEUE_STORE);
-const saleQueues=all.filter(q=>
-q.recordType==="Sale_Add"&&
-String(q.recordId).startsWith(String(sale.recordId)+"-LINE-")
-);
-
-const complete=saleQueues.length>0&&
-saleQueues.every(q=>q.status==="SENT");
-
-if(complete){
-sale.remoteSyncStatus="SYNCED";
-sale.remoteSyncedAt=timestamp();
-await idbPut(SALES_STORE,sale);
-}
-}
-}
-
-async function syncDirectSaleItem(item){
-try{
-const data=await sendSaleAddRequest(item.payload);
-
-await applyDirectSaleSyncResult(item,data);
-
-await saveActivity(
-"SALE_ADD_SYNC",
-"SUCCESS",
-(item.recordId||"")+" | "+(data.message||"Sale synced")
-);
-
-return true;
-}catch(error){
-item.status="ERROR";
-item.error=error.message;
-item.updatedAt=timestamp();
-await idbPut(QUEUE_STORE,item);
-
-await saveActivity(
-"SALE_ADD_SYNC",
-"ERROR",
-item.recordId||"",
-error.message
-);
-
-return false;
-}
-}
-
-async function syncBatchItems(items){
-if(items.length===0)return;
-
-try{
-const data=await sendBatch(items);
-
-for(const item of items){
-item.status="SENT";
-item.serverResponse=data;
-item.updatedAt=timestamp();
-await idbPut(QUEUE_STORE,item);
-}
-
-await saveActivity(
-"BATCH_SYNC",
-"SUCCESS",
-items.length+" record(s) synced"
-);
-
-}catch(error){
-for(const item of items){
-item.status="ERROR";
-item.error=error.message;
-item.updatedAt=timestamp();
-await idbPut(QUEUE_STORE,item);
-}
-
-await saveActivity(
-"BATCH_SYNC",
-"ERROR",
-items.length+" record(s)",
-error.message
-);
-}
-}
-
-async function syncPending(){
-if(syncing)return;
-
-if(!navigator.onLine){
-showMessage("Offline. Pending records remain in local queue.","info");
-return;
-}
-
-syncing=true;
-
-try{
-const queue=await idbGetAll(QUEUE_STORE);
-
-const pending=queue.filter(x=>
-x.status==="PENDING"||
-x.status==="ERROR"
-);
-
-const saleItems=pending.filter(x=>x.recordType==="Sale_Add");
-const batchItems=pending.filter(x=>x.recordType!=="Sale_Add");
-
-for(const item of saleItems){
-await syncDirectSaleItem(item);
-}
-
-if(batchItems.length){
-await syncBatchItems(batchItems);
-}
-
-await loadLocalData();
-await renderActivity();
-await renderDashboard();
-
-showMessage(
-"Sync completed. Sale and normal queues processed separately.",
-"success"
-);
-
-}catch(error){
-await saveActivity(
-"SYNC",
-"ERROR",
-"",
-error.message
-);
-
-showMessage("Sync error: "+error.message,"error");
-}finally{
-syncing=false;
-}
-}
-
-async function retryFailed(){
-const queue=await idbGetAll(QUEUE_STORE);
-const failed=queue.filter(x=>x.status==="ERROR");
-
-if(!failed.length){
-showMessage("No failed records found.","info");
-return;
-}
-
-for(const item of failed){
-item.status="PENDING";
-item.error="";
-item.updatedAt=timestamp();
-await idbPut(QUEUE_STORE,item);
-}
-
-showMessage(failed.length+" failed record(s) moved to retry queue.","info");
-
-await syncPending();
-}
-
-function calculateSummary(){
-const subtotal=cart.reduce((sum,x)=>{
-return sum+normalizeNumber(x.salePrice)*normalizeNumber(x.qty);
-},0);
-
-const discount=Math.min(
-subtotal,
-Math.max(0,normalizeNumber($("discount").value))
-);
-
-const taxable=Math.max(0,subtotal-discount);
-
-let cgst=0;
-let sgst=0;
-let igst=0;
-
-if($("gstMode").value==="INTRA"){
-for(const item of cart){
-const lineBase=
-normalizeNumber(item.salePrice)*
-normalizeNumber(item.qty);
-
-const lineDiscount=
-subtotal>0?
-discount*(lineBase/subtotal):
-0;
-
-const taxableLine=Math.max(0,lineBase-lineDiscount);
-const gst=taxableLine*normalizeNumber(item.gstRate)/100;
-
-cgst+=gst/2;
-sgst+=gst/2;
-}
-}else{
-for(const item of cart){
-const lineBase=
-normalizeNumber(item.salePrice)*
-normalizeNumber(item.qty);
-
-const lineDiscount=
-subtotal>0?
-discount*(lineBase/subtotal):
-0;
-
-const taxableLine=Math.max(0,lineBase-lineDiscount);
-
-igst+=taxableLine*normalizeNumber(item.gstRate)/100;
-}
-}
-
-const gstTotal=cgst+sgst+igst;
-const grandTotal=taxable+gstTotal;
-
-return{
-subtotal,
-discount,
-taxable,
-cgst,
-sgst,
-igst,
-gstTotal,
-grandTotal
-};
-}
-
-function renderSummary(){
-const s=calculateSummary();
-
-$("summarySubtotal").textContent=money(s.subtotal);
-$("summaryDiscount").textContent=money(s.discount);
-$("summaryTaxable").textContent=money(s.taxable);
-$("summaryCgst").textContent=money(s.cgst);
-$("summarySgst").textContent=money(s.sgst);
-$("summaryIgst").textContent=money(s.igst);
-$("summaryGst").textContent=money(s.gstTotal);
-$("summaryGrand").textContent=money(s.grandTotal);
-}
-
-function renderCart(){
-const body=$("cartBody");
-
-if(!cart.length){
-body.innerHTML="";
-$("cartEmpty").style.display="block";
-renderSummary();
-return;
-}
-
-$("cartEmpty").style.display="none";
-
-body.innerHTML=cart.map((item,index)=>{
-const total=normalizeNumber(item.salePrice)*normalizeNumber(item.qty);
-
-return `
-<tr>
-<td>${escapeHtml(item.productName)}</td>
-<td>${escapeHtml(item.sku)}</td>
-<td>${money(item.salePrice)}</td>
-<td>${normalizeNumber(item.gstRate).toFixed(2)}%</td>
-<td>
-<input class="cart-qty" data-index="${index}" type="number" min="1" max="${Math.max(1,normalizeNumber(item.stock)+normalizeNumber(item.qty))}" value="${item.qty}">
-</td>
-<td>${money(total)}</td>
-<td><button class="btn btn-danger remove-cart" data-index="${index}">Remove</button></td>
-</tr>
-`;
-}).join("");
-
-document.querySelectorAll(".cart-qty").forEach(input=>{
-input.addEventListener("change",e=>{
-const index=Number(e.target.dataset.index);
-const qty=Math.max(1,Math.floor(normalizeNumber(e.target.value)));
-cart[index].qty=qty;
-renderCart();
-});
-});
-
-document.querySelectorAll(".remove-cart").forEach(button=>{
-button.addEventListener("click",e=>{
-const index=Number(e.target.dataset.index);
-cart.splice(index,1);
-renderCart();
-});
-});
-
-renderSummary();
-}
-
-function addProductToCart(product){
-const existing=cart.find(x=>String(x.id)===String(product.id));
-
-if(existing){
-existing.qty++;
-}else{
-cart.push({
-id:product.id,
-recordId:product.recordId,
-productId:product.productId||product.id,
-sku:product.sku||"",
-productName:product.productName||"Unnamed Product",
-salePrice:normalizeNumber(product.salePrice),
-gstRate:normalizeNumber(product.gstRate),
-stock:normalizeNumber(product.stock),
-qty:1,
-barcode:product.barcode||product.productLineBarcode||""
-});
-}
-
-renderCart();
-$("saleProductSearch").value="";
-$("productResults").innerHTML="";
-}
-
-function searchSaleProducts(){
-const q=$("saleProductSearch").value.trim().toLowerCase();
-
-if(!q){
-$("productResults").innerHTML="";
-return;
-}
-
-const result=products.filter(p=>{
-return [
-p.productName,
-p.sku,
-p.productId,
-p.id,
-p.barcode,
-p.productLineBarcode,
-p.category
-].some(v=>String(v||"").toLowerCase().includes(q));
-}).slice(0,50);
-
-if(!result.length){
-$("productResults").innerHTML='<div class="empty">No product found</div>';
-return;
-}
-
-$("productResults").innerHTML=result.map(p=>{
-return `
-<div class="product-result" data-product-id="${escapeHtml(p.id)}">
-<strong>${escapeHtml(p.productName||"Unnamed")}</strong>
-<br>
-<span>SKU: ${escapeHtml(p.sku||"")}</span>
-<span> | Price: ${money(p.salePrice)}</span>
-<span> | Stock: ${normalizeNumber(p.stock)}</span>
-</div>
-`;
-}).join("");
-
-document.querySelectorAll(".product-result").forEach(el=>{
-el.addEventListener("click",()=>{
-const product=products.find(p=>String(p.id)===String(el.dataset.productId));
-if(product)addProductToCart(product);
-});
-});
-}
-
-function renderProducts(){
-const q=$("productListSearch").value.trim().toLowerCase();
-
-const result=products.filter(p=>{
-if(!q)return true;
-
-return [
-p.productName,
-p.sku,
-p.category,
-p.productId,
-p.id,
-p.barcode
-].some(v=>String(v||"").toLowerCase().includes(q));
-});
-
-$("productTableBody").innerHTML=result.map(p=>{
-const stock=normalizeNumber(p.stock);
-const status=p.status||(
-stock<=0?"OUT OF STOCK":
-stock<=normalizeNumber(p.minimumStock)?"LOW STOCK":"ACTIVE"
-);
-
-return `
-<tr>
-<td>${escapeHtml(p.productName||"")}</td>
-<td>${escapeHtml(p.sku||"")}</td>
-<td>${escapeHtml(p.category||"")}</td>
-<td>${money(p.salePrice)}</td>
-<td>${normalizeNumber(p.gstRate).toFixed(2)}%</td>
-<td>${stock}</td>
-<td>${escapeHtml(status)}</td>
-</tr>
-`;
-}).join("");
-
-if(!result.length){
-$("productTableBody").innerHTML='<tr><td colspan="7" class="empty">No products</td></tr>';
-}
-}
-
-function renderSales(){
-const q=$("salesSearch").value.trim().toLowerCase();
-
-const result=sales.filter(s=>{
-if(!q)return true;
-
-return [
-s.invoiceNo,
-s.customerName,
-s.customerMobile,
-s.saleId,
-s.recordId
-].some(v=>String(v||"").toLowerCase().includes(q));
-});
-
-result.sort((a,b)=>
-String(b.createdAt||"").localeCompare(String(a.createdAt||""))
-);
-
-$("salesTableBody").innerHTML=result.map(s=>{
-const status=s.remoteSyncStatus||"PENDING";
-
-const badge=status==="SYNCED"?
-"badge-success":
-status==="ERROR"?
-"badge-error":"badge-pending";
-
-return `
-<tr>
-<td>${escapeHtml(s.invoiceNo)}</td>
-<td>${escapeHtml(s.date)}</td>
-<td>${escapeHtml(s.customerName||"WALK-IN")}</td>
-<td>${escapeHtml(s.paymentMode||"")}</td>
-<td>${Array.isArray(s.items)?s.items.length:0}</td>
-<td>${money(s.grandTotal)}</td>
-<td><span class="badge ${badge}">${escapeHtml(status)}</span></td>
-</tr>
-`;
-}).join("");
-
-if(!result.length){
-$("salesTableBody").innerHTML='<tr><td colspan="7" class="empty">No sales</td></tr>';
-}
-}
-
-async function renderDashboard(){
-const queue=await idbGetAll(QUEUE_STORE);
-
-const pending=queue.filter(x=>
-x.status==="PENDING"||
-x.status==="ERROR"
-).length;
-
-const stock=products.reduce((sum,p)=>
-sum+normalizeNumber(p.stock),0
-);
-
-$("dashboardProducts").textContent=products.length;
-$("dashboardStock").textContent=stock;
-$("dashboardSales").textContent=sales.length;
-$("dashboardPending").textContent=pending;
-}
-
-async function initializeFirebase(){
-try{
-if(!firebase.apps.length)
 firebase.initializeApp(firebaseConfig);
 
-firebase.auth().onAuthStateChanged(async user=>{
-currentUser=user;
+const auth=firebase.auth();
+const db=firebase.database();
 
-if(user){
-$("userText").textContent=user.email||user.uid;
+const emailEl=document.getElementById("email");
+const passwordEl=document.getElementById("password");
+const loginBtn=document.getElementById("loginBtn");
+const logoutBtn=document.getElementById("logoutBtn");
+const loginBox=document.getElementById("loginBox");
+const statusEl=document.getElementById("status");
 
-try{
-const snap=await firebase.database()
-.ref("users/"+user.uid)
-.once("value");
+let currentUser=null;
 
-const value=snap.val();
-
-if(value&&typeof value==="object")
-currentProfile=value;
-}catch(e){}
-}else{
-$("userText").textContent="Not signed in";
+function showStatus(message,type="info"){
+    statusEl.className="status "+type;
+    statusEl.textContent=message;
 }
 
-await renderDashboard();
+function now(){
+    return new Date().toISOString();
+}
+
+function printLoginSuccess(user){
+    const lines=[
+        "LOGIN TEST",
+        "----------------------------------------",
+        "DATE: "+now(),
+        "STATUS: SUCCESS",
+        "EMAIL: "+(user.email||""),
+        "UID: "+(user.uid||""),
+        "DISPLAY NAME: "+(user.displayName||""),
+        "EMAIL VERIFIED: "+String(user.emailVerified),
+        "CREATED: "+(user.metadata?.creationTime||""),
+        "LAST SIGN IN: "+(user.metadata?.lastSignInTime||""),
+        "----------------------------------------"
+    ];
+
+    showStatus(lines.join("\n"),"success");
+}
+
+async function testAgentAccess(user){
+
+    const uid=user.uid;
+
+    showStatus(
+        "LOGIN SUCCESS\n\n"+
+        "Testing agent access...\n"+
+        "Firebase UID: "+uid+
+        "\n\nReading agent_access/"+uid+"...",
+        "info"
+    );
+
+    try{
+
+        const uidSnapshot=await db.ref("agent_access/"+uid).once("value");
+
+        if(uidSnapshot.exists()){
+
+            const data=uidSnapshot.val();
+
+            showStatus(
+                "LOGIN TEST\n"+
+                "----------------------------------------\n"+
+                "DATE: "+now()+"\n"+
+                "STATUS: SUCCESS\n"+
+                "EMAIL: "+(user.email||"")+"\n"+
+                "UID: "+uid+"\n"+
+                "AGENT ID: "+uid+"\n"+
+                "PATH: agent_access/"+uid+"\n"+
+                "RECORD FOUND: YES\n"+
+                "DATA:\n"+
+                JSON.stringify(data,null,2)+"\n"+
+                "----------------------------------------",
+                "success"
+            );
+
+            return;
+        }
+
+        const userPaths=[
+            "users/"+uid,
+            "agents/"+uid,
+            "user_profiles/"+uid
+        ];
+
+        for(const path of userPaths){
+
+            const snapshot=await db.ref(path).once("value");
+
+            if(!snapshot.exists()) continue;
+
+            const data=snapshot.val()||{};
+
+            const possibleAgentId=
+                data.agentId||
+                data.agentID||
+                data.agent_id||
+                data.id||
+                null;
+
+            if(!possibleAgentId) continue;
+
+            const agentSnapshot=
+                await db.ref("agent_access/"+possibleAgentId).once("value");
+
+            if(agentSnapshot.exists()){
+
+                showStatus(
+                    "LOGIN TEST\n"+
+                    "----------------------------------------\n"+
+                    "DATE: "+now()+"\n"+
+                    "STATUS: SUCCESS\n"+
+                    "EMAIL: "+(user.email||"")+"\n"+
+                    "UID: "+uid+"\n"+
+                    "PROFILE PATH: "+path+"\n"+
+                    "AGENT ID: "+possibleAgentId+"\n"+
+                    "AGENT ACCESS PATH: agent_access/"+possibleAgentId+"\n"+
+                    "RECORD FOUND: YES\n"+
+                    "DATA:\n"+
+                    JSON.stringify(agentSnapshot.val(),null,2)+"\n"+
+                    "----------------------------------------",
+                    "success"
+                );
+
+                return;
+            }
+        }
+
+        showStatus(
+            "LOGIN TEST\n"+
+            "----------------------------------------\n"+
+            "DATE: "+now()+"\n"+
+            "STATUS: LOGIN SUCCESS\n"+
+            "EMAIL: "+(user.email||"")+"\n"+
+            "UID: "+uid+"\n"+
+            "AGENT ID: NOT FOUND\n"+
+            "----------------------------------------\n"+
+            "agent_access/"+uid+" does not exist.\n"+
+            "No agentId was found in the tested profile paths.\n"+
+            "----------------------------------------",
+            "error"
+        );
+
+    }catch(error){
+
+        showStatus(
+            "LOGIN TEST\n"+
+            "----------------------------------------\n"+
+            "DATE: "+now()+"\n"+
+            "STATUS: DATABASE ERROR\n"+
+            "EMAIL: "+(user.email||"")+"\n"+
+            "UID: "+uid+"\n"+
+            "ERROR CODE: "+(error.code||"")+"\n"+
+            "ERROR: "+(error.message||String(error))+"\n"+
+            "----------------------------------------",
+            "error"
+        );
+
+        console.error("[ShopAuth] Firebase Database Error",error);
+    }
+}
+
+loginBtn.addEventListener("click",async function(){
+
+    const email=emailEl.value.trim();
+    const password=passwordEl.value;
+
+    if(!email){
+        showStatus("EMAIL IS REQUIRED","error");
+        return;
+    }
+
+    if(!password){
+        showStatus("PASSWORD IS REQUIRED","error");
+        return;
+    }
+
+    loginBtn.disabled=true;
+
+    showStatus(
+        "LOGIN TEST\n"+
+        "----------------------------------------\n"+
+        "DATE: "+now()+"\n"+
+        "STATUS: LOGIN IN PROGRESS\n"+
+        "EMAIL: "+email+"\n"+
+        "----------------------------------------",
+        "info"
+    );
+
+    try{
+
+        const result=await auth.signInWithEmailAndPassword(email,password);
+
+        currentUser=result.user;
+
+        printLoginSuccess(currentUser);
+
+        loginBox.classList.add("hidden");
+        logoutBtn.classList.remove("hidden");
+
+        await testAgentAccess(currentUser);
+
+    }catch(error){
+
+        currentUser=null;
+
+        showStatus(
+            "LOGIN TEST\n"+
+            "----------------------------------------\n"+
+            "DATE: "+now()+"\n"+
+            "STATUS: FAILED\n"+
+            "ERROR CODE: "+(error.code||"")+"\n"+
+            "ERROR: "+(error.message||String(error))+"\n"+
+            "----------------------------------------",
+            "error"
+        );
+
+        console.error("[ShopAuth] Login Error",error);
+
+    }finally{
+
+        loginBtn.disabled=false;
+
+    }
 });
-}catch(error){
-await saveActivity(
-"FIREBASE_INIT",
-"ERROR",
-"",
-error.message
-);
-}
-}
 
-async function testSalePayload(){
-if(!cart.length){
-showMessage("Add at least one product to test sale payload.","error");
-return;
-}
+logoutBtn.addEventListener("click",async function(){
 
-const sale={
-recordId:"TEST_"+Date.now(),
-shopId:currentProfile.shopId||"TEST_SHOP",
-invoiceNo:"TEST_INV_"+Date.now(),
-customerName:"TEST CUSTOMER",
-customerMobile:"TEST",
-paymentMode:"TEST"
-};
+    try{
 
-const item={
-id:cart[0].id,
-productId:cart[0].productId,
-sku:cart[0].sku,
-salePrice:cart[0].salePrice,
-lineTotal:cart[0].salePrice*cart[0].qty
-};
+        await auth.signOut();
 
-const payload={
-action:"addSale",
-sale:buildSale13Fields(sale,item,0)
-};
+        currentUser=null;
 
-try{
-validateSalePayload(payload);
+        loginBox.classList.remove("hidden");
+        logoutBtn.classList.add("hidden");
 
-const data=await sendSaleAddRequest(payload);
+        passwordEl.value="";
 
-await saveActivity(
-"SALE_TEST",
-"SUCCESS",
-JSON.stringify(data)
-);
+        showStatus(
+            "LOGOUT TEST\n"+
+            "----------------------------------------\n"+
+            "DATE: "+now()+"\n"+
+            "STATUS: SUCCESS\n"+
+            "----------------------------------------",
+            "success"
+        );
 
-showMessage("Sale API test PASS","success");
-}catch(error){
-await saveActivity(
-"SALE_TEST",
-"ERROR",
-"",
-error.message
-);
+    }catch(error){
 
-showMessage("Sale API test failed: "+error.message,"error");
-}
-}
+        showStatus(
+            "LOGOUT FAILED\n"+
+            "ERROR CODE: "+(error.code||"")+"\n"+
+            "ERROR: "+(error.message||String(error)),
+            "error"
+        );
 
-function setupEvents(){
-document.querySelectorAll(".nav button[data-page]").forEach(button=>{
-button.addEventListener("click",()=>{
-document.querySelectorAll(".nav button[data-page]").forEach(x=>{
-x.classList.remove("active");
-});
-button.classList.add("active");
+    }
 
-document.querySelectorAll(".page").forEach(page=>{
-page.classList.remove("active");
 });
 
-$(button.dataset.page).classList.add("active");
+auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL)
+.then(function(){
+
+    console.log("[ShopAuth] Firebase persistence = LOCAL");
+
+    showStatus(
+        "Firebase initialized.\n"+
+        "Persistence: LOCAL\n"+
+        "Waiting for login...",
+        "info"
+    );
+
+    return new Promise(function(resolve){
+        const unsubscribe=auth.onAuthStateChanged(async function(user){
+
+            unsubscribe();
+
+            if(user){
+
+                currentUser=user;
+
+                loginBox.classList.add("hidden");
+                logoutBtn.classList.remove("hidden");
+
+                printLoginSuccess(user);
+
+                await testAgentAccess(user);
+
+            }else{
+
+                currentUser=null;
+
+                console.log("[ShopAuth] No Firebase login session.");
+
+                showStatus(
+                    "Firebase initialized.\n"+
+                    "Persistence: LOCAL\n"+
+                    "STATUS: NOT LOGGED IN\n"+
+                    "Enter email and password, then press Login.",
+                    "info"
+                );
+
+            }
+
+            resolve();
+
+        });
+    });
+
+})
+.catch(function(error){
+
+    console.error("[ShopAuth] Firebase initialization error",error);
+
+    showStatus(
+        "FIREBASE INITIALIZATION ERROR\n"+
+        "----------------------------------------\n"+
+        "ERROR CODE: "+(error.code||"")+"\n"+
+        "ERROR: "+(error.message||String(error)),
+        "error"
+    );
+
 });
-});
-
-$("syncBtn").addEventListener("click",syncPending);
-$("retryBtn").addEventListener("click",retryFailed);
-
-$("saleProductSearch").addEventListener("input",searchSaleProducts);
-
-$("discount").addEventListener("input",renderSummary);
-$("gstMode").addEventListener("change",renderSummary);
-
-$("completeSaleBtn").addEventListener("click",completeSale);
-
-$("clearCartBtn").addEventListener("click",()=>{
-cart=[];
-$("customerName").value="";
-$("customerMobile").value="";
-$("discount").value="0";
-renderCart();
-});
-
-$("productListSearch").addEventListener("input",renderProducts);
-$("salesSearch").addEventListener("input",renderSales);
-
-window.addEventListener("online",()=>{
-setConnection();
-syncPending();
-});
-
-window.addEventListener("offline",setConnection);
-}
-
-async function startup(){
-setConnection();
-
-try{
-await openDatabase();
-await loadLocalData();
-await renderActivity();
-await renderDashboard();
-await initializeFirebase();
-
-if(navigator.onLine)
-setTimeout(syncPending,1000);
-
-}catch(error){
-showMessage("Startup error: "+error.message,"error");
-}
-}
-
-setupEvents();
-startup();
 </script>
+
 </body>
 </html>
