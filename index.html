@@ -297,6 +297,7 @@ const firebaseConfig = {
 const APP_CONFIG = {
     SITE_ID: "shophariom",
     APPS_SCRIPT_URL: "https://script.google.com/macros/s/AKfycbyrS_NNgH1siSwOGdY9wMzfqqUnMZvauKDIAvS6R7s87kDr3ubvTWRCzRhjHPRTAleK8w/exec",
+    SALE_SYNC_URL: "https://script.google.com/macros/s/AKfycbz-6o0RGbzDpvz11GaHLhXClpNvM5aCHMSqUw-FzCP49AQnxbo_sVRpsK7Ep_mOMnPL9w/exec",
     DATABASE_NAME: "ShopManagementDB",
     DATABASE_VERSION: 1
 };
@@ -722,7 +723,9 @@ async function updateLastLogin(uid, profile) {
                 userId: uid,
                 shopId: profile.shopId || "",
                 agentId: profile.role === "agent" ? uid : ""
-            })
+            }),
+            redirect: "follow",
+            cache: "no-store"
         }
     );
 
@@ -881,68 +884,366 @@ async function syncPendingRecords() {
             ""
         );
 
-        const records = batch.map(item => ({
-            recordId: item.recordId,
-            recordType: item.recordType,
-            shopId: item.shopId,
-            agentId: item.agentId,
-            operation: item.operation,
-            payload: item.payload
-        }));
+        const normalItems = batch.filter(
+            item => String(item.recordType || "").toUpperCase() !== "SALE_ADD"
+        );
 
-        try {
-            const response = await fetch(
-                APP_CONFIG.APPS_SCRIPT_URL,
-                {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "text/plain;charset=utf-8"
-                    },
-                    body: JSON.stringify({
-                        action: "batchSync",
-                        siteId: APP_CONFIG.SITE_ID,
-                        timestamp: Date.now(),
-                        nonce: generateNonce(),
-                        idToken: token,
-                        shopId: batch[0].shopId || "",
-                        agentId: batch[0].agentId || "",
-                        records: records
-                    })
+        const saleItems = batch.filter(
+            item => String(item.recordType || "").toUpperCase() === "SALE_ADD"
+        );
+
+        if (saleItems.length) {
+            for (const item of saleItems) {
+                try {
+                    const result =
+                        await sendSaleAddRequest(
+                            item.payload
+                        );
+
+                    await applyDirectSaleSyncResult(
+                        item,
+                        result
+                    );
+                } catch (error) {
+                    const message =
+                        error && error.message
+                            ? error.message
+                            : String(error);
+
+                    await updateQueueErrors(
+                        [item.recordId],
+                        message
+                    );
                 }
-            );
+            }
+        }
 
-            const text = await response.text();
-
-            let data;
+        if (normalItems.length) {
+            const records = normalItems.map(item => ({
+                recordId: item.recordId,
+                recordType: item.recordType,
+                shopId: item.shopId,
+                agentId: item.agentId,
+                operation: item.operation,
+                payload: item.payload
+            }));
 
             try {
-                data = JSON.parse(text);
+                const response = await fetch(
+                    APP_CONFIG.APPS_SCRIPT_URL,
+                    {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "text/plain;charset=utf-8"
+                        },
+                        body: JSON.stringify({
+                            action: "batchSync",
+                            siteId: APP_CONFIG.SITE_ID,
+                            timestamp: Date.now(),
+                            nonce: generateNonce(),
+                            idToken: token,
+                            shopId: normalItems[0].shopId || "",
+                            agentId: normalItems[0].agentId || "",
+                            records: records
+                        }),
+                        redirect: "follow",
+                        cache: "no-store"
+                    }
+                );
+
+                const text = await response.text();
+
+                let data;
+
+                try {
+                    data = JSON.parse(text);
+                } catch (error) {
+                    throw new Error(
+                        "APPS_SCRIPT_INVALID_RESPONSE"
+                    );
+                }
+
+                if (!response.ok || !data.results) {
+                    throw new Error(
+                        data && data.error
+                            ? String(data.error)
+                            : "BATCH_SYNC_FAILED"
+                    );
+                }
+
+                await applySyncResults(data.results);
             } catch (error) {
-                throw new Error(
-                    "APPS_SCRIPT_INVALID_RESPONSE"
+                const message = error && error.message
+                    ? error.message
+                    : String(error);
+
+                await updateQueueErrors(
+                    normalItems.map(item => item.recordId),
+                    message
                 );
             }
-
-            if (!response.ok || !data.results) {
-                throw new Error(
-                    data && data.error
-                        ? String(data.error)
-                        : "BATCH_SYNC_FAILED"
-                );
-            }
-
-            await applySyncResults(data.results);
-        } catch (error) {
-            const message = error && error.message
-                ? error.message
-                : String(error);
-
-            await updateQueueErrors(
-                batch.map(item => item.recordId),
-                message
-            );
         }
     }
+}
+
+function validateSaleAddRequest(request) {
+    if (!request || typeof request !== "object") {
+        return {
+            ok: false,
+            message: "SALE_REQUEST_EMPTY"
+        };
+    }
+
+    if (String(request.action || "") !== "addSale") {
+        return {
+            ok: false,
+            message: "INVALID_SALE_ACTION"
+        };
+    }
+
+    if (!Array.isArray(request.sale)) {
+        return {
+            ok: false,
+            message: "SALE_FIELDS_MUST_BE_ARRAY"
+        };
+    }
+
+    if (request.sale.length !== 13) {
+        return {
+            ok: false,
+            message: "SALE_FIELD_COUNT_MUST_BE_13"
+        };
+    }
+
+    for (let i = 0; i < request.sale.length; i++) {
+        if (
+            request.sale[i] === null ||
+            request.sale[i] === undefined ||
+            String(request.sale[i]).trim() === ""
+        ) {
+            return {
+                ok: false,
+                message: "SALE_FIELD_" + (i + 1) + "_EMPTY"
+            };
+        }
+    }
+
+    return {
+        ok: true,
+        message: "VALID"
+    };
+}
+
+async function sendSaleAddRequest(request) {
+    const validation =
+        validateSaleAddRequest(request);
+
+    if (!validation.ok) {
+        throw new Error(validation.message);
+    }
+
+    const response = await fetch(
+        APP_CONFIG.SALE_SYNC_URL,
+        {
+            method: "POST",
+            headers: {
+                "Content-Type": "text/plain;charset=utf-8"
+            },
+            body: JSON.stringify(request),
+            redirect: "follow",
+            cache: "no-store"
+        }
+    );
+
+    const text = await response.text();
+
+    let data;
+
+    try {
+        data = JSON.parse(text);
+    } catch (error) {
+        throw new Error(
+            "SALE_APPS_SCRIPT_INVALID_RESPONSE"
+        );
+    }
+
+    if (!response.ok) {
+        throw new Error(
+            "SALE_HTTP_" + response.status
+        );
+    }
+
+    if (!data || data.ok !== true) {
+        throw new Error(
+            data && (
+                data.message ||
+                data.error
+            )
+                ? String(
+                    data.message ||
+                    data.error
+                )
+                : "SALE_REMOTE_SYNC_FAILED"
+        );
+    }
+
+    return data;
+}
+
+async function applyDirectSaleSyncResult(
+    item,
+    result
+) {
+    const db = await openDatabase();
+
+    await new Promise((resolve, reject) => {
+        const transaction = db.transaction(
+            [
+                "sync_queue",
+                "sales"
+            ],
+            "readwrite"
+        );
+
+        const queueStore =
+            transaction.objectStore(
+                "sync_queue"
+            );
+
+        const salesStore =
+            transaction.objectStore(
+                "sales"
+            );
+
+        const queueRequest =
+            queueStore.get(
+                String(item.recordId)
+            );
+
+        queueRequest.onsuccess = () => {
+            const queueItem =
+                queueRequest.result;
+
+            if (!queueItem) {
+                return;
+            }
+
+            if (
+                result &&
+                result.ok === true
+            ) {
+                queueItem.syncStatus = "SENT";
+                queueItem.syncedAt = Date.now();
+                queueItem.updatedAt = Date.now();
+                queueItem.lastAttempt = Date.now();
+                queueItem.lastError = "";
+                queueItem.serverResponse = result;
+
+                queueStore.put(queueItem);
+
+                const invoiceNo =
+                    item.payload &&
+                    Array.isArray(item.payload.sale)
+                        ? String(item.payload.sale[7] || "")
+                        : "";
+
+                if (invoiceNo) {
+                    const index =
+                        salesStore.index("createdAt");
+
+                    const cursorRequest =
+                        index.openCursor(null, "prev");
+
+                    cursorRequest.onsuccess =
+                        event => {
+                            const cursor =
+                                event.target.result;
+
+                            if (!cursor) {
+                                return;
+                            }
+
+                            const sale =
+                                cursor.value;
+
+                            if (
+                                String(sale.invoiceNo || "") ===
+                                invoiceNo &&
+                                String(sale.shopId || "") ===
+                                String(item.shopId || "")
+                            ) {
+                                sale.lastSaleSyncAt =
+                                    Date.now();
+
+                                sale.lastSaleSyncResponse =
+                                    result;
+
+                                sale.remoteSyncStatus =
+                                    "SENT";
+
+                                salesStore.put(
+                                    sale
+                                );
+
+                                return;
+                            }
+
+                            cursor.continue();
+                        };
+                }
+            } else {
+                queueItem.syncStatus = "ERROR";
+                queueItem.retryCount =
+                    Number(
+                        queueItem.retryCount || 0
+                    ) + 1;
+                queueItem.lastAttempt =
+                    Date.now();
+                queueItem.updatedAt =
+                    Date.now();
+                queueItem.lastError =
+                    result &&
+                    (
+                        result.message ||
+                        result.error
+                    )
+                        ? String(
+                            result.message ||
+                            result.error
+                        )
+                        : "SALE_REMOTE_SYNC_FAILED";
+
+                queueItem.serverResponse =
+                    result || null;
+
+                queueStore.put(queueItem);
+            }
+        };
+
+        queueRequest.onerror = () => {
+            reject(
+                queueRequest.error ||
+                new Error(
+                    "DIRECT_SALE_QUEUE_READ_FAILED"
+                )
+            );
+        };
+
+        transaction.oncomplete = () => {
+            resolve();
+        };
+
+        transaction.onerror = () => {
+            reject(
+                transaction.error ||
+                new Error(
+                    "DIRECT_SALE_RESULT_APPLY_FAILED"
+                )
+            );
+        };
+    });
+
+    db.close();
 }
 
 async function updateQueueStatus(
@@ -1058,7 +1359,13 @@ async function applySyncResults(results) {
 
     await new Promise((resolve, reject) => {
         const transaction = db.transaction(
-            ["sync_queue", "products", "sales", "gst_records", "activity_logs"],
+            [
+                "sync_queue",
+                "products",
+                "sales",
+                "gst_records",
+                "activity_logs"
+            ],
             "readwrite"
         );
 
