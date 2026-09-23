@@ -1,14 +1,11 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
-<title>Shop TXT Backend Tester</title>
+<title>Shop Management Backend Tester</title>
 <style>
-*{
-    box-sizing:border-box;
-}
+*{box-sizing:border-box}
 body{
     margin:0;
     font-family:Arial,sans-serif;
@@ -16,12 +13,17 @@ body{
     color:#111827;
 }
 .container{
-    width:min(1200px,96%);
-    margin:20px auto;
+    max-width:1400px;
+    margin:auto;
+    padding:20px;
 }
 h1{
-    margin:0 0 18px;
+    margin:0 0 20px;
     font-size:28px;
+}
+h2{
+    margin:0 0 15px;
+    font-size:20px;
 }
 .card{
     background:#fff;
@@ -29,718 +31,1234 @@ h1{
     border-radius:10px;
     padding:18px;
     margin-bottom:18px;
-    box-shadow:0 2px 8px rgba(0,0,0,.05);
-}
-h2{
-    margin:0 0 14px;
-    font-size:20px;
-}
-label{
-    display:block;
-    font-size:13px;
-    font-weight:700;
-    margin:10px 0 5px;
-}
-input,textarea,select{
-    width:100%;
-    padding:10px 11px;
-    border:1px solid #cbd5e1;
-    border-radius:7px;
-    font-size:14px;
-    outline:none;
-}
-textarea{
-    min-height:120px;
-    resize:vertical;
-    font-family:monospace;
-}
-input:focus,textarea:focus,select:focus{
-    border-color:#2563eb;
 }
 .grid{
     display:grid;
-    grid-template-columns:repeat(3,1fr);
-    gap:12px;
+    grid-template-columns:repeat(2,minmax(0,1fr));
+    gap:14px;
 }
-.grid2{
+.grid3{
     display:grid;
-    grid-template-columns:repeat(2,1fr);
-    gap:12px;
+    grid-template-columns:repeat(3,minmax(0,1fr));
+    gap:14px;
 }
-.buttons{
+.field{
     display:flex;
-    flex-wrap:wrap;
-    gap:8px;
-    margin-top:12px;
+    flex-direction:column;
+    gap:6px;
+}
+.field.full{
+    grid-column:1/-1;
+}
+label{
+    font-size:14px;
+    font-weight:700;
+}
+input,textarea,select{
+    width:100%;
+    padding:11px 12px;
+    border:1px solid #9ca3af;
+    border-radius:7px;
+    font-size:14px;
+    background:#fff;
+}
+textarea{
+    min-height:100px;
+    resize:vertical;
 }
 button{
     border:0;
     border-radius:7px;
-    padding:10px 15px;
-    background:#2563eb;
-    color:#fff;
-    cursor:pointer;
+    padding:11px 16px;
     font-size:14px;
     font-weight:700;
-}
-button:hover{
-    opacity:.9;
+    cursor:pointer;
+    background:#2563eb;
+    color:#fff;
+    margin:4px;
 }
 button.secondary{
-    background:#475569;
+    background:#4b5563;
 }
 button.success{
-    background:#15803d;
+    background:#059669;
 }
 button.warning{
-    background:#b45309;
+    background:#d97706;
 }
 button.danger{
     background:#dc2626;
 }
+button:disabled{
+    opacity:.55;
+    cursor:not-allowed;
+}
+.button-row{
+    display:flex;
+    flex-wrap:wrap;
+    gap:4px;
+    margin-top:12px;
+}
 .status{
     padding:12px;
     border-radius:7px;
-    background:#f1f5f9;
-    border:1px solid #cbd5e1;
     font-weight:700;
     margin-top:12px;
     white-space:pre-wrap;
+    word-break:break-word;
 }
 .status.ok{
     background:#dcfce7;
-    border-color:#86efac;
     color:#166534;
 }
 .status.error{
     background:#fee2e2;
-    border-color:#fca5a5;
     color:#991b1b;
 }
-.status.loading{
+.status.info{
+    background:#dbeafe;
+    color:#1e40af;
+}
+.status.warning{
     background:#fef3c7;
-    border-color:#fcd34d;
     color:#92400e;
 }
 pre{
     margin:0;
+    background:#111827;
+    color:#e5e7eb;
+    padding:15px;
+    border-radius:8px;
+    overflow:auto;
     white-space:pre-wrap;
     word-break:break-word;
-    background:#0f172a;
-    color:#e2e8f0;
-    padding:14px;
+    font-size:13px;
+    line-height:1.5;
+}
+table{
+    width:100%;
+    border-collapse:collapse;
+    margin-top:12px;
+}
+th,td{
+    border:1px solid #d1d5db;
+    padding:8px;
+    text-align:left;
+    font-size:13px;
+    vertical-align:top;
+}
+th{
+    background:#f3f4f6;
+}
+.field-error{
+    color:#dc2626;
+    font-size:12px;
+    min-height:16px;
+}
+.field-ok{
+    color:#059669;
+    font-size:12px;
+    min-height:16px;
+}
+.info-box{
+    background:#f9fafb;
+    border:1px solid #d1d5db;
     border-radius:8px;
-    min-height:120px;
-    max-height:500px;
-    overflow:auto;
+    padding:12px;
+    margin-top:12px;
+    line-height:1.6;
     font-size:13px;
 }
-.small{
-    font-size:12px;
-    color:#64748b;
-    margin-top:5px;
-}
-.field-title{
-    font-size:12px;
-    color:#64748b;
-    margin-top:4px;
-}
 @media(max-width:800px){
-    .grid,.grid2{
+    .grid,.grid3{
         grid-template-columns:1fr;
+    }
+    .container{
+        padding:10px;
     }
 }
 </style>
 </head>
+
 <body>
 
 <div class="container">
 
-<h1>Shop TXT Backend Tester</h1>
+<h1>Shop Management Backend Tester</h1>
 
 <div class="card">
-    <h2>Backend Configuration</h2>
+<h2>1. Apps Script Web App</h2>
 
-    <label>Apps Script Web App URL</label>
-    <input id="webAppUrl" type="url" placeholder="https://script.google.com/macros/s/XXXXXXXX/exec">
-
-    <div class="small">
-        URL must end with /exec
-    </div>
-
-    <div class="buttons">
-        <button onclick="pingBackend()">Ping Backend</button>
-        <button class="secondary" onclick="readAllProducts()">Read Product Files</button>
-        <button class="secondary" onclick="readSaleFile()">Read sale.txt</button>
-    </div>
-
-    <div id="status" class="status">Ready</div>
+<div class="field">
+<label for="webAppUrl">Google Apps Script Web App URL</label>
+<input id="webAppUrl" type="url" placeholder="https://script.google.com/macros/s/XXXXXXXX/exec">
+<div id="urlError" class="field-error"></div>
 </div>
 
-<div class="card">
-    <h2>Single Sale Test</h2>
-
-    <div class="grid">
-
-        <div>
-            <label>Product Category ID *</label>
-            <input id="productCategoryId" value="CAT001">
-        </div>
-
-        <div>
-            <label>Product Line Barcode *</label>
-            <input id="productLineBarcode" value="BAR001">
-        </div>
-
-        <div>
-            <label>Shop ID *</label>
-            <input id="shopId" value="SHOP001">
-        </div>
-
-        <div>
-            <label>Firebase Client ID *</label>
-            <input id="clientId" value="">
-        </div>
-
-        <div>
-            <label>SKU *</label>
-            <input id="sku" value="SKU001">
-        </div>
-
-        <div>
-            <label>Firebase Login Date Time *</label>
-            <input id="firebaseLoginDateTime" value="">
-        </div>
-
-        <div>
-            <label>Notes</label>
-            <input id="notes" value="Testing sale">
-        </div>
-
-        <div>
-            <label>Invoice No</label>
-            <input id="invoiceNo" value="INV001">
-        </div>
-
-        <div>
-            <label>GSTIN Number</label>
-            <input id="gstinNumber" value="GSTIN001">
-        </div>
-
-        <div>
-            <label>Customer ID</label>
-            <input id="customerId" value="CUST001">
-        </div>
-
-        <div>
-            <label>Rate</label>
-            <input id="rate" value="100">
-        </div>
-
-        <div>
-            <label>Receive Amount</label>
-            <input id="receiveAmount" value="100">
-        </div>
-
-        <div>
-            <label>Transaction ID *</label>
-            <input id="transactionId" value="">
-        </div>
-
-    </div>
-
-    <div class="buttons">
-        <button class="secondary" onclick="generateClientId()">Generate Client ID</button>
-        <button class="secondary" onclick="generateLoginDateTime()">Generate Login Date Time</button>
-        <button class="secondary" onclick="generateTransactionId()">Generate Transaction ID</button>
-        <button class="success" onclick="sendSale()">Send Sale</button>
-        <button class="danger" onclick="testMissingClientId()">Test Missing Client ID</button>
-        <button class="danger" onclick="testMissingSku()">Test Missing SKU</button>
-        <button class="danger" onclick="testMissingLoginTime()">Test Missing Login Time</button>
-    </div>
+<div class="button-row">
+<button onclick="saveUrl()">Save URL</button>
+<button onclick="loadSavedUrl()" class="secondary">Load Saved URL</button>
+<button onclick="testPing()" class="success">Test Ping</button>
 </div>
 
-<div class="card">
-    <h2>Batch Sale Test</h2>
+<div id="mainStatus" class="status info">Ready.</div>
 
-    <label>Number of Sales</label>
-    <input id="batchCount" type="number" min="1" max="50" value="3">
-
-    <div class="buttons">
-        <button class="success" onclick="sendBatchSales()">Send Batch Sales</button>
-    </div>
+<div class="info-box">
+<b>Important:</b><br>
+Use only the base <b>/exec</b> URL.<br>
+Do not paste <b>?action=ping</b> at the end.
+</div>
 </div>
 
+
 <div class="card">
-    <h2>Current Product List</h2>
+<h2>2. Firebase Session Information</h2>
 
-    <div class="field-title">
-        Format: product line bar code|product category id|created date
-    </div>
-
-    <label>Content</label>
-    <textarea id="currentProducts">BAR001|CAT001|2026-09-23
-BAR002|CAT002|2026-09-23
-BAR003|CAT003|2026-09-23</textarea>
-
-    <div class="buttons">
-        <button class="success" onclick="writeCurrentProducts()">Write Current Product List</button>
-        <button class="secondary" onclick="readCurrentProducts()">Read Current Product List</button>
-    </div>
+<div class="grid">
+<div class="field">
+<label for="clientId">Firebase Client ID</label>
+<input id="clientId" type="text" placeholder="firebase-client-id">
+<div id="clientIdError" class="field-error"></div>
 </div>
 
-<div class="card">
-    <h2>Product Category Details</h2>
-
-    <div class="field-title">
-        Format: product id|product name|category|rate
-    </div>
-
-    <label>Content</label>
-    <textarea id="categoryDetails">PROD001|Product One|Category One|100
-PROD002|Product Two|Category Two|200
-PROD003|Product Three|Category Three|300</textarea>
-
-    <div class="buttons">
-        <button class="success" onclick="writeCategoryDetails()">Write Category Details</button>
-        <button class="secondary" onclick="readCategoryDetails()">Read Category Details</button>
-    </div>
+<div class="field">
+<label for="loginDateTime">Firebase Login Date Time</label>
+<input id="loginDateTime" type="text" placeholder="2026-09-23 19:20:00">
+<div id="loginDateTimeError" class="field-error"></div>
+</div>
 </div>
 
+<div class="button-row">
+<button onclick="generateClientId()">Generate Client ID</button>
+<button onclick="generateLoginDateTime()" class="secondary">Generate Login Date Time</button>
+</div>
+</div>
+
+
 <div class="card">
-    <h2>Raw Server Response</h2>
-    <pre id="output">No response yet.</pre>
+<h2>3. Sale Fields</h2>
+
+<div class="info-box">
+<b>Server automatically generates Current Date Time.</b><br>
+HTML sends exactly 13 incoming fields.<br>
+Server creates field number 7 and stores the final record as 14 fields.
+</div>
+
+<div class="grid">
+
+<div class="field">
+<label for="productCategoryId">1. Product Category ID</label>
+<input id="productCategoryId" type="text" placeholder="CAT001">
+<div id="productCategoryIdError" class="field-error"></div>
+</div>
+
+<div class="field">
+<label for="productBarcode">2. Product Line Barcode</label>
+<input id="productBarcode" type="text" placeholder="8901234567890">
+<div id="productBarcodeError" class="field-error"></div>
+</div>
+
+<div class="field">
+<label for="shopId">3. Shop ID</label>
+<input id="shopId" type="text" placeholder="SHOP001">
+<div id="shopIdError" class="field-error"></div>
+</div>
+
+<div class="field">
+<label for="saleClientId">4. Firebase Client ID</label>
+<input id="saleClientId" type="text" placeholder="Generated Firebase Client ID">
+<div id="saleClientIdError" class="field-error"></div>
+</div>
+
+<div class="field">
+<label for="sku">5. SKU</label>
+<input id="sku" type="text" placeholder="SKU001">
+<div id="skuError" class="field-error"></div>
+</div>
+
+<div class="field">
+<label for="saleLoginDateTime">6. Firebase Login Date Time</label>
+<input id="saleLoginDateTime" type="text" placeholder="2026-09-23 19:20:00">
+<div id="saleLoginDateTimeError" class="field-error"></div>
+</div>
+
+<div class="field">
+<label for="notes">8. Notes</label>
+<input id="notes" type="text" placeholder="Sale notes">
+<div id="notesError" class="field-error"></div>
+</div>
+
+<div class="field">
+<label for="invoiceNo">9. Invoice No</label>
+<input id="invoiceNo" type="text" placeholder="INV001">
+<div id="invoiceNoError" class="field-error"></div>
+</div>
+
+<div class="field">
+<label for="gstin">10. GSTIN Number</label>
+<input id="gstin" type="text" placeholder="GSTIN number">
+<div id="gstinError" class="field-error"></div>
+</div>
+
+<div class="field">
+<label for="customerId">11. Customer ID</label>
+<input id="customerId" type="text" placeholder="CUSTOMER001">
+<div id="customerIdError" class="field-error"></div>
+</div>
+
+<div class="field">
+<label for="rate">12. Rate</label>
+<input id="rate" type="text" inputmode="decimal" placeholder="100.00">
+<div id="rateError" class="field-error"></div>
+</div>
+
+<div class="field">
+<label for="receiveAmount">13. Receive Amount</label>
+<input id="receiveAmount" type="text" inputmode="decimal" placeholder="100.00">
+<div id="receiveAmountError" class="field-error"></div>
+</div>
+
+<div class="field">
+<label for="transactionId">14. Transaction ID</label>
+<input id="transactionId" type="text" placeholder="TXN-001">
+<div id="transactionIdError" class="field-error"></div>
+</div>
+
+</div>
+
+<div class="button-row">
+<button onclick="copySessionToSale()">Copy Session Data</button>
+<button onclick="generateTransactionId()" class="secondary">Generate Transaction ID</button>
+<button onclick="validateSale()" class="warning">Validate All Fields</button>
+<button onclick="sendSale()" class="success">Send Sale</button>
+</div>
+
+<div id="saleStatus" class="status info">Sale form ready.</div>
+</div>
+
+
+<div class="card">
+<h2>4. Batch Sale Test</h2>
+
+<div class="field">
+<label for="batchCount">Number of Sales</label>
+<input id="batchCount" type="number" min="1" max="50" value="2">
+</div>
+
+<div class="button-row">
+<button onclick="sendBatchSales()" class="success">Send Batch Sales</button>
+</div>
+
+<div id="batchStatus" class="status info">Batch not started.</div>
+</div>
+
+
+<div class="card">
+<h2>5. Product Files</h2>
+
+<div class="button-row">
+<button onclick="readCurrentProducts()">Read Current Product List</button>
+<button onclick="readCategoryDetails()">Read Category Details</button>
+<button onclick="readSaleFile()" class="secondary">Read Sale File</button>
+</div>
+
+<div id="productStatus" class="status info">No product request yet.</div>
+</div>
+
+
+<div class="card">
+<h2>6. Product File Write Test</h2>
+
+<div class="field">
+<label for="currentProductsInput">Current Product List Content</label>
+<textarea id="currentProductsInput">8901234567890|CAT001|2026-09-23 19:20:00
+8901234567891|CAT002|2026-09-23 19:21:00</textarea>
+</div>
+
+<div class="button-row">
+<button onclick="writeCurrentProducts()" class="warning">Write Current Product List</button>
+</div>
+
+<div class="field">
+<label for="categoryDetailsInput">Category Details Content</label>
+<textarea id="categoryDetailsInput">CAT001|Product One|Category A|100
+CAT002|Product Two|Category B|200</textarea>
+</div>
+
+<div class="button-row">
+<button onclick="writeCategoryDetails()" class="warning">Write Category Details</button>
+</div>
+</div>
+
+
+<div class="card">
+<h2>7. Detailed Request / Response Debug</h2>
+
+<table>
+<thead>
+<tr>
+<th>Property</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr><td>Request URL</td><td id="debugUrl">-</td></tr>
+<tr><td>Request Method</td><td id="debugMethod">-</td></tr>
+<tr><td>HTTP Status</td><td id="debugStatus">-</td></tr>
+<tr><td>Response Content Type</td><td id="debugContentType">-</td></tr>
+<tr><td>Response Length</td><td id="debugLength">-</td></tr>
+<tr><td>Error Type</td><td id="debugErrorType">-</td></tr>
+<tr><td>Error Message</td><td id="debugErrorMessage">-</td></tr>
+<tr><td>Browser Origin</td><td id="debugOrigin">-</td></tr>
+<tr><td>Page Protocol</td><td id="debugProtocol">-</td></tr>
+</tbody>
+</table>
+
+<h3>Request Payload</h3>
+<pre id="requestPayload">-</pre>
+
+<h3>Raw Server Response</h3>
+<pre id="rawResponse">-</pre>
+
+<h3>Parsed Server Response</h3>
+<pre id="parsedResponse">-</pre>
+
 </div>
 
 </div>
 
 <script>
-const WEB_APP_URL = '';
+'use strict';
 
-function getUrl(){
-    const input = document.getElementById('webAppUrl').value.trim();
+const STORAGE_KEY='shop_backend_web_app_url';
 
-    if(input){
-        return input;
-    }
+document.getElementById('debugOrigin').textContent=window.location.origin;
+document.getElementById('debugProtocol').textContent=window.location.protocol;
 
-    return WEB_APP_URL;
+function $(id){
+    return document.getElementById(id);
 }
 
-function validateUrl(){
-    const url = getUrl();
+function setStatus(id,type,message){
+    const el=$(id);
+    el.className='status '+type;
+    el.textContent=message;
+}
+
+function clearFieldErrors(){
+    document.querySelectorAll('.field-error').forEach(el=>{
+        el.textContent='';
+    });
+}
+
+function fieldError(id,message){
+    $(id).textContent=message;
+}
+
+function normalizeUrl(value){
+    let url=String(value||'').trim();
 
     if(!url){
-        throw new Error('Please enter Apps Script Web App /exec URL');
+        throw new Error('WEB_APP_URL_EMPTY');
     }
 
-    if(!url.includes('/exec')){
-        throw new Error('Invalid Web App URL. URL must contain /exec');
-    }
+    try{
+        const parsed=new URL(url);
 
-    return url;
+        if(parsed.protocol!=='https:' && parsed.protocol!=='http:'){
+            throw new Error('INVALID_PROTOCOL');
+        }
+
+        parsed.search='';
+        parsed.hash='';
+
+        return parsed.toString().replace(/\/$/,'');
+    }catch(error){
+        throw new Error('INVALID_WEB_APP_URL: '+error.message);
+    }
 }
 
-function setStatus(message,type=''){
-    const el = document.getElementById('status');
-
-    el.className = 'status';
-
-    if(type){
-        el.classList.add(type);
+function getUrl(){
+    try{
+        const url=normalizeUrl($('webAppUrl').value);
+        $('webAppUrl').value=url;
+        $('urlError').textContent='';
+        return url;
+    }catch(error){
+        $('urlError').textContent=error.message;
+        throw error;
     }
-
-    el.textContent = message;
 }
 
-function showOutput(data){
-    const output = document.getElementById('output');
-
-    if(typeof data === 'string'){
-        output.textContent = data;
-        return;
+function saveUrl(){
+    try{
+        const url=getUrl();
+        localStorage.setItem(STORAGE_KEY,url);
+        setStatus('mainStatus','ok','SUCCESS: Web App URL saved\n'+url);
+    }catch(error){
+        setStatus('mainStatus','error','URL ERROR\n'+error.message);
     }
+}
 
-    output.textContent = JSON.stringify(data,null,2);
+function loadSavedUrl(){
+    const url=localStorage.getItem(STORAGE_KEY)||'';
+    $('webAppUrl').value=url;
+    setStatus(
+        'mainStatus',
+        url?'ok':'warning',
+        url?'Saved URL loaded.':'No saved URL found.'
+    );
+}
+
+function nowDateTime(){
+    const d=new Date();
+    const pad=n=>String(n).padStart(2,'0');
+
+    return d.getFullYear()+'-'+
+        pad(d.getMonth()+1)+'-'+
+        pad(d.getDate())+' '+
+        pad(d.getHours())+':'+
+        pad(d.getMinutes())+':'+
+        pad(d.getSeconds());
 }
 
 function generateClientId(){
-    const now = new Date();
+    const d=new Date();
+    const pad=n=>String(n).padStart(2,'0');
 
-    const pad = value => String(value).padStart(2,'0');
+    const value=
+        'client_'+
+        d.getFullYear()+
+        pad(d.getMonth()+1)+
+        pad(d.getDate())+
+        '_'+
+        pad(d.getHours())+
+        pad(d.getMinutes())+
+        pad(d.getSeconds())+
+        '_'+
+        Math.random().toString(36).slice(2,8);
 
-    const date =
-        now.getFullYear() +
-        pad(now.getMonth()+1) +
-        pad(now.getDate()) + '_' +
-        pad(now.getHours()) +
-        pad(now.getMinutes()) +
-        pad(now.getSeconds());
-
-    const clientId = 'testUID_' + date;
-
-    document.getElementById('clientId').value = clientId;
-
-    generateLoginDateTime();
-
-    setStatus('Client ID generated','ok');
+    $('clientId').value=value;
+    $('saleClientId').value=value;
 }
 
 function generateLoginDateTime(){
-    const now = new Date();
-
-    const pad = value => String(value).padStart(2,'0');
-
-    const value =
-        now.getFullYear() + '-' +
-        pad(now.getMonth()+1) + '-' +
-        pad(now.getDate()) + ' ' +
-        pad(now.getHours()) + ':' +
-        pad(now.getMinutes()) + ':' +
-        pad(now.getSeconds());
-
-    document.getElementById('firebaseLoginDateTime').value = value;
-
-    setStatus('Firebase login date time generated','ok');
+    const value=nowDateTime();
+    $('loginDateTime').value=value;
+    $('saleLoginDateTime').value=value;
 }
 
 function generateTransactionId(){
-    const now = Date.now();
-
-    const random =
-        Math.random().toString(36).substring(2,10).toUpperCase();
-
-    const transactionId = 'TXN_' + now + '_' + random;
-
-    document.getElementById('transactionId').value = transactionId;
-
-    setStatus('Transaction ID generated','ok');
+    $('transactionId').value=
+        'TXN-'+
+        Date.now()+
+        '-'+
+        Math.random().toString(36).slice(2,8).toUpperCase();
 }
 
-async function requestGet(action){
-    const url = validateUrl();
+function copySessionToSale(){
+    $('saleClientId').value=$('clientId').value.trim();
+    $('saleLoginDateTime').value=$('loginDateTime').value.trim();
 
-    setStatus('Requesting ' + action + '...','loading');
+    setStatus(
+        'saleStatus',
+        'ok',
+        'Session fields copied to sale fields.'
+    );
+}
+
+function isValidDateTime(value){
+    const text=String(value||'').trim();
+
+    if(!text){
+        return false;
+    }
+
+    const match=text.match(
+        /^(\d{4})[-/](\d{1,2})[-/](\d{1,2})[ T](\d{1,2}):(\d{2})(?::(\d{2}))?$/
+    );
+
+    if(!match){
+        const parsed=new Date(text);
+        return !isNaN(parsed.getTime());
+    }
+
+    const year=Number(match[1]);
+    const month=Number(match[2]);
+    const day=Number(match[3]);
+    const hour=Number(match[4]);
+    const minute=Number(match[5]);
+    const second=Number(match[6]||0);
+
+    if(month<1 || month>12) return false;
+    if(day<1 || day>31) return false;
+    if(hour<0 || hour>23) return false;
+    if(minute<0 || minute>59) return false;
+    if(second<0 || second>59) return false;
+
+    const d=new Date(
+        year,
+        month-1,
+        day,
+        hour,
+        minute,
+        second
+    );
+
+    return(
+        d.getFullYear()===year &&
+        d.getMonth()===month-1 &&
+        d.getDate()===day &&
+        d.getHours()===hour &&
+        d.getMinutes()===minute &&
+        d.getSeconds()===second
+    );
+}
+
+function validateSale(){
+    clearFieldErrors();
+
+    let valid=true;
+
+    const requiredFields=[
+        ['productCategoryId','productCategoryIdError','Product Category ID'],
+        ['productBarcode','productBarcodeError','Product Line Barcode'],
+        ['shopId','shopIdError','Shop ID'],
+        ['saleClientId','saleClientIdError','Firebase Client ID'],
+        ['sku','skuError','SKU'],
+        ['saleLoginDateTime','saleLoginDateTimeError','Firebase Login Date Time'],
+        ['transactionId','transactionIdError','Transaction ID']
+    ];
+
+    requiredFields.forEach(item=>{
+        const value=$(item[0]).value.trim();
+
+        if(!value){
+            fieldError(item[1],item[2]+' is required.');
+            valid=false;
+        }
+    });
+
+    const loginTime=$('saleLoginDateTime').value.trim();
+
+    if(loginTime && !isValidDateTime(loginTime)){
+        fieldError(
+            'saleLoginDateTimeError',
+            'Invalid Firebase Login Date Time. Expected format: YYYY-MM-DD HH:mm:ss'
+        );
+        valid=false;
+    }
+
+    const rate=$('rate').value.trim();
+
+    if(rate && !/^\d+(\.\d+)?$/.test(rate)){
+        fieldError(
+            'rateError',
+            'Rate must be a valid positive number.'
+        );
+        valid=false;
+    }
+
+    const receive=$('receiveAmount').value.trim();
+
+    if(receive && !/^\d+(\.\d+)?$/.test(receive)){
+        fieldError(
+            'receiveAmountError',
+            'Receive Amount must be a valid positive number.'
+        );
+        valid=false;
+    }
+
+    const transactionId=$('transactionId').value.trim();
+
+    if(transactionId && /[\r\n|]/.test(transactionId)){
+        fieldError(
+            'transactionIdError',
+            'Transaction ID cannot contain newline or | character.'
+        );
+        valid=false;
+    }
+
+    if(valid){
+        setStatus(
+            'saleStatus',
+            'ok',
+            'VALIDATION SUCCESS\nAll required sale fields are valid.'
+        );
+    }else{
+        setStatus(
+            'saleStatus',
+            'error',
+            'VALIDATION ERROR\nOne or more fields are invalid. Check the red messages below each field.'
+        );
+    }
+
+    return valid;
+}
+
+function createSalePayload(){
+    return {
+        action:'addSale',
+        sale:[
+            $('productCategoryId').value.trim(),
+            $('productBarcode').value.trim(),
+            $('shopId').value.trim(),
+            $('saleClientId').value.trim(),
+            $('sku').value.trim(),
+            $('saleLoginDateTime').value.trim(),
+            $('notes').value.trim(),
+            $('invoiceNo').value.trim(),
+            $('gstin').value.trim(),
+            $('customerId').value.trim(),
+            $('rate').value.trim(),
+            $('receiveAmount').value.trim(),
+            $('transactionId').value.trim()
+        ]
+    };
+}
+
+function debugRequest(url,method,payload){
+    $('debugUrl').textContent=url;
+    $('debugMethod').textContent=method;
+    $('debugStatus').textContent='Waiting';
+    $('debugContentType').textContent='-';
+    $('debugLength').textContent='-';
+    $('debugErrorType').textContent='-';
+    $('debugErrorMessage').textContent='-';
+    $('requestPayload').textContent=JSON.stringify(payload,null,2);
+    $('rawResponse').textContent='Waiting...';
+    $('parsedResponse').textContent='Waiting...';
+}
+
+async function requestGet(action,extra={}){
+    const base=getUrl();
+    const urlObject=new URL(base);
+
+    urlObject.searchParams.set('action',action);
+
+    Object.keys(extra).forEach(key=>{
+        urlObject.searchParams.set(key,extra[key]);
+    });
+
+    const url=urlObject.toString();
+
+    const payload={
+        action,
+        ...extra
+    };
+
+    debugRequest(url,'GET',payload);
 
     try{
-        const response = await fetch(
-            url + '?action=' + encodeURIComponent(action),
-            {
-                method:'GET',
-                cache:'no-store'
-            }
-        );
+        const response=await fetch(url,{
+            method:'GET',
+            cache:'no-store',
+            redirect:'follow'
+        });
 
-        const text = await response.text();
+        $('debugStatus').textContent=response.status+' '+response.statusText;
+        $('debugContentType').textContent=response.headers.get('content-type')||'-';
 
-        showOutput(text);
+        const text=await response.text();
 
-        let data;
+        $('debugLength').textContent=String(text.length);
+        $('rawResponse').textContent=text;
+
+        if(!response.ok){
+            const error=new Error(
+                'HTTP_'+response.status+': '+response.statusText+
+                '\nResponse: '+text
+            );
+
+            $('debugErrorType').textContent='HTTP_ERROR';
+            $('debugErrorMessage').textContent=error.message;
+
+            throw error;
+        }
+
+        let parsed;
 
         try{
-            data = JSON.parse(text);
+            parsed=JSON.parse(text);
         }catch(error){
+            $('debugErrorType').textContent='INVALID_JSON';
+            $('debugErrorMessage').textContent=
+                'Server did not return valid JSON.\n'+
+                error.message;
+
             throw new Error(
-                'Invalid JSON response:\n' + text.substring(0,1000)
+                'INVALID_JSON_RESPONSE: '+text.slice(0,1000)
             );
         }
 
-        if(data.ok){
-            setStatus('SUCCESS: ' + action,'ok');
-        }else{
-            setStatus(
-                'SERVER ERROR: ' +
-                (data.error || 'UNKNOWN') +
-                '\n' +
-                (data.message || ''),
-                'error'
-            );
-        }
+        $('parsedResponse').textContent=
+            JSON.stringify(parsed,null,2);
 
-        return data;
+        return parsed;
 
     }catch(error){
-        showOutput(String(error));
+        if($('debugErrorType').textContent==='-'){
+            $('debugErrorType').textContent=
+                classifyFetchError(error);
+        }
 
-        setStatus(
-            'REQUEST ERROR\n' + error.message,
-            'error'
-        );
+        if($('debugErrorMessage').textContent==='-'){
+            $('debugErrorMessage').textContent=
+                error.stack||error.message||String(error);
+        }
 
         throw error;
     }
 }
 
-async function requestPost(payload){
-    const url = validateUrl();
+async function requestPost(action,data){
+    const base=getUrl();
+    const url=new URL(base);
 
-    setStatus(
-        'Sending ' + (payload.action || 'request') + '...',
-        'loading'
+    const payload={
+        action,
+        ...data
+    };
+
+    debugRequest(
+        url.toString(),
+        'POST',
+        payload
     );
 
     try{
-        const response = await fetch(
-            url,
-            {
-                method:'POST',
-                headers:{
-                    'Content-Type':'text/plain;charset=utf-8'
-                },
-                body:JSON.stringify(payload),
-                cache:'no-store'
-            }
-        );
+        const response=await fetch(url.toString(),{
+            method:'POST',
+            headers:{
+                'Content-Type':'text/plain;charset=utf-8'
+            },
+            body:JSON.stringify(payload),
+            cache:'no-store',
+            redirect:'follow'
+        });
 
-        const text = await response.text();
+        $('debugStatus').textContent=
+            response.status+' '+response.statusText;
 
-        showOutput(text);
+        $('debugContentType').textContent=
+            response.headers.get('content-type')||'-';
 
-        let data;
+        const text=await response.text();
+
+        $('debugLength').textContent=String(text.length);
+        $('rawResponse').textContent=text;
+
+        if(!response.ok){
+            const error=new Error(
+                'HTTP_'+response.status+': '+response.statusText+
+                '\nResponse: '+text
+            );
+
+            $('debugErrorType').textContent='HTTP_ERROR';
+            $('debugErrorMessage').textContent=error.message;
+
+            throw error;
+        }
+
+        let parsed;
 
         try{
-            data = JSON.parse(text);
+            parsed=JSON.parse(text);
         }catch(error){
+            $('debugErrorType').textContent='INVALID_JSON';
+            $('debugErrorMessage').textContent=
+                'Server response is not valid JSON.\n'+
+                error.message;
+
             throw new Error(
-                'Invalid JSON response:\n' +
-                text.substring(0,2000)
+                'INVALID_JSON_RESPONSE: '+text.slice(0,1000)
             );
         }
 
-        if(data.ok){
-            setStatus(
-                'SUCCESS: ' + (payload.action || 'request'),
-                'ok'
-            );
-        }else{
-            setStatus(
-                'SERVER ERROR: ' +
-                (data.error || 'UNKNOWN') +
-                '\n' +
-                (data.message || ''),
-                'error'
-            );
-        }
+        $('parsedResponse').textContent=
+            JSON.stringify(parsed,null,2);
 
-        return data;
+        return parsed;
 
     }catch(error){
-        showOutput(String(error));
 
-        setStatus(
-            'REQUEST ERROR\n' + error.message,
-            'error'
-        );
+        if($('debugErrorType').textContent==='-'){
+            $('debugErrorType').textContent=
+                classifyFetchError(error);
+        }
+
+        if($('debugErrorMessage').textContent==='-'){
+            $('debugErrorMessage').textContent=
+                error.stack||error.message||String(error);
+        }
 
         throw error;
     }
 }
 
-function pingBackend(){
-    requestGet('ping');
-}
+function classifyFetchError(error){
+    const message=String(error?.message||error||'');
 
-function readAllProducts(){
-    requestGet('getProducts');
-}
+    if(message.includes('Failed to fetch')){
+        if(location.protocol==='file:'){
+            return 'NETWORK_ORIGIN_ERROR_FILE_PROTOCOL';
+        }
 
-function readCurrentProducts(){
-    requestGet('getCurrentProducts');
-}
-
-function readCategoryDetails(){
-    requestGet('getCategoryDetails');
-}
-
-function readSaleFile(){
-    requestGet('getSale');
-}
-
-function getSaleFields(){
-    return [
-        document.getElementById('productCategoryId').value,
-        document.getElementById('productLineBarcode').value,
-        document.getElementById('shopId').value,
-        document.getElementById('clientId').value,
-        document.getElementById('sku').value,
-        document.getElementById('firebaseLoginDateTime').value,
-        document.getElementById('notes').value,
-        document.getElementById('invoiceNo').value,
-        document.getElementById('gstinNumber').value,
-        document.getElementById('customerId').value,
-        document.getElementById('rate').value,
-        document.getElementById('receiveAmount').value,
-        document.getElementById('transactionId').value
-    ];
-}
-
-function prepareSale(){
-    if(!document.getElementById('clientId').value.trim()){
-        generateClientId();
+        return 'NETWORK_OR_CORS_OR_REDIRECT_ERROR';
     }
 
-    if(!document.getElementById('firebaseLoginDateTime').value.trim()){
-        generateLoginDateTime();
+    if(message.includes('NetworkError')){
+        return 'NETWORK_ERROR';
     }
 
-    if(!document.getElementById('transactionId').value.trim()){
-        generateTransactionId();
+    if(message.includes('AbortError')){
+        return 'REQUEST_ABORTED_OR_TIMEOUT';
     }
 
-    return getSaleFields();
+    if(message.includes('INVALID_JSON')){
+        return 'INVALID_JSON';
+    }
+
+    return 'UNKNOWN_JAVASCRIPT_ERROR';
+}
+
+async function testPing(){
+    try{
+        setStatus(
+            'mainStatus',
+            'info',
+            'Testing backend ping...'
+        );
+
+        const result=await requestGet('ping');
+
+        if(result && result.ok){
+            setStatus(
+                'mainStatus',
+                'ok',
+                'SUCCESS: ping\n'+
+                JSON.stringify(result,null,2)
+            );
+        }else{
+            setStatus(
+                'mainStatus',
+                'warning',
+                'PING RESPONSE RECEIVED\n'+
+                JSON.stringify(result,null,2)
+            );
+        }
+
+    }catch(error){
+        setStatus(
+            'mainStatus',
+            'error',
+            'PING ERROR\n'+
+            formatError(error)
+        );
+    }
 }
 
 async function sendSale(){
-    const fields = prepareSale();
+    if(!validateSale()){
+        return;
+    }
 
-    await requestPost({
-        action:'addSale',
-        fields:fields
-    });
-}
+    const payload=createSalePayload();
 
-async function testMissingClientId(){
-    const fields = prepareSale();
+    try{
+        setStatus(
+            'saleStatus',
+            'info',
+            'Sending sale...\n13 incoming fields will be sent.\nServer will create field 7 Current Date Time.'
+        );
 
-    fields[3] = '';
+        const result=await requestPost(
+            'addSale',
+            {sale:payload.sale}
+        );
 
-    await requestPost({
-        action:'addSale',
-        fields:fields
-    });
-}
+        if(result && result.ok){
+            setStatus(
+                'saleStatus',
+                'ok',
+                'SUCCESS: Sale saved\n'+
+                JSON.stringify(result,null,2)
+            );
+        }else{
+            setStatus(
+                'saleStatus',
+                'error',
+                'SERVER ERROR\n'+
+                JSON.stringify(result,null,2)
+            );
+        }
 
-async function testMissingSku(){
-    const fields = prepareSale();
-
-    fields[4] = '';
-
-    await requestPost({
-        action:'addSale',
-        fields:fields
-    });
-}
-
-async function testMissingLoginTime(){
-    const fields = prepareSale();
-
-    fields[5] = '';
-
-    await requestPost({
-        action:'addSale',
-        fields:fields
-    });
-}
-
-function createBatchSale(index){
-    const now = new Date();
-
-    const pad = value => String(value).padStart(2,'0');
-
-    const loginTime =
-        now.getFullYear() + '-' +
-        pad(now.getMonth()+1) + '-' +
-        pad(now.getDate()) + ' ' +
-        pad(now.getHours()) + ':' +
-        pad(now.getMinutes()) + ':' +
-        pad(now.getSeconds());
-
-    const transactionId =
-        'BATCH_TXN_' +
-        Date.now() +
-        '_' +
-        index +
-        '_' +
-        Math.random().toString(36).substring(2,8).toUpperCase();
-
-    return [
-        'CAT00' + ((index % 9) + 1),
-        'BAR00' + ((index % 9) + 1),
-        'SHOP001',
-        'testUID_' +
-        now.getFullYear() +
-        pad(now.getMonth()+1) +
-        pad(now.getDate()) +
-        '_' +
-        pad(now.getHours()) +
-        pad(now.getMinutes()) +
-        pad(now.getSeconds()),
-        'SKU00' + ((index % 9) + 1),
-        loginTime,
-        'Batch testing sale ' + index,
-        'BATCH_INV_' + index,
-        'GSTIN_TEST',
-        'CUSTOMER_' + index,
-        String(100 + index),
-        String(100 + index),
-        transactionId
-    ];
+    }catch(error){
+        setStatus(
+            'saleStatus',
+            'error',
+            'REQUEST ERROR\n'+
+            formatError(error)
+        );
+    }
 }
 
 async function sendBatchSales(){
-    let count =
-        Number(document.getElementById('batchCount').value);
+    const count=Number($('batchCount').value);
 
-    if(!Number.isFinite(count)){
-        count = 1;
+    if(!Number.isInteger(count)||count<1||count>50){
+        setStatus(
+            'batchStatus',
+            'error',
+            'BATCH VALIDATION ERROR\nBatch count must be between 1 and 50.'
+        );
+        return;
     }
 
-    count = Math.max(1,Math.min(50,Math.floor(count)));
-
-    const sales = [];
+    const sales=[];
 
     for(let i=1;i<=count;i++){
-        sales.push(createBatchSale(i));
+        sales.push([
+            'CAT'+String(i).padStart(3,'0'),
+            'BARCODE'+String(i).padStart(3,'0'),
+            $('shopId').value.trim()||'SHOP001',
+            $('saleClientId').value.trim()||'BATCH_CLIENT',
+            'SKU'+String(i).padStart(3,'0'),
+            $('saleLoginDateTime').value.trim()||nowDateTime(),
+            'Batch test '+i,
+            'INV-BATCH-'+i,
+            '',
+            '',
+            '100',
+            '100',
+            'BATCH-TXN-'+Date.now()+'-'+i
+        ]);
     }
 
-    await requestPost({
-        action:'addSales',
-        sales:sales
-    });
+    try{
+        setStatus(
+            'batchStatus',
+            'info',
+            'Sending '+count+' sales...'
+        );
+
+        const result=await requestPost(
+            'addSales',
+            {sales}
+        );
+
+        if(result && result.ok){
+            setStatus(
+                'batchStatus',
+                'ok',
+                'SUCCESS: Batch completed\n'+
+                JSON.stringify(result,null,2)
+            );
+        }else{
+            setStatus(
+                'batchStatus',
+                'error',
+                'BATCH SERVER ERROR\n'+
+                JSON.stringify(result,null,2)
+            );
+        }
+
+    }catch(error){
+        setStatus(
+            'batchStatus',
+            'error',
+            'BATCH REQUEST ERROR\n'+
+            formatError(error)
+        );
+    }
+}
+
+async function readCurrentProducts(){
+    try{
+        setStatus(
+            'productStatus',
+            'info',
+            'Reading current product list...'
+        );
+
+        const result=await requestGet(
+            'getCurrentProducts'
+        );
+
+        setStatus(
+            'productStatus',
+            result?.ok?'ok':'warning',
+            'Current Product List Response\n'+
+            JSON.stringify(result,null,2)
+        );
+
+    }catch(error){
+        setStatus(
+            'productStatus',
+            'error',
+            'PRODUCT READ ERROR\n'+
+            formatError(error)
+        );
+    }
+}
+
+async function readCategoryDetails(){
+    try{
+        setStatus(
+            'productStatus',
+            'info',
+            'Reading category details...'
+        );
+
+        const result=await requestGet(
+            'getCategoryDetails'
+        );
+
+        setStatus(
+            'productStatus',
+            result?.ok?'ok':'warning',
+            'Category Details Response\n'+
+            JSON.stringify(result,null,2)
+        );
+
+    }catch(error){
+        setStatus(
+            'productStatus',
+            'error',
+            'CATEGORY READ ERROR\n'+
+            formatError(error)
+        );
+    }
+}
+
+async function readSaleFile(){
+    try{
+        setStatus(
+            'productStatus',
+            'info',
+            'Reading sale.txt...'
+        );
+
+        const result=await requestGet(
+            'getSale'
+        );
+
+        setStatus(
+            'productStatus',
+            result?.ok?'ok':'warning',
+            'Sale File Response\n'+
+            JSON.stringify(result,null,2)
+        );
+
+    }catch(error){
+        setStatus(
+            'productStatus',
+            'error',
+            'SALE FILE READ ERROR\n'+
+            formatError(error)
+        );
+    }
 }
 
 async function writeCurrentProducts(){
-    const content =
-        document.getElementById('currentProducts').value;
+    const content=$('currentProductsInput').value;
 
-    await requestPost({
-        action:'writeCurrentProducts',
-        content:content
-    });
+    try{
+        setStatus(
+            'productStatus',
+            'info',
+            'Writing current product list...'
+        );
+
+        const result=await requestPost(
+            'writeCurrentProducts',
+            {content}
+        );
+
+        setStatus(
+            'productStatus',
+            result?.ok?'ok':'error',
+            'WRITE CURRENT PRODUCTS RESPONSE\n'+
+            JSON.stringify(result,null,2)
+        );
+
+    }catch(error){
+        setStatus(
+            'productStatus',
+            'error',
+            'WRITE ERROR\n'+
+            formatError(error)
+        );
+    }
 }
 
 async function writeCategoryDetails(){
-    const content =
-        document.getElementById('categoryDetails').value;
+    const content=$('categoryDetailsInput').value;
 
-    await requestPost({
-        action:'writeCategoryDetails',
-        content:content
-    });
+    try{
+        setStatus(
+            'productStatus',
+            'info',
+            'Writing category details...'
+        );
+
+        const result=await requestPost(
+            'writeCategoryDetails',
+            {content}
+        );
+
+        setStatus(
+            'productStatus',
+            result?.ok?'ok':'error',
+            'WRITE CATEGORY RESPONSE\n'+
+            JSON.stringify(result,null,2)
+        );
+
+    }catch(error){
+        setStatus(
+            'productStatus',
+            'error',
+            'WRITE CATEGORY ERROR\n'+
+            formatError(error)
+        );
+    }
 }
 
-document.getElementById('webAppUrl').addEventListener(
-    'change',
-    function(){
-        const value = this.value.trim();
+function formatError(error){
+    const type=$('debugErrorType').textContent;
+    const message=$('debugErrorMessage').textContent;
 
-        if(value){
-            localStorage.setItem(
-                'shop_backend_url',
-                value
-            );
-        }
-    }
-);
+    return(
+        'Type: '+type+
+        '\nMessage: '+message+
+        '\nJavaScript Error: '+(error?.message||String(error))+
+        '\nPage Protocol: '+location.protocol+
+        '\nOrigin: '+location.origin
+    );
+}
 
-(function(){
-    const saved =
-        localStorage.getItem('shop_backend_url');
+window.addEventListener('error',function(event){
+    $('debugErrorType').textContent='JAVASCRIPT_RUNTIME_ERROR';
+    $('debugErrorMessage').textContent=
+        event.message+
+        '\nFile: '+event.filename+
+        '\nLine: '+event.lineno+
+        '\nColumn: '+event.colno;
+});
 
-    if(saved){
-        document.getElementById('webAppUrl').value = saved;
-    }
-})();
+window.addEventListener('unhandledrejection',function(event){
+    const reason=event.reason;
+
+    $('debugErrorType').textContent=
+        'UNHANDLED_PROMISE_REJECTION';
+
+    $('debugErrorMessage').textContent=
+        reason?.stack||
+        reason?.message||
+        String(reason);
+});
+
+loadSavedUrl();
 </script>
 
 </body>
