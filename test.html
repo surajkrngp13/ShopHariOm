@@ -2,1263 +2,563 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1.0">
-<title>Shop Management Backend Tester</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Shop Management Backend Test</title>
 <style>
 *{box-sizing:border-box}
-body{
-    margin:0;
-    font-family:Arial,sans-serif;
-    background:#f3f4f6;
-    color:#111827;
-}
-.container{
-    max-width:1400px;
-    margin:auto;
-    padding:20px;
-}
-h1{
-    margin:0 0 20px;
-    font-size:28px;
-}
-h2{
-    margin:0 0 15px;
-    font-size:20px;
-}
-.card{
-    background:#fff;
-    border:1px solid #d1d5db;
-    border-radius:10px;
-    padding:18px;
-    margin-bottom:18px;
-}
-.grid{
-    display:grid;
-    grid-template-columns:repeat(2,minmax(0,1fr));
-    gap:14px;
-}
-.grid3{
-    display:grid;
-    grid-template-columns:repeat(3,minmax(0,1fr));
-    gap:14px;
-}
-.field{
-    display:flex;
-    flex-direction:column;
-    gap:6px;
-}
-.field.full{
-    grid-column:1/-1;
-}
-label{
-    font-size:14px;
-    font-weight:700;
-}
-input,textarea,select{
-    width:100%;
-    padding:11px 12px;
-    border:1px solid #9ca3af;
-    border-radius:7px;
-    font-size:14px;
-    background:#fff;
-}
-textarea{
-    min-height:100px;
-    resize:vertical;
-}
-button{
-    border:0;
-    border-radius:7px;
-    padding:11px 16px;
-    font-size:14px;
-    font-weight:700;
-    cursor:pointer;
-    background:#2563eb;
-    color:#fff;
-    margin:4px;
-}
-button.secondary{
-    background:#4b5563;
-}
-button.success{
-    background:#059669;
-}
-button.warning{
-    background:#d97706;
-}
-button.danger{
-    background:#dc2626;
-}
-button:disabled{
-    opacity:.55;
-    cursor:not-allowed;
-}
-.button-row{
-    display:flex;
-    flex-wrap:wrap;
-    gap:4px;
-    margin-top:12px;
-}
-.status{
-    padding:12px;
-    border-radius:7px;
-    font-weight:700;
-    margin-top:12px;
-    white-space:pre-wrap;
-    word-break:break-word;
-}
-.status.ok{
-    background:#dcfce7;
-    color:#166534;
-}
-.status.error{
-    background:#fee2e2;
-    color:#991b1b;
-}
-.status.info{
-    background:#dbeafe;
-    color:#1e40af;
-}
-.status.warning{
-    background:#fef3c7;
-    color:#92400e;
-}
-pre{
-    margin:0;
-    background:#111827;
-    color:#e5e7eb;
-    padding:15px;
-    border-radius:8px;
-    overflow:auto;
-    white-space:pre-wrap;
-    word-break:break-word;
-    font-size:13px;
-    line-height:1.5;
-}
-table{
-    width:100%;
-    border-collapse:collapse;
-    margin-top:12px;
-}
-th,td{
-    border:1px solid #d1d5db;
-    padding:8px;
-    text-align:left;
-    font-size:13px;
-    vertical-align:top;
-}
-th{
-    background:#f3f4f6;
-}
-.field-error{
-    color:#dc2626;
-    font-size:12px;
-    min-height:16px;
-}
-.field-ok{
-    color:#059669;
-    font-size:12px;
-    min-height:16px;
-}
-.info-box{
-    background:#f9fafb;
-    border:1px solid #d1d5db;
-    border-radius:8px;
-    padding:12px;
-    margin-top:12px;
-    line-height:1.6;
-    font-size:13px;
-}
-@media(max-width:800px){
-    .grid,.grid3{
-        grid-template-columns:1fr;
-    }
-    .container{
-        padding:10px;
-    }
-}
+body{margin:0;font-family:Arial,sans-serif;background:#f4f6f8;color:#222}
+.container{max-width:1100px;margin:30px auto;padding:20px}
+h1{margin:0 0 20px}
+.card{background:#fff;border-radius:10px;padding:20px;margin-bottom:20px;box-shadow:0 2px 10px rgba(0,0,0,.08)}
+.row{display:flex;gap:10px;flex-wrap:wrap}
+button{border:0;border-radius:6px;padding:10px 16px;cursor:pointer;font-weight:600}
+.primary{background:#1976d2;color:#fff}
+.secondary{background:#555;color:#fff}
+.success{color:#16803c;font-weight:700}
+.error{color:#c62828;font-weight:700}
+.pending{color:#e67e00;font-weight:700}
+.status{padding:8px 12px;border-radius:6px;background:#eee;display:inline-block}
+pre{white-space:pre-wrap;word-break:break-word;background:#111;color:#eee;padding:15px;border-radius:8px;overflow:auto;max-height:500px}
+table{width:100%;border-collapse:collapse;margin-top:15px}
+th,td{border:1px solid #ddd;padding:9px;text-align:left}
+th{background:#f0f0f0}
+input{padding:10px;border:1px solid #ccc;border-radius:6px;width:100%}
+.field{flex:1;min-width:220px}
+.test-item{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid #eee}
 </style>
 </head>
-
 <body>
 
 <div class="container">
 
-<h1>Shop Management Backend Tester</h1>
+<h1>Shop Management Backend Test</h1>
 
 <div class="card">
-<h2>1. Apps Script Web App</h2>
-
+<div class="row">
 <div class="field">
-<label for="webAppUrl">Google Apps Script Web App URL</label>
-<input id="webAppUrl" type="url" placeholder="https://script.google.com/macros/s/XXXXXXXX/exec">
-<div id="urlError" class="field-error"></div>
-</div>
-
-<div class="button-row">
-<button onclick="saveUrl()">Save URL</button>
-<button onclick="loadSavedUrl()" class="secondary">Load Saved URL</button>
-<button onclick="testPing()" class="success">Test Ping</button>
-</div>
-
-<div id="mainStatus" class="status info">Ready.</div>
-
-<div class="info-box">
-<b>Important:</b><br>
-Use only the base <b>/exec</b> URL.<br>
-Do not paste <b>?action=ping</b> at the end.
+<label>Google Apps Script Web App URL</label>
+<input id="webAppUrl" value="PASTE_YOUR_WEB_APP_URL_HERE">
 </div>
 </div>
-
+<br>
+<div class="row">
+<button class="primary" onclick="runAllTests()">Run All Tests</button>
+<button class="secondary" onclick="testPing()">Test Ping</button>
+<button class="secondary" onclick="testAddSale()">Test Add Sale</button>
+<button class="secondary" onclick="clearLog()">Clear Log</button>
+</div>
+</div>
 
 <div class="card">
-<h2>2. Firebase Session Information</h2>
+<h2>Test Status</h2>
 
-<div class="grid">
-<div class="field">
-<label for="clientId">Firebase Client ID</label>
-<input id="clientId" type="text" placeholder="firebase-client-id">
-<div id="clientIdError" class="field-error"></div>
+<div class="test-item">
+<span>Browser Environment</span>
+<span id="browserStatus" class="status">PENDING</span>
 </div>
 
-<div class="field">
-<label for="loginDateTime">Firebase Login Date Time</label>
-<input id="loginDateTime" type="text" placeholder="2026-09-23 19:20:00">
-<div id="loginDateTimeError" class="field-error"></div>
-</div>
+<div class="test-item">
+<span>Local Storage</span>
+<span id="storageStatus" class="status">PENDING</span>
 </div>
 
-<div class="button-row">
-<button onclick="generateClientId()">Generate Client ID</button>
-<button onclick="generateLoginDateTime()" class="secondary">Generate Login Date Time</button>
-</div>
+<div class="test-item">
+<span>Backend GET</span>
+<span id="getStatus" class="status">PENDING</span>
 </div>
 
+<div class="test-item">
+<span>JSON Response</span>
+<span id="jsonStatus" class="status">PENDING</span>
+</div>
+
+<div class="test-item">
+<span>Response Time</span>
+<span id="timeStatus" class="status">PENDING</span>
+</div>
+
+<div class="test-item">
+<span>Sale Validation</span>
+<span id="validationStatus" class="status">PENDING</span>
+</div>
+
+<div class="test-item">
+<span>Sale Request</span>
+<span id="saleStatus" class="status">PENDING</span>
+</div>
+
+<div class="test-item">
+<span>Passed</span>
+<strong id="passedCount">0</strong>
+</div>
+
+<div class="test-item">
+<span>Failed</span>
+<strong id="failedCount">0</strong>
+</div>
+
+<div class="test-item">
+<span>Total</span>
+<strong id="totalCount">7</strong>
+</div>
+</div>
 
 <div class="card">
-<h2>3. Sale Fields</h2>
-
-<div class="info-box">
-<b>Server automatically generates Current Date Time.</b><br>
-HTML sends exactly 13 incoming fields.<br>
-Server creates field number 7 and stores the final record as 14 fields.
+<h2>Sale Request JSON</h2>
+<pre id="requestOutput"></pre>
 </div>
-
-<div class="grid">
-
-<div class="field">
-<label for="productCategoryId">1. Product Category ID</label>
-<input id="productCategoryId" type="text" placeholder="CAT001">
-<div id="productCategoryIdError" class="field-error"></div>
-</div>
-
-<div class="field">
-<label for="productBarcode">2. Product Line Barcode</label>
-<input id="productBarcode" type="text" placeholder="8901234567890">
-<div id="productBarcodeError" class="field-error"></div>
-</div>
-
-<div class="field">
-<label for="shopId">3. Shop ID</label>
-<input id="shopId" type="text" placeholder="SHOP001">
-<div id="shopIdError" class="field-error"></div>
-</div>
-
-<div class="field">
-<label for="saleClientId">4. Firebase Client ID</label>
-<input id="saleClientId" type="text" placeholder="Generated Firebase Client ID">
-<div id="saleClientIdError" class="field-error"></div>
-</div>
-
-<div class="field">
-<label for="sku">5. SKU</label>
-<input id="sku" type="text" placeholder="SKU001">
-<div id="skuError" class="field-error"></div>
-</div>
-
-<div class="field">
-<label for="saleLoginDateTime">6. Firebase Login Date Time</label>
-<input id="saleLoginDateTime" type="text" placeholder="2026-09-23 19:20:00">
-<div id="saleLoginDateTimeError" class="field-error"></div>
-</div>
-
-<div class="field">
-<label for="notes">8. Notes</label>
-<input id="notes" type="text" placeholder="Sale notes">
-<div id="notesError" class="field-error"></div>
-</div>
-
-<div class="field">
-<label for="invoiceNo">9. Invoice No</label>
-<input id="invoiceNo" type="text" placeholder="INV001">
-<div id="invoiceNoError" class="field-error"></div>
-</div>
-
-<div class="field">
-<label for="gstin">10. GSTIN Number</label>
-<input id="gstin" type="text" placeholder="GSTIN number">
-<div id="gstinError" class="field-error"></div>
-</div>
-
-<div class="field">
-<label for="customerId">11. Customer ID</label>
-<input id="customerId" type="text" placeholder="CUSTOMER001">
-<div id="customerIdError" class="field-error"></div>
-</div>
-
-<div class="field">
-<label for="rate">12. Rate</label>
-<input id="rate" type="text" inputmode="decimal" placeholder="100.00">
-<div id="rateError" class="field-error"></div>
-</div>
-
-<div class="field">
-<label for="receiveAmount">13. Receive Amount</label>
-<input id="receiveAmount" type="text" inputmode="decimal" placeholder="100.00">
-<div id="receiveAmountError" class="field-error"></div>
-</div>
-
-<div class="field">
-<label for="transactionId">14. Transaction ID</label>
-<input id="transactionId" type="text" placeholder="TXN-001">
-<div id="transactionIdError" class="field-error"></div>
-</div>
-
-</div>
-
-<div class="button-row">
-<button onclick="copySessionToSale()">Copy Session Data</button>
-<button onclick="generateTransactionId()" class="secondary">Generate Transaction ID</button>
-<button onclick="validateSale()" class="warning">Validate All Fields</button>
-<button onclick="sendSale()" class="success">Send Sale</button>
-</div>
-
-<div id="saleStatus" class="status info">Sale form ready.</div>
-</div>
-
 
 <div class="card">
-<h2>4. Batch Sale Test</h2>
-
-<div class="field">
-<label for="batchCount">Number of Sales</label>
-<input id="batchCount" type="number" min="1" max="50" value="2">
+<h2>Backend Response</h2>
+<pre id="responseOutput"></pre>
 </div>
-
-<div class="button-row">
-<button onclick="sendBatchSales()" class="success">Send Batch Sales</button>
-</div>
-
-<div id="batchStatus" class="status info">Batch not started.</div>
-</div>
-
 
 <div class="card">
-<h2>5. Product Files</h2>
-
-<div class="button-row">
-<button onclick="readCurrentProducts()">Read Current Product List</button>
-<button onclick="readCategoryDetails()">Read Category Details</button>
-<button onclick="readSaleFile()" class="secondary">Read Sale File</button>
-</div>
-
-<div id="productStatus" class="status info">No product request yet.</div>
-</div>
-
-
-<div class="card">
-<h2>6. Product File Write Test</h2>
-
-<div class="field">
-<label for="currentProductsInput">Current Product List Content</label>
-<textarea id="currentProductsInput">8901234567890|CAT001|2026-09-23 19:20:00
-8901234567891|CAT002|2026-09-23 19:21:00</textarea>
-</div>
-
-<div class="button-row">
-<button onclick="writeCurrentProducts()" class="warning">Write Current Product List</button>
-</div>
-
-<div class="field">
-<label for="categoryDetailsInput">Category Details Content</label>
-<textarea id="categoryDetailsInput">CAT001|Product One|Category A|100
-CAT002|Product Two|Category B|200</textarea>
-</div>
-
-<div class="button-row">
-<button onclick="writeCategoryDetails()" class="warning">Write Category Details</button>
-</div>
-</div>
-
-
-<div class="card">
-<h2>7. Detailed Request / Response Debug</h2>
-
-<table>
-<thead>
-<tr>
-<th>Property</th>
-<th>Value</th>
-</tr>
-</thead>
-<tbody>
-<tr><td>Request URL</td><td id="debugUrl">-</td></tr>
-<tr><td>Request Method</td><td id="debugMethod">-</td></tr>
-<tr><td>HTTP Status</td><td id="debugStatus">-</td></tr>
-<tr><td>Response Content Type</td><td id="debugContentType">-</td></tr>
-<tr><td>Response Length</td><td id="debugLength">-</td></tr>
-<tr><td>Error Type</td><td id="debugErrorType">-</td></tr>
-<tr><td>Error Message</td><td id="debugErrorMessage">-</td></tr>
-<tr><td>Browser Origin</td><td id="debugOrigin">-</td></tr>
-<tr><td>Page Protocol</td><td id="debugProtocol">-</td></tr>
-</tbody>
-</table>
-
-<h3>Request Payload</h3>
-<pre id="requestPayload">-</pre>
-
-<h3>Raw Server Response</h3>
-<pre id="rawResponse">-</pre>
-
-<h3>Parsed Server Response</h3>
-<pre id="parsedResponse">-</pre>
-
+<h2>Activity / Debug Log</h2>
+<pre id="activityLog"></pre>
 </div>
 
 </div>
 
 <script>
-'use strict';
+const TEST_CONFIG = {
+  saleId: 'TEST-SALE-001',
+  saleDate: '2026-09-23',
+  categoryId: 'CAT-001',
+  barcode: '8901234567890',
+  shopId: 'SHOP-001',
+  clientId: 'CLIENT-001',
+  sku: 'SKU-001',
+  loginDateTime: '2026-09-23 20:30:00',
+  notes: 'Backend sale test request',
+  invoiceNo: 'INV-TEST-001',
+  gstin: 'TEST-GSTIN',
+  customerId: 'CUSTOMER-001',
+  rate: '100',
+  receiveAmount: '100',
+  transactionId: 'TEST-TXN-001'
+};
 
-const STORAGE_KEY='shop_backend_web_app_url';
+let passed = 0;
+let failed = 0;
+let total = 7;
 
-document.getElementById('debugOrigin').textContent=window.location.origin;
-document.getElementById('debugProtocol').textContent=window.location.protocol;
-
-function $(id){
-    return document.getElementById(id);
+function getUrl() {
+  return document.getElementById('webAppUrl').value.trim();
 }
 
-function setStatus(id,type,message){
-    const el=$(id);
-    el.className='status '+type;
-    el.textContent=message;
+function setStatus(id, status) {
+  const element = document.getElementById(id);
+
+  element.textContent = status;
+
+  element.className = 'status';
+
+  if (status === 'PASS') {
+    element.classList.add('success');
+  } else if (status === 'FAIL') {
+    element.classList.add('error');
+  } else {
+    element.classList.add('pending');
+  }
 }
 
-function clearFieldErrors(){
-    document.querySelectorAll('.field-error').forEach(el=>{
-        el.textContent='';
-    });
+function resetCounters() {
+  passed = 0;
+  failed = 0;
+  updateCounters();
 }
 
-function fieldError(id,message){
-    $(id).textContent=message;
+function updateCounters() {
+  document.getElementById('passedCount').textContent = passed;
+  document.getElementById('failedCount').textContent = failed;
+  document.getElementById('totalCount').textContent = total;
 }
 
-function normalizeUrl(value){
-    let url=String(value||'').trim();
+function recordResult(id, success) {
+  setStatus(id, success ? 'PASS' : 'FAIL');
 
-    if(!url){
-        throw new Error('WEB_APP_URL_EMPTY');
+  if (success) {
+    passed++;
+  } else {
+    failed++;
+  }
+
+  updateCounters();
+}
+
+function addLog(title, data) {
+  const log = document.getElementById('activityLog');
+
+  const time = new Date().toLocaleTimeString();
+
+  let output = '';
+
+  if (typeof data === 'string') {
+    output = data;
+  } else {
+    try {
+      output = JSON.stringify(data, null, 2);
+    } catch (error) {
+      output = String(data);
     }
+  }
 
-    try{
-        const parsed=new URL(url);
-
-        if(parsed.protocol!=='https:' && parsed.protocol!=='http:'){
-            throw new Error('INVALID_PROTOCOL');
-        }
-
-        parsed.search='';
-        parsed.hash='';
-
-        return parsed.toString().replace(/\/$/,'');
-    }catch(error){
-        throw new Error('INVALID_WEB_APP_URL: '+error.message);
-    }
+  log.textContent += '\n[' + time + '] ' + title + '\n' + output + '\n';
+  log.scrollTop = log.scrollHeight;
 }
 
-function getUrl(){
-    try{
-        const url=normalizeUrl($('webAppUrl').value);
-        $('webAppUrl').value=url;
-        $('urlError').textContent='';
-        return url;
-    }catch(error){
-        $('urlError').textContent=error.message;
-        throw error;
-    }
+function clearLog() {
+  document.getElementById('activityLog').textContent = '';
+  document.getElementById('requestOutput').textContent = '';
+  document.getElementById('responseOutput').textContent = '';
+
+  passed = 0;
+  failed = 0;
+
+  [
+    'browserStatus',
+    'storageStatus',
+    'getStatus',
+    'jsonStatus',
+    'timeStatus',
+    'validationStatus',
+    'saleStatus'
+  ].forEach(function(id) {
+    setStatus(id, 'PENDING');
+  });
+
+  updateCounters();
 }
 
-function saveUrl(){
-    try{
-        const url=getUrl();
-        localStorage.setItem(STORAGE_KEY,url);
-        setStatus('mainStatus','ok','SUCCESS: Web App URL saved\n'+url);
-    }catch(error){
-        setStatus('mainStatus','error','URL ERROR\n'+error.message);
-    }
+function createSaleRequest() {
+  return {
+    action: 'addSale',
+    sale: [
+      TEST_CONFIG.categoryId,
+      TEST_CONFIG.barcode,
+      TEST_CONFIG.shopId,
+      TEST_CONFIG.clientId,
+      TEST_CONFIG.sku,
+      TEST_CONFIG.loginDateTime,
+      TEST_CONFIG.notes,
+      TEST_CONFIG.invoiceNo,
+      TEST_CONFIG.gstin,
+      TEST_CONFIG.customerId,
+      TEST_CONFIG.rate,
+      TEST_CONFIG.receiveAmount,
+      TEST_CONFIG.transactionId
+    ]
+  };
 }
 
-function loadSavedUrl(){
-    const url=localStorage.getItem(STORAGE_KEY)||'';
-    $('webAppUrl').value=url;
-    setStatus(
-        'mainStatus',
-        url?'ok':'warning',
-        url?'Saved URL loaded.':'No saved URL found.'
-    );
+function testBrowser() {
+  const ok =
+    typeof window !== 'undefined' &&
+    typeof document !== 'undefined' &&
+    typeof fetch === 'function';
+
+  recordResult('browserStatus', ok);
+
+  addLog('Browser Environment', {
+    ok: ok,
+    fetch: typeof fetch === 'function',
+    userAgent: navigator.userAgent
+  });
+
+  return ok;
 }
 
-function nowDateTime(){
-    const d=new Date();
-    const pad=n=>String(n).padStart(2,'0');
+function testStorage() {
+  try {
+    const key = '__shop_test__';
+    localStorage.setItem(key, '1');
+    const value = localStorage.getItem(key);
+    localStorage.removeItem(key);
 
-    return d.getFullYear()+'-'+
-        pad(d.getMonth()+1)+'-'+
-        pad(d.getDate())+' '+
-        pad(d.getHours())+':'+
-        pad(d.getMinutes())+':'+
-        pad(d.getSeconds());
-}
+    const ok = value === '1';
 
-function generateClientId(){
-    const d=new Date();
-    const pad=n=>String(n).padStart(2,'0');
+    recordResult('storageStatus', ok);
 
-    const value=
-        'client_'+
-        d.getFullYear()+
-        pad(d.getMonth()+1)+
-        pad(d.getDate())+
-        '_'+
-        pad(d.getHours())+
-        pad(d.getMinutes())+
-        pad(d.getSeconds())+
-        '_'+
-        Math.random().toString(36).slice(2,8);
-
-    $('clientId').value=value;
-    $('saleClientId').value=value;
-}
-
-function generateLoginDateTime(){
-    const value=nowDateTime();
-    $('loginDateTime').value=value;
-    $('saleLoginDateTime').value=value;
-}
-
-function generateTransactionId(){
-    $('transactionId').value=
-        'TXN-'+
-        Date.now()+
-        '-'+
-        Math.random().toString(36).slice(2,8).toUpperCase();
-}
-
-function copySessionToSale(){
-    $('saleClientId').value=$('clientId').value.trim();
-    $('saleLoginDateTime').value=$('loginDateTime').value.trim();
-
-    setStatus(
-        'saleStatus',
-        'ok',
-        'Session fields copied to sale fields.'
-    );
-}
-
-function isValidDateTime(value){
-    const text=String(value||'').trim();
-
-    if(!text){
-        return false;
-    }
-
-    const match=text.match(
-        /^(\d{4})[-/](\d{1,2})[-/](\d{1,2})[ T](\d{1,2}):(\d{2})(?::(\d{2}))?$/
-    );
-
-    if(!match){
-        const parsed=new Date(text);
-        return !isNaN(parsed.getTime());
-    }
-
-    const year=Number(match[1]);
-    const month=Number(match[2]);
-    const day=Number(match[3]);
-    const hour=Number(match[4]);
-    const minute=Number(match[5]);
-    const second=Number(match[6]||0);
-
-    if(month<1 || month>12) return false;
-    if(day<1 || day>31) return false;
-    if(hour<0 || hour>23) return false;
-    if(minute<0 || minute>59) return false;
-    if(second<0 || second>59) return false;
-
-    const d=new Date(
-        year,
-        month-1,
-        day,
-        hour,
-        minute,
-        second
-    );
-
-    return(
-        d.getFullYear()===year &&
-        d.getMonth()===month-1 &&
-        d.getDate()===day &&
-        d.getHours()===hour &&
-        d.getMinutes()===minute &&
-        d.getSeconds()===second
-    );
-}
-
-function validateSale(){
-    clearFieldErrors();
-
-    let valid=true;
-
-    const requiredFields=[
-        ['productCategoryId','productCategoryIdError','Product Category ID'],
-        ['productBarcode','productBarcodeError','Product Line Barcode'],
-        ['shopId','shopIdError','Shop ID'],
-        ['saleClientId','saleClientIdError','Firebase Client ID'],
-        ['sku','skuError','SKU'],
-        ['saleLoginDateTime','saleLoginDateTimeError','Firebase Login Date Time'],
-        ['transactionId','transactionIdError','Transaction ID']
-    ];
-
-    requiredFields.forEach(item=>{
-        const value=$(item[0]).value.trim();
-
-        if(!value){
-            fieldError(item[1],item[2]+' is required.');
-            valid=false;
-        }
+    addLog('Local Storage', {
+      ok: ok
     });
 
-    const loginTime=$('saleLoginDateTime').value.trim();
+    return ok;
+  } catch (error) {
+    recordResult('storageStatus', false);
 
-    if(loginTime && !isValidDateTime(loginTime)){
-        fieldError(
-            'saleLoginDateTimeError',
-            'Invalid Firebase Login Date Time. Expected format: YYYY-MM-DD HH:mm:ss'
-        );
-        valid=false;
-    }
+    addLog('Local Storage ERROR', {
+      message: error.message
+    });
 
-    const rate=$('rate').value.trim();
-
-    if(rate && !/^\d+(\.\d+)?$/.test(rate)){
-        fieldError(
-            'rateError',
-            'Rate must be a valid positive number.'
-        );
-        valid=false;
-    }
-
-    const receive=$('receiveAmount').value.trim();
-
-    if(receive && !/^\d+(\.\d+)?$/.test(receive)){
-        fieldError(
-            'receiveAmountError',
-            'Receive Amount must be a valid positive number.'
-        );
-        valid=false;
-    }
-
-    const transactionId=$('transactionId').value.trim();
-
-    if(transactionId && /[\r\n|]/.test(transactionId)){
-        fieldError(
-            'transactionIdError',
-            'Transaction ID cannot contain newline or | character.'
-        );
-        valid=false;
-    }
-
-    if(valid){
-        setStatus(
-            'saleStatus',
-            'ok',
-            'VALIDATION SUCCESS\nAll required sale fields are valid.'
-        );
-    }else{
-        setStatus(
-            'saleStatus',
-            'error',
-            'VALIDATION ERROR\nOne or more fields are invalid. Check the red messages below each field.'
-        );
-    }
-
-    return valid;
+    return false;
+  }
 }
 
-function createSalePayload(){
+async function testPing() {
+  const url = getUrl();
+
+  if (!url || url === 'PASTE_YOUR_WEB_APP_URL_HERE') {
+    setStatus('getStatus', 'FAIL');
+    setStatus('jsonStatus', 'FAIL');
+    setStatus('timeStatus', 'FAIL');
+
+    failed += 3;
+    updateCounters();
+
+    addLog('Backend GET ERROR', 'Please enter the deployed Apps Script Web App URL.');
+    return false;
+  }
+
+  const start = performance.now();
+
+  try {
+    const response = await fetch(url + '?action=ping', {
+      method: 'GET',
+      cache: 'no-store',
+      redirect: 'follow'
+    });
+
+    const elapsed = Math.round(performance.now() - start);
+
+    const text = await response.text();
+
+    let data;
+
+    try {
+      data = JSON.parse(text);
+    } catch (error) {
+      data = null;
+    }
+
+    const getOk = response.ok;
+    const jsonOk = data !== null && typeof data === 'object';
+    const timeOk = elapsed >= 0;
+
+    recordResult('getStatus', getOk);
+    recordResult('jsonStatus', jsonOk);
+    recordResult('timeStatus', timeOk);
+
+    document.getElementById('responseOutput').textContent = text;
+
+    addLog('Backend GET', {
+      httpStatus: response.status,
+      responseTimeMs: elapsed,
+      response: data || text
+    });
+
+    if (data && data.activity) {
+      addLog('Backend Activity', data.activity);
+    }
+
+    return getOk && jsonOk && timeOk;
+
+  } catch (error) {
+    recordResult('getStatus', false);
+    recordResult('jsonStatus', false);
+    recordResult('timeStatus', false);
+
+    addLog('Backend GET ERROR', {
+      name: error.name,
+      message: error.message
+    });
+
+    return false;
+  }
+}
+
+function validateSaleLocally(request) {
+  if (!request || request.action !== 'addSale') {
     return {
-        action:'addSale',
-        sale:[
-            $('productCategoryId').value.trim(),
-            $('productBarcode').value.trim(),
-            $('shopId').value.trim(),
-            $('saleClientId').value.trim(),
-            $('sku').value.trim(),
-            $('saleLoginDateTime').value.trim(),
-            $('notes').value.trim(),
-            $('invoiceNo').value.trim(),
-            $('gstin').value.trim(),
-            $('customerId').value.trim(),
-            $('rate').value.trim(),
-            $('receiveAmount').value.trim(),
-            $('transactionId').value.trim()
-        ]
+      ok: false,
+      message: 'action must be addSale'
     };
+  }
+
+  if (!Array.isArray(request.sale)) {
+    return {
+      ok: false,
+      message: 'sale must be an array'
+    };
+  }
+
+  if (request.sale.length !== 13) {
+    return {
+      ok: false,
+      message: 'sale must contain exactly 13 fields'
+    };
+  }
+
+  for (let i = 0; i < request.sale.length; i++) {
+    if (String(request.sale[i]).trim() === '') {
+      return {
+        ok: false,
+        message: 'sale field ' + (i + 1) + ' is empty'
+      };
+    }
+
+    if (
+      String(request.sale[i]).includes('|') ||
+      String(request.sale[i]).includes('\n') ||
+      String(request.sale[i]).includes('\r') ||
+      String(request.sale[i]).includes('%')
+    ) {
+      return {
+        ok: false,
+        message: 'sale field ' + (i + 1) + ' contains an invalid character'
+      };
+    }
+  }
+
+  if (isNaN(Number(request.sale[10]))) {
+    return {
+      ok: false,
+      message: 'Rate is not numeric'
+    };
+  }
+
+  if (isNaN(Number(request.sale[11]))) {
+    return {
+      ok: false,
+      message: 'Receive Amount is not numeric'
+    };
+  }
+
+  return {
+    ok: true,
+    message: 'All required sale fields are valid'
+  };
 }
 
-function debugRequest(url,method,payload){
-    $('debugUrl').textContent=url;
-    $('debugMethod').textContent=method;
-    $('debugStatus').textContent='Waiting';
-    $('debugContentType').textContent='-';
-    $('debugLength').textContent='-';
-    $('debugErrorType').textContent='-';
-    $('debugErrorMessage').textContent='-';
-    $('requestPayload').textContent=JSON.stringify(payload,null,2);
-    $('rawResponse').textContent='Waiting...';
-    $('parsedResponse').textContent='Waiting...';
-}
+async function testAddSale() {
+  const url = getUrl();
 
-async function requestGet(action,extra={}){
-    const base=getUrl();
-    const urlObject=new URL(base);
+  if (!url || url === 'PASTE_YOUR_WEB_APP_URL_HERE') {
+    setStatus('validationStatus', 'FAIL');
+    setStatus('saleStatus', 'FAIL');
 
-    urlObject.searchParams.set('action',action);
+    failed += 2;
+    updateCounters();
 
-    Object.keys(extra).forEach(key=>{
-        urlObject.searchParams.set(key,extra[key]);
+    addLog('Sale Request ERROR', 'Please enter the deployed Apps Script Web App URL.');
+    return false;
+  }
+
+  const request = createSaleRequest();
+
+  document.getElementById('requestOutput').textContent =
+    JSON.stringify(request, null, 2);
+
+  const validation = validateSaleLocally(request);
+
+  recordResult('validationStatus', validation.ok);
+
+  addLog('Sale Validation', validation);
+
+  if (!validation.ok) {
+    setStatus('saleStatus', 'FAIL');
+    failed++;
+    updateCounters();
+    return false;
+  }
+
+  try {
+    const start = performance.now();
+
+    addLog('Sale POST Started', {
+      url: url,
+      request: request
     });
 
-    const url=urlObject.toString();
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(request),
+      redirect: 'follow',
+      cache: 'no-store'
+    });
 
-    const payload={
-        action,
-        ...extra
-    };
+    const elapsed = Math.round(performance.now() - start);
 
-    debugRequest(url,'GET',payload);
+    const text = await response.text();
 
-    try{
-        const response=await fetch(url,{
-            method:'GET',
-            cache:'no-store',
-            redirect:'follow'
-        });
+    let data;
 
-        $('debugStatus').textContent=response.status+' '+response.statusText;
-        $('debugContentType').textContent=response.headers.get('content-type')||'-';
-
-        const text=await response.text();
-
-        $('debugLength').textContent=String(text.length);
-        $('rawResponse').textContent=text;
-
-        if(!response.ok){
-            const error=new Error(
-                'HTTP_'+response.status+': '+response.statusText+
-                '\nResponse: '+text
-            );
-
-            $('debugErrorType').textContent='HTTP_ERROR';
-            $('debugErrorMessage').textContent=error.message;
-
-            throw error;
-        }
-
-        let parsed;
-
-        try{
-            parsed=JSON.parse(text);
-        }catch(error){
-            $('debugErrorType').textContent='INVALID_JSON';
-            $('debugErrorMessage').textContent=
-                'Server did not return valid JSON.\n'+
-                error.message;
-
-            throw new Error(
-                'INVALID_JSON_RESPONSE: '+text.slice(0,1000)
-            );
-        }
-
-        $('parsedResponse').textContent=
-            JSON.stringify(parsed,null,2);
-
-        return parsed;
-
-    }catch(error){
-        if($('debugErrorType').textContent==='-'){
-            $('debugErrorType').textContent=
-                classifyFetchError(error);
-        }
-
-        if($('debugErrorMessage').textContent==='-'){
-            $('debugErrorMessage').textContent=
-                error.stack||error.message||String(error);
-        }
-
-        throw error;
+    try {
+      data = JSON.parse(text);
+    } catch (error) {
+      data = null;
     }
+
+    document.getElementById('responseOutput').textContent =
+      data ? JSON.stringify(data, null, 2) : text;
+
+    const success = response.ok &&
+      data &&
+      data.ok === true &&
+      data.action === 'addSale';
+
+    recordResult('saleStatus', success);
+
+    addLog('Sale POST Response', {
+      httpStatus: response.status,
+      responseTimeMs: elapsed,
+      response: data || text
+    });
+
+    if (data && data.activity) {
+      addLog('Sale Activity / Debug', data.activity);
+    }
+
+    if (data && data.error) {
+      addLog('Sale Backend Error', {
+        error: data.error,
+        message: data.message,
+        activity: data.activity || null
+      });
+    }
+
+    return success;
+
+  } catch (error) {
+    recordResult('saleStatus', false);
+
+    addLog('Sale POST ERROR', {
+      name: error.name,
+      message: error.message
+    });
+
+    return false;
+  }
 }
 
-async function requestPost(action,data){
-    const base=getUrl();
-    const url=new URL(base);
+async function runAllTests() {
+  clearLog();
 
-    const payload={
-        action,
-        ...data
-    };
+  addLog('TEST STARTED', {
+    time: new Date().toISOString()
+  });
 
-    debugRequest(
-        url.toString(),
-        'POST',
-        payload
-    );
+  testBrowser();
+  testStorage();
 
-    try{
-        const response=await fetch(url.toString(),{
-            method:'POST',
-            headers:{
-                'Content-Type':'text/plain;charset=utf-8'
-            },
-            body:JSON.stringify(payload),
-            cache:'no-store',
-            redirect:'follow'
-        });
+  await testPing();
+  await testAddSale();
 
-        $('debugStatus').textContent=
-            response.status+' '+response.statusText;
-
-        $('debugContentType').textContent=
-            response.headers.get('content-type')||'-';
-
-        const text=await response.text();
-
-        $('debugLength').textContent=String(text.length);
-        $('rawResponse').textContent=text;
-
-        if(!response.ok){
-            const error=new Error(
-                'HTTP_'+response.status+': '+response.statusText+
-                '\nResponse: '+text
-            );
-
-            $('debugErrorType').textContent='HTTP_ERROR';
-            $('debugErrorMessage').textContent=error.message;
-
-            throw error;
-        }
-
-        let parsed;
-
-        try{
-            parsed=JSON.parse(text);
-        }catch(error){
-            $('debugErrorType').textContent='INVALID_JSON';
-            $('debugErrorMessage').textContent=
-                'Server response is not valid JSON.\n'+
-                error.message;
-
-            throw new Error(
-                'INVALID_JSON_RESPONSE: '+text.slice(0,1000)
-            );
-        }
-
-        $('parsedResponse').textContent=
-            JSON.stringify(parsed,null,2);
-
-        return parsed;
-
-    }catch(error){
-
-        if($('debugErrorType').textContent==='-'){
-            $('debugErrorType').textContent=
-                classifyFetchError(error);
-        }
-
-        if($('debugErrorMessage').textContent==='-'){
-            $('debugErrorMessage').textContent=
-                error.stack||error.message||String(error);
-        }
-
-        throw error;
-    }
+  addLog('TEST COMPLETED', {
+    passed: passed,
+    failed: failed,
+    total: total
+  });
 }
 
-function classifyFetchError(error){
-    const message=String(error?.message||error||'');
+document.getElementById('requestOutput').textContent =
+  JSON.stringify(createSaleRequest(), null, 2);
 
-    if(message.includes('Failed to fetch')){
-        if(location.protocol==='file:'){
-            return 'NETWORK_ORIGIN_ERROR_FILE_PROTOCOL';
-        }
-
-        return 'NETWORK_OR_CORS_OR_REDIRECT_ERROR';
-    }
-
-    if(message.includes('NetworkError')){
-        return 'NETWORK_ERROR';
-    }
-
-    if(message.includes('AbortError')){
-        return 'REQUEST_ABORTED_OR_TIMEOUT';
-    }
-
-    if(message.includes('INVALID_JSON')){
-        return 'INVALID_JSON';
-    }
-
-    return 'UNKNOWN_JAVASCRIPT_ERROR';
-}
-
-async function testPing(){
-    try{
-        setStatus(
-            'mainStatus',
-            'info',
-            'Testing backend ping...'
-        );
-
-        const result=await requestGet('ping');
-
-        if(result && result.ok){
-            setStatus(
-                'mainStatus',
-                'ok',
-                'SUCCESS: ping\n'+
-                JSON.stringify(result,null,2)
-            );
-        }else{
-            setStatus(
-                'mainStatus',
-                'warning',
-                'PING RESPONSE RECEIVED\n'+
-                JSON.stringify(result,null,2)
-            );
-        }
-
-    }catch(error){
-        setStatus(
-            'mainStatus',
-            'error',
-            'PING ERROR\n'+
-            formatError(error)
-        );
-    }
-}
-
-async function sendSale(){
-    if(!validateSale()){
-        return;
-    }
-
-    const payload=createSalePayload();
-
-    try{
-        setStatus(
-            'saleStatus',
-            'info',
-            'Sending sale...\n13 incoming fields will be sent.\nServer will create field 7 Current Date Time.'
-        );
-
-        const result=await requestPost(
-            'addSale',
-            {sale:payload.sale}
-        );
-
-        if(result && result.ok){
-            setStatus(
-                'saleStatus',
-                'ok',
-                'SUCCESS: Sale saved\n'+
-                JSON.stringify(result,null,2)
-            );
-        }else{
-            setStatus(
-                'saleStatus',
-                'error',
-                'SERVER ERROR\n'+
-                JSON.stringify(result,null,2)
-            );
-        }
-
-    }catch(error){
-        setStatus(
-            'saleStatus',
-            'error',
-            'REQUEST ERROR\n'+
-            formatError(error)
-        );
-    }
-}
-
-async function sendBatchSales(){
-    const count=Number($('batchCount').value);
-
-    if(!Number.isInteger(count)||count<1||count>50){
-        setStatus(
-            'batchStatus',
-            'error',
-            'BATCH VALIDATION ERROR\nBatch count must be between 1 and 50.'
-        );
-        return;
-    }
-
-    const sales=[];
-
-    for(let i=1;i<=count;i++){
-        sales.push([
-            'CAT'+String(i).padStart(3,'0'),
-            'BARCODE'+String(i).padStart(3,'0'),
-            $('shopId').value.trim()||'SHOP001',
-            $('saleClientId').value.trim()||'BATCH_CLIENT',
-            'SKU'+String(i).padStart(3,'0'),
-            $('saleLoginDateTime').value.trim()||nowDateTime(),
-            'Batch test '+i,
-            'INV-BATCH-'+i,
-            '',
-            '',
-            '100',
-            '100',
-            'BATCH-TXN-'+Date.now()+'-'+i
-        ]);
-    }
-
-    try{
-        setStatus(
-            'batchStatus',
-            'info',
-            'Sending '+count+' sales...'
-        );
-
-        const result=await requestPost(
-            'addSales',
-            {sales}
-        );
-
-        if(result && result.ok){
-            setStatus(
-                'batchStatus',
-                'ok',
-                'SUCCESS: Batch completed\n'+
-                JSON.stringify(result,null,2)
-            );
-        }else{
-            setStatus(
-                'batchStatus',
-                'error',
-                'BATCH SERVER ERROR\n'+
-                JSON.stringify(result,null,2)
-            );
-        }
-
-    }catch(error){
-        setStatus(
-            'batchStatus',
-            'error',
-            'BATCH REQUEST ERROR\n'+
-            formatError(error)
-        );
-    }
-}
-
-async function readCurrentProducts(){
-    try{
-        setStatus(
-            'productStatus',
-            'info',
-            'Reading current product list...'
-        );
-
-        const result=await requestGet(
-            'getCurrentProducts'
-        );
-
-        setStatus(
-            'productStatus',
-            result?.ok?'ok':'warning',
-            'Current Product List Response\n'+
-            JSON.stringify(result,null,2)
-        );
-
-    }catch(error){
-        setStatus(
-            'productStatus',
-            'error',
-            'PRODUCT READ ERROR\n'+
-            formatError(error)
-        );
-    }
-}
-
-async function readCategoryDetails(){
-    try{
-        setStatus(
-            'productStatus',
-            'info',
-            'Reading category details...'
-        );
-
-        const result=await requestGet(
-            'getCategoryDetails'
-        );
-
-        setStatus(
-            'productStatus',
-            result?.ok?'ok':'warning',
-            'Category Details Response\n'+
-            JSON.stringify(result,null,2)
-        );
-
-    }catch(error){
-        setStatus(
-            'productStatus',
-            'error',
-            'CATEGORY READ ERROR\n'+
-            formatError(error)
-        );
-    }
-}
-
-async function readSaleFile(){
-    try{
-        setStatus(
-            'productStatus',
-            'info',
-            'Reading sale.txt...'
-        );
-
-        const result=await requestGet(
-            'getSale'
-        );
-
-        setStatus(
-            'productStatus',
-            result?.ok?'ok':'warning',
-            'Sale File Response\n'+
-            JSON.stringify(result,null,2)
-        );
-
-    }catch(error){
-        setStatus(
-            'productStatus',
-            'error',
-            'SALE FILE READ ERROR\n'+
-            formatError(error)
-        );
-    }
-}
-
-async function writeCurrentProducts(){
-    const content=$('currentProductsInput').value;
-
-    try{
-        setStatus(
-            'productStatus',
-            'info',
-            'Writing current product list...'
-        );
-
-        const result=await requestPost(
-            'writeCurrentProducts',
-            {content}
-        );
-
-        setStatus(
-            'productStatus',
-            result?.ok?'ok':'error',
-            'WRITE CURRENT PRODUCTS RESPONSE\n'+
-            JSON.stringify(result,null,2)
-        );
-
-    }catch(error){
-        setStatus(
-            'productStatus',
-            'error',
-            'WRITE ERROR\n'+
-            formatError(error)
-        );
-    }
-}
-
-async function writeCategoryDetails(){
-    const content=$('categoryDetailsInput').value;
-
-    try{
-        setStatus(
-            'productStatus',
-            'info',
-            'Writing category details...'
-        );
-
-        const result=await requestPost(
-            'writeCategoryDetails',
-            {content}
-        );
-
-        setStatus(
-            'productStatus',
-            result?.ok?'ok':'error',
-            'WRITE CATEGORY RESPONSE\n'+
-            JSON.stringify(result,null,2)
-        );
-
-    }catch(error){
-        setStatus(
-            'productStatus',
-            'error',
-            'WRITE CATEGORY ERROR\n'+
-            formatError(error)
-        );
-    }
-}
-
-function formatError(error){
-    const type=$('debugErrorType').textContent;
-    const message=$('debugErrorMessage').textContent;
-
-    return(
-        'Type: '+type+
-        '\nMessage: '+message+
-        '\nJavaScript Error: '+(error?.message||String(error))+
-        '\nPage Protocol: '+location.protocol+
-        '\nOrigin: '+location.origin
-    );
-}
-
-window.addEventListener('error',function(event){
-    $('debugErrorType').textContent='JAVASCRIPT_RUNTIME_ERROR';
-    $('debugErrorMessage').textContent=
-        event.message+
-        '\nFile: '+event.filename+
-        '\nLine: '+event.lineno+
-        '\nColumn: '+event.colno;
-});
-
-window.addEventListener('unhandledrejection',function(event){
-    const reason=event.reason;
-
-    $('debugErrorType').textContent=
-        'UNHANDLED_PROMISE_REJECTION';
-
-    $('debugErrorMessage').textContent=
-        reason?.stack||
-        reason?.message||
-        String(reason);
-});
-
-loadSavedUrl();
+updateCounters();
 </script>
 
 </body>
