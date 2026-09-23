@@ -471,15 +471,15 @@ async function testAddSale() {
       request: request
     });
 
-    const response = await fetch(url, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(request),
-      redirect: 'follow',
-      cache: 'no-store'
-    });
+  const response = await fetch(url, {
+  method: 'POST',
+  headers: {
+    'Content-Type': 'text/plain;charset=utf-8'
+  },
+  body: JSON.stringify(request),
+  redirect: 'follow',
+  cache: 'no-store'
+});
 
     const elapsed = Math.round(performance.now() - start);
 
