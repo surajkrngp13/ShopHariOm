@@ -1,0 +1,747 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Shop TXT Backend Tester</title>
+<style>
+*{
+    box-sizing:border-box;
+}
+body{
+    margin:0;
+    font-family:Arial,sans-serif;
+    background:#f3f4f6;
+    color:#111827;
+}
+.container{
+    width:min(1200px,96%);
+    margin:20px auto;
+}
+h1{
+    margin:0 0 18px;
+    font-size:28px;
+}
+.card{
+    background:#fff;
+    border:1px solid #d1d5db;
+    border-radius:10px;
+    padding:18px;
+    margin-bottom:18px;
+    box-shadow:0 2px 8px rgba(0,0,0,.05);
+}
+h2{
+    margin:0 0 14px;
+    font-size:20px;
+}
+label{
+    display:block;
+    font-size:13px;
+    font-weight:700;
+    margin:10px 0 5px;
+}
+input,textarea,select{
+    width:100%;
+    padding:10px 11px;
+    border:1px solid #cbd5e1;
+    border-radius:7px;
+    font-size:14px;
+    outline:none;
+}
+textarea{
+    min-height:120px;
+    resize:vertical;
+    font-family:monospace;
+}
+input:focus,textarea:focus,select:focus{
+    border-color:#2563eb;
+}
+.grid{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:12px;
+}
+.grid2{
+    display:grid;
+    grid-template-columns:repeat(2,1fr);
+    gap:12px;
+}
+.buttons{
+    display:flex;
+    flex-wrap:wrap;
+    gap:8px;
+    margin-top:12px;
+}
+button{
+    border:0;
+    border-radius:7px;
+    padding:10px 15px;
+    background:#2563eb;
+    color:#fff;
+    cursor:pointer;
+    font-size:14px;
+    font-weight:700;
+}
+button:hover{
+    opacity:.9;
+}
+button.secondary{
+    background:#475569;
+}
+button.success{
+    background:#15803d;
+}
+button.warning{
+    background:#b45309;
+}
+button.danger{
+    background:#dc2626;
+}
+.status{
+    padding:12px;
+    border-radius:7px;
+    background:#f1f5f9;
+    border:1px solid #cbd5e1;
+    font-weight:700;
+    margin-top:12px;
+    white-space:pre-wrap;
+}
+.status.ok{
+    background:#dcfce7;
+    border-color:#86efac;
+    color:#166534;
+}
+.status.error{
+    background:#fee2e2;
+    border-color:#fca5a5;
+    color:#991b1b;
+}
+.status.loading{
+    background:#fef3c7;
+    border-color:#fcd34d;
+    color:#92400e;
+}
+pre{
+    margin:0;
+    white-space:pre-wrap;
+    word-break:break-word;
+    background:#0f172a;
+    color:#e2e8f0;
+    padding:14px;
+    border-radius:8px;
+    min-height:120px;
+    max-height:500px;
+    overflow:auto;
+    font-size:13px;
+}
+.small{
+    font-size:12px;
+    color:#64748b;
+    margin-top:5px;
+}
+.field-title{
+    font-size:12px;
+    color:#64748b;
+    margin-top:4px;
+}
+@media(max-width:800px){
+    .grid,.grid2{
+        grid-template-columns:1fr;
+    }
+}
+</style>
+</head>
+<body>
+
+<div class="container">
+
+<h1>Shop TXT Backend Tester</h1>
+
+<div class="card">
+    <h2>Backend Configuration</h2>
+
+    <label>Apps Script Web App URL</label>
+    <input id="webAppUrl" type="url" placeholder="https://script.google.com/macros/s/XXXXXXXX/exec">
+
+    <div class="small">
+        URL must end with /exec
+    </div>
+
+    <div class="buttons">
+        <button onclick="pingBackend()">Ping Backend</button>
+        <button class="secondary" onclick="readAllProducts()">Read Product Files</button>
+        <button class="secondary" onclick="readSaleFile()">Read sale.txt</button>
+    </div>
+
+    <div id="status" class="status">Ready</div>
+</div>
+
+<div class="card">
+    <h2>Single Sale Test</h2>
+
+    <div class="grid">
+
+        <div>
+            <label>Product Category ID *</label>
+            <input id="productCategoryId" value="CAT001">
+        </div>
+
+        <div>
+            <label>Product Line Barcode *</label>
+            <input id="productLineBarcode" value="BAR001">
+        </div>
+
+        <div>
+            <label>Shop ID *</label>
+            <input id="shopId" value="SHOP001">
+        </div>
+
+        <div>
+            <label>Firebase Client ID *</label>
+            <input id="clientId" value="">
+        </div>
+
+        <div>
+            <label>SKU *</label>
+            <input id="sku" value="SKU001">
+        </div>
+
+        <div>
+            <label>Firebase Login Date Time *</label>
+            <input id="firebaseLoginDateTime" value="">
+        </div>
+
+        <div>
+            <label>Notes</label>
+            <input id="notes" value="Testing sale">
+        </div>
+
+        <div>
+            <label>Invoice No</label>
+            <input id="invoiceNo" value="INV001">
+        </div>
+
+        <div>
+            <label>GSTIN Number</label>
+            <input id="gstinNumber" value="GSTIN001">
+        </div>
+
+        <div>
+            <label>Customer ID</label>
+            <input id="customerId" value="CUST001">
+        </div>
+
+        <div>
+            <label>Rate</label>
+            <input id="rate" value="100">
+        </div>
+
+        <div>
+            <label>Receive Amount</label>
+            <input id="receiveAmount" value="100">
+        </div>
+
+        <div>
+            <label>Transaction ID *</label>
+            <input id="transactionId" value="">
+        </div>
+
+    </div>
+
+    <div class="buttons">
+        <button class="secondary" onclick="generateClientId()">Generate Client ID</button>
+        <button class="secondary" onclick="generateLoginDateTime()">Generate Login Date Time</button>
+        <button class="secondary" onclick="generateTransactionId()">Generate Transaction ID</button>
+        <button class="success" onclick="sendSale()">Send Sale</button>
+        <button class="danger" onclick="testMissingClientId()">Test Missing Client ID</button>
+        <button class="danger" onclick="testMissingSku()">Test Missing SKU</button>
+        <button class="danger" onclick="testMissingLoginTime()">Test Missing Login Time</button>
+    </div>
+</div>
+
+<div class="card">
+    <h2>Batch Sale Test</h2>
+
+    <label>Number of Sales</label>
+    <input id="batchCount" type="number" min="1" max="50" value="3">
+
+    <div class="buttons">
+        <button class="success" onclick="sendBatchSales()">Send Batch Sales</button>
+    </div>
+</div>
+
+<div class="card">
+    <h2>Current Product List</h2>
+
+    <div class="field-title">
+        Format: product line bar code|product category id|created date
+    </div>
+
+    <label>Content</label>
+    <textarea id="currentProducts">BAR001|CAT001|2026-09-23
+BAR002|CAT002|2026-09-23
+BAR003|CAT003|2026-09-23</textarea>
+
+    <div class="buttons">
+        <button class="success" onclick="writeCurrentProducts()">Write Current Product List</button>
+        <button class="secondary" onclick="readCurrentProducts()">Read Current Product List</button>
+    </div>
+</div>
+
+<div class="card">
+    <h2>Product Category Details</h2>
+
+    <div class="field-title">
+        Format: product id|product name|category|rate
+    </div>
+
+    <label>Content</label>
+    <textarea id="categoryDetails">PROD001|Product One|Category One|100
+PROD002|Product Two|Category Two|200
+PROD003|Product Three|Category Three|300</textarea>
+
+    <div class="buttons">
+        <button class="success" onclick="writeCategoryDetails()">Write Category Details</button>
+        <button class="secondary" onclick="readCategoryDetails()">Read Category Details</button>
+    </div>
+</div>
+
+<div class="card">
+    <h2>Raw Server Response</h2>
+    <pre id="output">No response yet.</pre>
+</div>
+
+</div>
+
+<script>
+const WEB_APP_URL = '';
+
+function getUrl(){
+    const input = document.getElementById('webAppUrl').value.trim();
+
+    if(input){
+        return input;
+    }
+
+    return WEB_APP_URL;
+}
+
+function validateUrl(){
+    const url = getUrl();
+
+    if(!url){
+        throw new Error('Please enter Apps Script Web App /exec URL');
+    }
+
+    if(!url.includes('/exec')){
+        throw new Error('Invalid Web App URL. URL must contain /exec');
+    }
+
+    return url;
+}
+
+function setStatus(message,type=''){
+    const el = document.getElementById('status');
+
+    el.className = 'status';
+
+    if(type){
+        el.classList.add(type);
+    }
+
+    el.textContent = message;
+}
+
+function showOutput(data){
+    const output = document.getElementById('output');
+
+    if(typeof data === 'string'){
+        output.textContent = data;
+        return;
+    }
+
+    output.textContent = JSON.stringify(data,null,2);
+}
+
+function generateClientId(){
+    const now = new Date();
+
+    const pad = value => String(value).padStart(2,'0');
+
+    const date =
+        now.getFullYear() +
+        pad(now.getMonth()+1) +
+        pad(now.getDate()) + '_' +
+        pad(now.getHours()) +
+        pad(now.getMinutes()) +
+        pad(now.getSeconds());
+
+    const clientId = 'testUID_' + date;
+
+    document.getElementById('clientId').value = clientId;
+
+    generateLoginDateTime();
+
+    setStatus('Client ID generated','ok');
+}
+
+function generateLoginDateTime(){
+    const now = new Date();
+
+    const pad = value => String(value).padStart(2,'0');
+
+    const value =
+        now.getFullYear() + '-' +
+        pad(now.getMonth()+1) + '-' +
+        pad(now.getDate()) + ' ' +
+        pad(now.getHours()) + ':' +
+        pad(now.getMinutes()) + ':' +
+        pad(now.getSeconds());
+
+    document.getElementById('firebaseLoginDateTime').value = value;
+
+    setStatus('Firebase login date time generated','ok');
+}
+
+function generateTransactionId(){
+    const now = Date.now();
+
+    const random =
+        Math.random().toString(36).substring(2,10).toUpperCase();
+
+    const transactionId = 'TXN_' + now + '_' + random;
+
+    document.getElementById('transactionId').value = transactionId;
+
+    setStatus('Transaction ID generated','ok');
+}
+
+async function requestGet(action){
+    const url = validateUrl();
+
+    setStatus('Requesting ' + action + '...','loading');
+
+    try{
+        const response = await fetch(
+            url + '?action=' + encodeURIComponent(action),
+            {
+                method:'GET',
+                cache:'no-store'
+            }
+        );
+
+        const text = await response.text();
+
+        showOutput(text);
+
+        let data;
+
+        try{
+            data = JSON.parse(text);
+        }catch(error){
+            throw new Error(
+                'Invalid JSON response:\n' + text.substring(0,1000)
+            );
+        }
+
+        if(data.ok){
+            setStatus('SUCCESS: ' + action,'ok');
+        }else{
+            setStatus(
+                'SERVER ERROR: ' +
+                (data.error || 'UNKNOWN') +
+                '\n' +
+                (data.message || ''),
+                'error'
+            );
+        }
+
+        return data;
+
+    }catch(error){
+        showOutput(String(error));
+
+        setStatus(
+            'REQUEST ERROR\n' + error.message,
+            'error'
+        );
+
+        throw error;
+    }
+}
+
+async function requestPost(payload){
+    const url = validateUrl();
+
+    setStatus(
+        'Sending ' + (payload.action || 'request') + '...',
+        'loading'
+    );
+
+    try{
+        const response = await fetch(
+            url,
+            {
+                method:'POST',
+                headers:{
+                    'Content-Type':'text/plain;charset=utf-8'
+                },
+                body:JSON.stringify(payload),
+                cache:'no-store'
+            }
+        );
+
+        const text = await response.text();
+
+        showOutput(text);
+
+        let data;
+
+        try{
+            data = JSON.parse(text);
+        }catch(error){
+            throw new Error(
+                'Invalid JSON response:\n' +
+                text.substring(0,2000)
+            );
+        }
+
+        if(data.ok){
+            setStatus(
+                'SUCCESS: ' + (payload.action || 'request'),
+                'ok'
+            );
+        }else{
+            setStatus(
+                'SERVER ERROR: ' +
+                (data.error || 'UNKNOWN') +
+                '\n' +
+                (data.message || ''),
+                'error'
+            );
+        }
+
+        return data;
+
+    }catch(error){
+        showOutput(String(error));
+
+        setStatus(
+            'REQUEST ERROR\n' + error.message,
+            'error'
+        );
+
+        throw error;
+    }
+}
+
+function pingBackend(){
+    requestGet('ping');
+}
+
+function readAllProducts(){
+    requestGet('getProducts');
+}
+
+function readCurrentProducts(){
+    requestGet('getCurrentProducts');
+}
+
+function readCategoryDetails(){
+    requestGet('getCategoryDetails');
+}
+
+function readSaleFile(){
+    requestGet('getSale');
+}
+
+function getSaleFields(){
+    return [
+        document.getElementById('productCategoryId').value,
+        document.getElementById('productLineBarcode').value,
+        document.getElementById('shopId').value,
+        document.getElementById('clientId').value,
+        document.getElementById('sku').value,
+        document.getElementById('firebaseLoginDateTime').value,
+        document.getElementById('notes').value,
+        document.getElementById('invoiceNo').value,
+        document.getElementById('gstinNumber').value,
+        document.getElementById('customerId').value,
+        document.getElementById('rate').value,
+        document.getElementById('receiveAmount').value,
+        document.getElementById('transactionId').value
+    ];
+}
+
+function prepareSale(){
+    if(!document.getElementById('clientId').value.trim()){
+        generateClientId();
+    }
+
+    if(!document.getElementById('firebaseLoginDateTime').value.trim()){
+        generateLoginDateTime();
+    }
+
+    if(!document.getElementById('transactionId').value.trim()){
+        generateTransactionId();
+    }
+
+    return getSaleFields();
+}
+
+async function sendSale(){
+    const fields = prepareSale();
+
+    await requestPost({
+        action:'addSale',
+        fields:fields
+    });
+}
+
+async function testMissingClientId(){
+    const fields = prepareSale();
+
+    fields[3] = '';
+
+    await requestPost({
+        action:'addSale',
+        fields:fields
+    });
+}
+
+async function testMissingSku(){
+    const fields = prepareSale();
+
+    fields[4] = '';
+
+    await requestPost({
+        action:'addSale',
+        fields:fields
+    });
+}
+
+async function testMissingLoginTime(){
+    const fields = prepareSale();
+
+    fields[5] = '';
+
+    await requestPost({
+        action:'addSale',
+        fields:fields
+    });
+}
+
+function createBatchSale(index){
+    const now = new Date();
+
+    const pad = value => String(value).padStart(2,'0');
+
+    const loginTime =
+        now.getFullYear() + '-' +
+        pad(now.getMonth()+1) + '-' +
+        pad(now.getDate()) + ' ' +
+        pad(now.getHours()) + ':' +
+        pad(now.getMinutes()) + ':' +
+        pad(now.getSeconds());
+
+    const transactionId =
+        'BATCH_TXN_' +
+        Date.now() +
+        '_' +
+        index +
+        '_' +
+        Math.random().toString(36).substring(2,8).toUpperCase();
+
+    return [
+        'CAT00' + ((index % 9) + 1),
+        'BAR00' + ((index % 9) + 1),
+        'SHOP001',
+        'testUID_' +
+        now.getFullYear() +
+        pad(now.getMonth()+1) +
+        pad(now.getDate()) +
+        '_' +
+        pad(now.getHours()) +
+        pad(now.getMinutes()) +
+        pad(now.getSeconds()),
+        'SKU00' + ((index % 9) + 1),
+        loginTime,
+        'Batch testing sale ' + index,
+        'BATCH_INV_' + index,
+        'GSTIN_TEST',
+        'CUSTOMER_' + index,
+        String(100 + index),
+        String(100 + index),
+        transactionId
+    ];
+}
+
+async function sendBatchSales(){
+    let count =
+        Number(document.getElementById('batchCount').value);
+
+    if(!Number.isFinite(count)){
+        count = 1;
+    }
+
+    count = Math.max(1,Math.min(50,Math.floor(count)));
+
+    const sales = [];
+
+    for(let i=1;i<=count;i++){
+        sales.push(createBatchSale(i));
+    }
+
+    await requestPost({
+        action:'addSales',
+        sales:sales
+    });
+}
+
+async function writeCurrentProducts(){
+    const content =
+        document.getElementById('currentProducts').value;
+
+    await requestPost({
+        action:'writeCurrentProducts',
+        content:content
+    });
+}
+
+async function writeCategoryDetails(){
+    const content =
+        document.getElementById('categoryDetails').value;
+
+    await requestPost({
+        action:'writeCategoryDetails',
+        content:content
+    });
+}
+
+document.getElementById('webAppUrl').addEventListener(
+    'change',
+    function(){
+        const value = this.value.trim();
+
+        if(value){
+            localStorage.setItem(
+                'shop_backend_url',
+                value
+            );
+        }
+    }
+);
+
+(function(){
+    const saved =
+        localStorage.getItem('shop_backend_url');
+
+    if(saved){
+        document.getElementById('webAppUrl').value = saved;
+    }
+})();
+</script>
+
+</body>
+</html>
