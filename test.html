@@ -5,560 +5,974 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Shop Management Backend Test</title>
 <style>
-*{box-sizing:border-box}
-body{margin:0;font-family:Arial,sans-serif;background:#f4f6f8;color:#222}
-.container{max-width:1100px;margin:30px auto;padding:20px}
-h1{margin:0 0 20px}
-.card{background:#fff;border-radius:10px;padding:20px;margin-bottom:20px;box-shadow:0 2px 10px rgba(0,0,0,.08)}
-.row{display:flex;gap:10px;flex-wrap:wrap}
-button{border:0;border-radius:6px;padding:10px 16px;cursor:pointer;font-weight:600}
-.primary{background:#1976d2;color:#fff}
-.secondary{background:#555;color:#fff}
-.success{color:#16803c;font-weight:700}
-.error{color:#c62828;font-weight:700}
-.pending{color:#e67e00;font-weight:700}
-.status{padding:8px 12px;border-radius:6px;background:#eee;display:inline-block}
-pre{white-space:pre-wrap;word-break:break-word;background:#111;color:#eee;padding:15px;border-radius:8px;overflow:auto;max-height:500px}
-table{width:100%;border-collapse:collapse;margin-top:15px}
-th,td{border:1px solid #ddd;padding:9px;text-align:left}
-th{background:#f0f0f0}
-input{padding:10px;border:1px solid #ccc;border-radius:6px;width:100%}
-.field{flex:1;min-width:220px}
-.test-item{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid #eee}
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    padding: 20px;
+    font-family: Arial, sans-serif;
+    background: #f5f5f5;
+    color: #222;
+}
+
+.container {
+    max-width: 1100px;
+    margin: 0 auto;
+}
+
+h1 {
+    margin: 0 0 20px;
+    font-size: 26px;
+}
+
+.panel {
+    background: #fff;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 16px;
+    margin-bottom: 16px;
+}
+
+.panel-title {
+    font-size: 18px;
+    font-weight: 700;
+    margin-bottom: 12px;
+}
+
+button {
+    border: 0;
+    border-radius: 6px;
+    padding: 10px 16px;
+    font-size: 14px;
+    cursor: pointer;
+    background: #1976d2;
+    color: #fff;
+}
+
+button:hover {
+    opacity: 0.9;
+}
+
+button:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.status-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+}
+
+.status-item {
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    padding: 12px;
+    background: #fafafa;
+}
+
+.status-name {
+    font-weight: 700;
+    margin-bottom: 5px;
+}
+
+.status-result {
+    font-weight: 700;
+}
+
+.pass {
+    color: #16803c;
+}
+
+.fail {
+    color: #c62828;
+}
+
+.pending {
+    color: #777;
+}
+
+.summary {
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap;
+    font-weight: 700;
+}
+
+pre {
+    margin: 0;
+    white-space: pre-wrap;
+    word-break: break-word;
+    background: #111;
+    color: #eee;
+    border-radius: 6px;
+    padding: 14px;
+    overflow-x: auto;
+    font-size: 13px;
+    line-height: 1.5;
+}
+
+.activity-log {
+    max-height: 500px;
+    overflow-y: auto;
+}
+
+.log-entry {
+    border-bottom: 1px solid #ddd;
+    padding: 10px 0;
+}
+
+.log-time {
+    color: #666;
+    font-size: 12px;
+    margin-bottom: 4px;
+}
+
+.log-title {
+    font-weight: 700;
+    margin-bottom: 5px;
+}
+
+.log-data {
+    background: #f7f7f7;
+    border: 1px solid #ddd;
+    padding: 8px;
+    border-radius: 5px;
+    white-space: pre-wrap;
+    word-break: break-word;
+    font-family: monospace;
+    font-size: 12px;
+}
+
+.url-box {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    margin-bottom: 10px;
+    font-family: monospace;
+    font-size: 13px;
+}
+
+.sale-fields {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+}
+
+.sale-field {
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    padding: 9px;
+    background: #fafafa;
+}
+
+.sale-index {
+    color: #666;
+    font-size: 12px;
+}
+
+.sale-value {
+    font-family: monospace;
+    margin-top: 3px;
+    word-break: break-word;
+}
+
+@media (max-width: 700px) {
+    body {
+        padding: 10px;
+    }
+
+    .status-grid,
+    .sale-fields {
+        grid-template-columns: 1fr;
+    }
+}
 </style>
 </head>
+
 <body>
 
 <div class="container">
 
-<h1>Shop Management Backend Test</h1>
+    <h1>Shop Management Backend Test</h1>
 
-<div class="card">
-<div class="row">
-<div class="field">
-<label>Google Apps Script Web App URL</label>
-<input id="webAppUrl" value="PASTE_YOUR_WEB_APP_URL_HERE">
-</div>
-</div>
-<br>
-<div class="row">
-<button class="primary" onclick="runAllTests()">Run All Tests</button>
-<button class="secondary" onclick="testPing()">Test Ping</button>
-<button class="secondary" onclick="testAddSale()">Test Add Sale</button>
-<button class="secondary" onclick="clearLog()">Clear Log</button>
-</div>
-</div>
+    <div class="panel">
+        <div class="panel-title">Backend URL</div>
+        <input
+            id="backendUrl"
+            class="url-box"
+            type="text"
+            value="https://script.google.com/macros/s/AKfycbz-6o0RGbzDpvz11GaHLhXClpNvM5aCHMSqUw-FzCP49AQnxbo_sVRpsK7Ep_mOMnPL9w/exec"
+        >
+        <button id="runTestButton" onclick="runAllTests()">Run All Tests</button>
+    </div>
 
-<div class="card">
-<h2>Test Status</h2>
+    <div class="panel">
+        <div class="panel-title">Test Status</div>
 
-<div class="test-item">
-<span>Browser Environment</span>
-<span id="browserStatus" class="status">PENDING</span>
-</div>
+        <div class="status-grid">
 
-<div class="test-item">
-<span>Local Storage</span>
-<span id="storageStatus" class="status">PENDING</span>
-</div>
+            <div class="status-item">
+                <div class="status-name">Browser Environment</div>
+                <div id="browserStatus" class="status-result pending">PENDING</div>
+            </div>
 
-<div class="test-item">
-<span>Backend GET</span>
-<span id="getStatus" class="status">PENDING</span>
-</div>
+            <div class="status-item">
+                <div class="status-name">Local Storage</div>
+                <div id="storageStatus" class="status-result pending">PENDING</div>
+            </div>
 
-<div class="test-item">
-<span>JSON Response</span>
-<span id="jsonStatus" class="status">PENDING</span>
-</div>
+            <div class="status-item">
+                <div class="status-name">Backend GET</div>
+                <div id="getStatus" class="status-result pending">PENDING</div>
+            </div>
 
-<div class="test-item">
-<span>Response Time</span>
-<span id="timeStatus" class="status">PENDING</span>
-</div>
+            <div class="status-item">
+                <div class="status-name">JSON Response</div>
+                <div id="jsonStatus" class="status-result pending">PENDING</div>
+            </div>
 
-<div class="test-item">
-<span>Sale Validation</span>
-<span id="validationStatus" class="status">PENDING</span>
-</div>
+            <div class="status-item">
+                <div class="status-name">Response Time</div>
+                <div id="timeStatus" class="status-result pending">PENDING</div>
+            </div>
 
-<div class="test-item">
-<span>Sale Request</span>
-<span id="saleStatus" class="status">PENDING</span>
-</div>
+            <div class="status-item">
+                <div class="status-name">Sale Validation</div>
+                <div id="validationStatus" class="status-result pending">PENDING</div>
+            </div>
 
-<div class="test-item">
-<span>Passed</span>
-<strong id="passedCount">0</strong>
-</div>
+            <div class="status-item">
+                <div class="status-name">Sale Request</div>
+                <div id="saleStatus" class="status-result pending">PENDING</div>
+            </div>
 
-<div class="test-item">
-<span>Failed</span>
-<strong id="failedCount">0</strong>
-</div>
+        </div>
+    </div>
 
-<div class="test-item">
-<span>Total</span>
-<strong id="totalCount">7</strong>
-</div>
-</div>
+    <div class="panel">
+        <div class="panel-title">Test Summary</div>
 
-<div class="card">
-<h2>Sale Request JSON</h2>
-<pre id="requestOutput"></pre>
-</div>
+        <div class="summary">
+            <div>Passed: <span id="passedCount">0</span></div>
+            <div>Failed: <span id="failedCount">0</span></div>
+            <div>Total: <span id="totalCount">7</span></div>
+        </div>
+    </div>
 
-<div class="card">
-<h2>Backend Response</h2>
-<pre id="responseOutput"></pre>
-</div>
+    <div class="panel">
+        <div class="panel-title">Sale Request JSON</div>
+        <pre id="requestOutput">{}</pre>
+    </div>
 
-<div class="card">
-<h2>Activity / Debug Log</h2>
-<pre id="activityLog"></pre>
-</div>
+    <div class="panel">
+        <div class="panel-title">Backend Response</div>
+        <pre id="responseOutput">{}</pre>
+    </div>
+
+    <div class="panel">
+        <div class="panel-title">Activity Log</div>
+        <div id="activityLog" class="activity-log"></div>
+    </div>
 
 </div>
 
 <script>
 const TEST_CONFIG = {
-  saleId: 'TEST-SALE-001',
-  saleDate: '2026-09-23',
-  categoryId: 'CAT-001',
-  barcode: '8901234567890',
-  shopId: 'SHOP-001',
-  clientId: 'CLIENT-001',
-  sku: 'SKU-001',
-  loginDateTime: '2026-09-23 20:30:00',
-  notes: 'Backend sale test request',
-  invoiceNo: 'INV-TEST-001',
-  gstin: 'TEST-GSTIN',
-  customerId: 'CUSTOMER-001',
-  rate: '100',
-  receiveAmount: '100',
-  transactionId: 'TEST-TXN-001'
+    categoryId: 'CAT-001',
+    barcode: '8901234567890',
+    shopId: 'SHOP-001',
+    clientId: 'CLIENT-001',
+    sku: 'SKU-001',
+    loginDateTime: '2026-09-23 20:30:00',
+    notes: 'Backend sale test request',
+    invoiceNo: 'INV-TEST-001',
+    gstin: 'TEST-GSTIN',
+    customerId: 'CUSTOMER-001',
+    rate: '100',
+    receiveAmount: '100',
+    transactionId: 'TEST-TXN-001'
 };
+
+const TEST_COUNT = 7;
 
 let passed = 0;
 let failed = 0;
-let total = 7;
 
-function getUrl() {
-  return document.getElementById('webAppUrl').value.trim();
-}
-
-function setStatus(id, status) {
-  const element = document.getElementById(id);
-
-  element.textContent = status;
-
-  element.className = 'status';
-
-  if (status === 'PASS') {
-    element.classList.add('success');
-  } else if (status === 'FAIL') {
-    element.classList.add('error');
-  } else {
-    element.classList.add('pending');
-  }
-}
-
-function resetCounters() {
-  passed = 0;
-  failed = 0;
-  updateCounters();
-}
-
-function updateCounters() {
-  document.getElementById('passedCount').textContent = passed;
-  document.getElementById('failedCount').textContent = failed;
-  document.getElementById('totalCount').textContent = total;
-}
-
-function recordResult(id, success) {
-  setStatus(id, success ? 'PASS' : 'FAIL');
-
-  if (success) {
-    passed++;
-  } else {
-    failed++;
-  }
-
-  updateCounters();
+function nowTime() {
+    return new Date().toLocaleTimeString('en-IN', {
+        hour12: true
+    });
 }
 
 function addLog(title, data) {
-  const log = document.getElementById('activityLog');
+    const log = document.getElementById('activityLog');
 
-  const time = new Date().toLocaleTimeString();
+    const entry = document.createElement('div');
+    entry.className = 'log-entry';
 
-  let output = '';
+    const time = document.createElement('div');
+    time.className = 'log-time';
+    time.textContent = '[' + nowTime() + ']';
 
-  if (typeof data === 'string') {
-    output = data;
-  } else {
-    try {
-      output = JSON.stringify(data, null, 2);
-    } catch (error) {
-      output = String(data);
+    const titleElement = document.createElement('div');
+    titleElement.className = 'log-title';
+    titleElement.textContent = title;
+
+    const dataElement = document.createElement('div');
+    dataElement.className = 'log-data';
+
+    if (data !== undefined && data !== null) {
+        if (typeof data === 'string') {
+            dataElement.textContent = data;
+        } else {
+            try {
+                dataElement.textContent = JSON.stringify(data, null, 2);
+            } catch (error) {
+                dataElement.textContent = String(data);
+            }
+        }
     }
-  }
 
-  log.textContent += '\n[' + time + '] ' + title + '\n' + output + '\n';
-  log.scrollTop = log.scrollHeight;
+    entry.appendChild(time);
+    entry.appendChild(titleElement);
+
+    if (data !== undefined) {
+        entry.appendChild(dataElement);
+    }
+
+    log.appendChild(entry);
+    log.scrollTop = log.scrollHeight;
 }
 
-function clearLog() {
-  document.getElementById('activityLog').textContent = '';
-  document.getElementById('requestOutput').textContent = '';
-  document.getElementById('responseOutput').textContent = '';
+function setStatus(id, status) {
+    const element = document.getElementById(id);
 
-  passed = 0;
-  failed = 0;
+    element.classList.remove('pass', 'fail', 'pending');
 
-  [
-    'browserStatus',
-    'storageStatus',
-    'getStatus',
-    'jsonStatus',
-    'timeStatus',
-    'validationStatus',
-    'saleStatus'
-  ].forEach(function(id) {
-    setStatus(id, 'PENDING');
-  });
+    if (status === 'PASS') {
+        element.classList.add('pass');
+        element.textContent = 'PASS';
+    } else if (status === 'FAIL') {
+        element.classList.add('fail');
+        element.textContent = 'FAIL';
+    } else {
+        element.classList.add('pending');
+        element.textContent = 'PENDING';
+    }
+}
 
-  updateCounters();
+function updateSummary() {
+    document.getElementById('passedCount').textContent = passed;
+    document.getElementById('failedCount').textContent = failed;
+    document.getElementById('totalCount').textContent = TEST_COUNT;
+}
+
+function markPass(id, title, data) {
+    setStatus(id, 'PASS');
+    passed++;
+    addLog(title, data);
+    updateSummary();
+}
+
+function markFail(id, title, data) {
+    setStatus(id, 'FAIL');
+    failed++;
+    addLog(title, data);
+    updateSummary();
+}
+
+function getBackendUrl() {
+    return document.getElementById('backendUrl').value.trim();
 }
 
 function createSaleRequest() {
-  return {
-    action: 'addSale',
-    sale: [
-      TEST_CONFIG.categoryId,
-      TEST_CONFIG.barcode,
-      TEST_CONFIG.shopId,
-      TEST_CONFIG.clientId,
-      TEST_CONFIG.sku,
-      TEST_CONFIG.loginDateTime,
-      TEST_CONFIG.notes,
-      TEST_CONFIG.invoiceNo,
-      TEST_CONFIG.gstin,
-      TEST_CONFIG.customerId,
-      TEST_CONFIG.rate,
-      TEST_CONFIG.receiveAmount,
-      TEST_CONFIG.transactionId
-    ]
-  };
+    return {
+        action: 'addSale',
+        sale: [
+            TEST_CONFIG.categoryId,
+            TEST_CONFIG.barcode,
+            TEST_CONFIG.shopId,
+            TEST_CONFIG.clientId,
+            TEST_CONFIG.sku,
+            TEST_CONFIG.loginDateTime,
+            TEST_CONFIG.notes,
+            TEST_CONFIG.invoiceNo,
+            TEST_CONFIG.gstin,
+            TEST_CONFIG.customerId,
+            TEST_CONFIG.rate,
+            TEST_CONFIG.receiveAmount,
+            TEST_CONFIG.transactionId
+        ]
+    };
 }
 
-function testBrowser() {
-  const ok =
-    typeof window !== 'undefined' &&
-    typeof document !== 'undefined' &&
-    typeof fetch === 'function';
+function validateSaleRequest(request) {
+    if (!request || typeof request !== 'object') {
+        return {
+            ok: false,
+            message: 'Request object is missing'
+        };
+    }
 
-  recordResult('browserStatus', ok);
+    if (request.action !== 'addSale') {
+        return {
+            ok: false,
+            message: 'Action must be addSale'
+        };
+    }
 
-  addLog('Browser Environment', {
-    ok: ok,
-    fetch: typeof fetch === 'function',
-    userAgent: navigator.userAgent
-  });
+    if (!Array.isArray(request.sale)) {
+        return {
+            ok: false,
+            message: 'sale must be an array'
+        };
+    }
 
-  return ok;
+    if (request.sale.length !== 13) {
+        return {
+            ok: false,
+            message: 'sale must contain exactly 13 fields, received ' + request.sale.length
+        };
+    }
+
+    for (let i = 0; i < request.sale.length; i++) {
+        if (request.sale[i] === undefined || request.sale[i] === null) {
+            return {
+                ok: false,
+                message: 'Sale field ' + i + ' is null or undefined'
+            };
+        }
+
+        if (String(request.sale[i]).trim() === '') {
+            return {
+                ok: false,
+                message: 'Sale field ' + i + ' is empty'
+            };
+        }
+    }
+
+    return {
+        ok: true,
+        message: 'All required sale fields are valid'
+    };
 }
 
-function testStorage() {
-  try {
-    const key = '__shop_test__';
-    localStorage.setItem(key, '1');
-    const value = localStorage.getItem(key);
-    localStorage.removeItem(key);
+async function testBrowserEnvironment() {
+    try {
+        const checks = {
+            fetch: typeof fetch === 'function',
+            promise: typeof Promise === 'function',
+            json: typeof JSON === 'object',
+            localStorage: typeof localStorage !== 'undefined'
+        };
 
-    const ok = value === '1';
+        const ok = Object.values(checks).every(Boolean);
 
-    recordResult('storageStatus', ok);
+        if (ok) {
+            markPass(
+                'browserStatus',
+                'Browser Environment',
+                checks
+            );
+        } else {
+            markFail(
+                'browserStatus',
+                'Browser Environment',
+                checks
+            );
+        }
 
-    addLog('Local Storage', {
-      ok: ok
-    });
+        return ok;
+    } catch (error) {
+        markFail(
+            'browserStatus',
+            'Browser Environment ERROR',
+            {
+                name: error.name,
+                message: error.message
+            }
+        );
 
-    return ok;
-  } catch (error) {
-    recordResult('storageStatus', false);
-
-    addLog('Local Storage ERROR', {
-      message: error.message
-    });
-
-    return false;
-  }
+        return false;
+    }
 }
 
-async function testPing() {
-  const url = getUrl();
+async function testLocalStorage() {
+    try {
+        const key = '__shop_management_test__';
+        const value = String(Date.now());
 
-  if (!url || url === 'PASTE_YOUR_WEB_APP_URL_HERE') {
-    setStatus('getStatus', 'FAIL');
-    setStatus('jsonStatus', 'FAIL');
-    setStatus('timeStatus', 'FAIL');
+        localStorage.setItem(key, value);
 
-    failed += 3;
-    updateCounters();
+        const readValue = localStorage.getItem(key);
 
-    addLog('Backend GET ERROR', 'Please enter the deployed Apps Script Web App URL.');
-    return false;
-  }
+        localStorage.removeItem(key);
 
-  const start = performance.now();
+        if (readValue === value) {
+            markPass(
+                'storageStatus',
+                'Local Storage',
+                {
+                    write: true,
+                    read: true,
+                    remove: true
+                }
+            );
 
-  try {
-    const response = await fetch(url + '?action=ping', {
-      method: 'GET',
-      cache: 'no-store',
-      redirect: 'follow'
-    });
+            return true;
+        }
 
-    const elapsed = Math.round(performance.now() - start);
+        markFail(
+            'storageStatus',
+            'Local Storage',
+            {
+                expected: value,
+                received: readValue
+            }
+        );
 
-    const text = await response.text();
+        return false;
 
-    let data;
+    } catch (error) {
+        markFail(
+            'storageStatus',
+            'Local Storage ERROR',
+            {
+                name: error.name,
+                message: error.message
+            }
+        );
+
+        return false;
+    }
+}
+
+async function testBackendGet() {
+    const url = getBackendUrl();
+
+    addLog(
+        'Backend GET Started',
+        {
+            url: url,
+            action: 'ping'
+        }
+    );
+
+    const start = performance.now();
 
     try {
-      data = JSON.parse(text);
+        const response = await fetch(
+            url + '?action=ping&_=' + Date.now(),
+            {
+                method: 'GET',
+                redirect: 'follow',
+                cache: 'no-store'
+            }
+        );
+
+        const elapsed = Math.round(performance.now() - start);
+
+        const text = await response.text();
+
+        let data;
+
+        try {
+            data = JSON.parse(text);
+        } catch (error) {
+            data = {
+                parseError: error.message,
+                raw: text
+            };
+        }
+
+        addLog(
+            'Backend GET',
+            {
+                httpStatus: response.status,
+                responseTimeMs: elapsed,
+                response: data
+            }
+        );
+
+        if (response.ok) {
+            markPass(
+                'getStatus',
+                'Backend GET',
+                {
+                    httpStatus: response.status,
+                    responseTimeMs: elapsed
+                }
+            );
+        } else {
+            markFail(
+                'getStatus',
+                'Backend GET',
+                {
+                    httpStatus: response.status,
+                    responseTimeMs: elapsed,
+                    response: data
+                }
+            );
+
+            return {
+                ok: false,
+                data,
+                elapsed
+            };
+        }
+
+        if (data && typeof data === 'object') {
+            markPass(
+                'jsonStatus',
+                'JSON Response',
+                {
+                    valid: true,
+                    type: typeof data
+                }
+            );
+        } else {
+            markFail(
+                'jsonStatus',
+                'JSON Response',
+                {
+                    valid: false
+                }
+            );
+        }
+
+        if (elapsed < 60000) {
+            markPass(
+                'timeStatus',
+                'Response Time',
+                {
+                    responseTimeMs: elapsed
+                }
+            );
+        } else {
+            markFail(
+                'timeStatus',
+                'Response Time',
+                {
+                    responseTimeMs: elapsed,
+                    limitMs: 60000
+                }
+            );
+        }
+
+        document.getElementById('responseOutput').textContent =
+            JSON.stringify(data, null, 2);
+
+        if (data && data.activity) {
+            addLog(
+                'Backend Activity',
+                data.activity
+            );
+        }
+
+        return {
+            ok: true,
+            data,
+            elapsed
+        };
+
     } catch (error) {
-      data = null;
+        const elapsed = Math.round(performance.now() - start);
+
+        addLog(
+            'Backend GET ERROR',
+            {
+                name: error.name,
+                message: error.message,
+                responseTimeMs: elapsed
+            }
+        );
+
+        markFail(
+            'getStatus',
+            'Backend GET',
+            {
+                name: error.name,
+                message: error.message,
+                responseTimeMs: elapsed
+            }
+        );
+
+        markFail(
+            'jsonStatus',
+            'JSON Response',
+            {
+                message: 'No JSON response received'
+            }
+        );
+
+        markFail(
+            'timeStatus',
+            'Response Time',
+            {
+                responseTimeMs: elapsed
+            }
+        );
+
+        return {
+            ok: false,
+            error
+        };
     }
-
-    const getOk = response.ok;
-    const jsonOk = data !== null && typeof data === 'object';
-    const timeOk = elapsed >= 0;
-
-    recordResult('getStatus', getOk);
-    recordResult('jsonStatus', jsonOk);
-    recordResult('timeStatus', timeOk);
-
-    document.getElementById('responseOutput').textContent = text;
-
-    addLog('Backend GET', {
-      httpStatus: response.status,
-      responseTimeMs: elapsed,
-      response: data || text
-    });
-
-    if (data && data.activity) {
-      addLog('Backend Activity', data.activity);
-    }
-
-    return getOk && jsonOk && timeOk;
-
-  } catch (error) {
-    recordResult('getStatus', false);
-    recordResult('jsonStatus', false);
-    recordResult('timeStatus', false);
-
-    addLog('Backend GET ERROR', {
-      name: error.name,
-      message: error.message
-    });
-
-    return false;
-  }
 }
 
-function validateSaleLocally(request) {
-  if (!request || request.action !== 'addSale') {
-    return {
-      ok: false,
-      message: 'action must be addSale'
-    };
-  }
+async function testSaleValidation() {
+    const request = createSaleRequest();
 
-  if (!Array.isArray(request.sale)) {
-    return {
-      ok: false,
-      message: 'sale must be an array'
-    };
-  }
+    document.getElementById('requestOutput').textContent =
+        JSON.stringify(request, null, 2);
 
-  if (request.sale.length !== 13) {
-    return {
-      ok: false,
-      message: 'sale must contain exactly 13 fields'
-    };
-  }
+    const validation = validateSaleRequest(request);
 
-  for (let i = 0; i < request.sale.length; i++) {
-    if (String(request.sale[i]).trim() === '') {
-      return {
-        ok: false,
-        message: 'sale field ' + (i + 1) + ' is empty'
-      };
+    if (validation.ok) {
+        markPass(
+            'validationStatus',
+            'Sale Validation',
+            validation
+        );
+    } else {
+        markFail(
+            'validationStatus',
+            'Sale Validation',
+            validation
+        );
     }
 
-    if (
-      String(request.sale[i]).includes('|') ||
-      String(request.sale[i]).includes('\n') ||
-      String(request.sale[i]).includes('\r') ||
-      String(request.sale[i]).includes('%')
-    ) {
-      return {
-        ok: false,
-        message: 'sale field ' + (i + 1) + ' contains an invalid character'
-      };
-    }
-  }
+    addLog(
+        'Sale Request Created',
+        request
+    );
 
-  if (isNaN(Number(request.sale[10]))) {
-    return {
-      ok: false,
-      message: 'Rate is not numeric'
-    };
-  }
-
-  if (isNaN(Number(request.sale[11]))) {
-    return {
-      ok: false,
-      message: 'Receive Amount is not numeric'
-    };
-  }
-
-  return {
-    ok: true,
-    message: 'All required sale fields are valid'
-  };
+    return validation.ok;
 }
 
 async function testAddSale() {
-  const url = getUrl();
+    const url = getBackendUrl();
+    const request = createSaleRequest();
 
-  if (!url || url === 'PASTE_YOUR_WEB_APP_URL_HERE') {
-    setStatus('validationStatus', 'FAIL');
-    setStatus('saleStatus', 'FAIL');
+    document.getElementById('responseOutput').textContent = '';
 
-    failed += 2;
-    updateCounters();
+    setStatus('saleStatus', 'PENDING');
 
-    addLog('Sale Request ERROR', 'Please enter the deployed Apps Script Web App URL.');
-    return false;
-  }
+    addLog(
+        'Sale POST Started',
+        {
+            url: url,
+            method: 'POST',
+            contentType: 'text/plain;charset=utf-8',
+            request: request
+        }
+    );
 
-  const request = createSaleRequest();
-
-  document.getElementById('requestOutput').textContent =
-    JSON.stringify(request, null, 2);
-
-  const validation = validateSaleLocally(request);
-
-  recordResult('validationStatus', validation.ok);
-
-  addLog('Sale Validation', validation);
-
-  if (!validation.ok) {
-    setStatus('saleStatus', 'FAIL');
-    failed++;
-    updateCounters();
-    return false;
-  }
-
-  try {
     const start = performance.now();
 
-    addLog('Sale POST Started', {
-      url: url,
-      request: request
-    });
-
-  const response = await fetch(url, {
-  method: 'POST',
-  headers: {
-    'Content-Type': 'text/plain;charset=utf-8'
-  },
-  body: JSON.stringify(request),
-  redirect: 'follow',
-  cache: 'no-store'
-});
-
-    const elapsed = Math.round(performance.now() - start);
-
-    const text = await response.text();
-
-    let data;
-
     try {
-      data = JSON.parse(text);
+        const body = JSON.stringify(request);
+
+        const response = await fetch(
+            url,
+            {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'text/plain;charset=utf-8'
+                },
+                body: body,
+                redirect: 'follow',
+                cache: 'no-store'
+            }
+        );
+
+        const elapsed = Math.round(performance.now() - start);
+
+        const text = await response.text();
+
+        let data;
+
+        try {
+            data = JSON.parse(text);
+        } catch (error) {
+            data = {
+                parseError: error.message,
+                raw: text
+            };
+        }
+
+        document.getElementById('responseOutput').textContent =
+            JSON.stringify(data, null, 2);
+
+        addLog(
+            'Sale POST Response',
+            {
+                httpStatus: response.status,
+                responseTimeMs: elapsed,
+                response: data
+            }
+        );
+
+        if (data && data.activity) {
+            addLog(
+                'Sale Backend Activity',
+                data.activity
+            );
+        }
+
+        if (data && data.ok === true) {
+            markPass(
+                'saleStatus',
+                'Sale Request',
+                {
+                    httpStatus: response.status,
+                    responseTimeMs: elapsed,
+                    backendOk: true,
+                    response: data
+                }
+            );
+
+            return true;
+        }
+
+        markFail(
+            'saleStatus',
+            'Sale Request',
+            {
+                httpStatus: response.status,
+                responseTimeMs: elapsed,
+                backendOk: data ? data.ok : undefined,
+                response: data
+            }
+        );
+
+        return false;
+
     } catch (error) {
-      data = null;
+        const elapsed = Math.round(performance.now() - start);
+
+        const errorData = {
+            name: error.name,
+            message: error.message,
+            responseTimeMs: elapsed,
+            url: url,
+            method: 'POST',
+            contentType: 'text/plain;charset=utf-8',
+            request: request
+        };
+
+        document.getElementById('responseOutput').textContent =
+            JSON.stringify(
+                {
+                    ok: false,
+                    error: 'POST_FETCH_ERROR',
+                    message: error.message,
+                    activity: errorData
+                },
+                null,
+                2
+            );
+
+        addLog(
+            'Sale POST ERROR',
+            errorData
+        );
+
+        markFail(
+            'saleStatus',
+            'Sale Request',
+            errorData
+        );
+
+        return false;
     }
-
-    document.getElementById('responseOutput').textContent =
-      data ? JSON.stringify(data, null, 2) : text;
-
-    const success = response.ok &&
-      data &&
-      data.ok === true &&
-      data.action === 'addSale';
-
-    recordResult('saleStatus', success);
-
-    addLog('Sale POST Response', {
-      httpStatus: response.status,
-      responseTimeMs: elapsed,
-      response: data || text
-    });
-
-    if (data && data.activity) {
-      addLog('Sale Activity / Debug', data.activity);
-    }
-
-    if (data && data.error) {
-      addLog('Sale Backend Error', {
-        error: data.error,
-        message: data.message,
-        activity: data.activity || null
-      });
-    }
-
-    return success;
-
-  } catch (error) {
-    recordResult('saleStatus', false);
-
-    addLog('Sale POST ERROR', {
-      name: error.name,
-      message: error.message
-    });
-
-    return false;
-  }
 }
 
 async function runAllTests() {
-  clearLog();
+    const button = document.getElementById('runTestButton');
 
-  addLog('TEST STARTED', {
-    time: new Date().toISOString()
-  });
+    button.disabled = true;
+    button.textContent = 'Testing...';
 
-  testBrowser();
-  testStorage();
+    passed = 0;
+    failed = 0;
 
-  await testPing();
-  await testAddSale();
+    document.getElementById('activityLog').innerHTML = '';
+    document.getElementById('responseOutput').textContent = '{}';
+    document.getElementById('requestOutput').textContent = '{}';
 
-  addLog('TEST COMPLETED', {
-    passed: passed,
-    failed: failed,
-    total: total
-  });
+    [
+        'browserStatus',
+        'storageStatus',
+        'getStatus',
+        'jsonStatus',
+        'timeStatus',
+        'validationStatus',
+        'saleStatus'
+    ].forEach(function(id) {
+        setStatus(id, 'PENDING');
+    });
+
+    updateSummary();
+
+    addLog(
+        'TEST STARTED',
+        {
+            totalTests: TEST_COUNT,
+            startTime: new Date().toISOString()
+        }
+    );
+
+    try {
+        await testBrowserEnvironment();
+
+        await testLocalStorage();
+
+        const backendResult = await testBackendGet();
+
+        await testSaleValidation();
+
+        await testAddSale();
+
+        addLog(
+            'TEST COMPLETED',
+            {
+                passed: passed,
+                failed: failed,
+                total: TEST_COUNT,
+                completedAt: new Date().toISOString()
+            }
+        );
+
+    } catch (error) {
+        addLog(
+            'TEST RUN ERROR',
+            {
+                name: error.name,
+                message: error.message,
+                stack: error.stack
+            }
+        );
+    }
+
+    button.disabled = false;
+    button.textContent = 'Run All Tests';
 }
 
-document.getElementById('requestOutput').textContent =
-  JSON.stringify(createSaleRequest(), null, 2);
-
-updateCounters();
+document.addEventListener('DOMContentLoaded', function() {
+    addLog(
+        'TEST PAGE READY',
+        {
+            message: 'Ready to run backend tests',
+            saleFieldCount: 13,
+            postContentType: 'text/plain;charset=utf-8'
+        }
+    );
+});
 </script>
 
 </body>
