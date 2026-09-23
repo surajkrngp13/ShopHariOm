@@ -5,358 +5,197 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
 <title>Shop Management</title>
+<script src="https://www.gstatic.com/firebasejs/11.10.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/11.10.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/11.10.0/firebase-database-compat.js"></script>
 <style>
 *{box-sizing:border-box}
-body{margin:0;font-family:Arial,sans-serif;background:#f4f6f8;color:#1f2937}
-button,input,select{font:inherit}
-button{cursor:pointer;border:0;border-radius:6px;padding:9px 14px}
-button:disabled{opacity:.6;cursor:not-allowed}
-.container{max-width:1500px;margin:auto;padding:18px}
-.topbar{background:#111827;color:#fff;padding:14px 18px;display:flex;align-items:center;justify-content:space-between;gap:15px;position:sticky;top:0;z-index:20}
-.topbar h2{margin:0;font-size:20px}
-.topbar-right{display:flex;align-items:center;gap:10px}
-.status{padding:5px 9px;border-radius:20px;font-size:12px;background:#374151}
-.logout{background:#dc2626;color:#fff}
-.nav{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:18px}
-.nav button{background:#fff;border:1px solid #d1d5db}
-.nav button.active{background:#2563eb;color:#fff;border-color:#2563eb}
-.section{background:#fff;border-radius:10px;padding:18px;margin-bottom:18px;box-shadow:0 1px 4px rgba(0,0,0,.08)}
-.section h3{margin:0 0 15px}
-.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
-.field{display:flex;flex-direction:column;gap:5px}
+body{margin:0;font-family:Arial,sans-serif;background:#f5f7fb;color:#1f2937}
+button,input,select,textarea{font:inherit}
+button{cursor:pointer}
+.topbar{height:64px;background:#111827;color:#fff;display:flex;align-items:center;justify-content:space-between;padding:0 24px}
+.topbar h1{font-size:20px;margin:0}
+.topbar-right{display:flex;align-items:center;gap:12px;font-size:13px}
+.status-dot{width:9px;height:9px;border-radius:50%;background:#ef4444;display:inline-block}
+.status-dot.online{background:#22c55e}
+.container{max-width:1400px;margin:auto;padding:20px}
+.nav{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:20px}
+.nav button{border:0;background:#fff;padding:11px 18px;border-radius:8px;box-shadow:0 1px 4px #0001}
+.nav button.active{background:#2563eb;color:#fff}
+.page{display:none}
+.page.active{display:block}
+.cards{display:grid;grid-template-columns:repeat(4,1fr);gap:15px;margin-bottom:20px}
+.card{background:#fff;border-radius:12px;padding:18px;box-shadow:0 2px 8px #0000000b}
+.card-title{font-size:13px;color:#6b7280;margin-bottom:8px}
+.card-value{font-size:26px;font-weight:700}
+.panel{background:#fff;border-radius:12px;padding:20px;box-shadow:0 2px 8px #0000000b;margin-bottom:20px}
+.panel h2{margin:0 0 16px;font-size:18px}
+.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+.field{display:flex;flex-direction:column;gap:6px}
 .field label{font-size:13px;font-weight:600}
-.field input,.field select{border:1px solid #d1d5db;border-radius:6px;padding:9px;background:#fff;min-width:0}
+.field input,.field select,.field textarea{width:100%;border:1px solid #d1d5db;border-radius:7px;padding:10px;background:#fff}
+.field textarea{min-height:80px;resize:vertical}
 .full{grid-column:1/-1}
-.actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:15px}
-.primary{background:#2563eb;color:#fff}
-.success{background:#16a34a;color:#fff}
-.warning{background:#d97706;color:#fff}
-.danger{background:#dc2626;color:#fff}
-.secondary{background:#6b7280;color:#fff}
-.cards{display:grid;grid-template-columns:repeat(6,1fr);gap:12px;margin-bottom:18px}
-.card{background:#fff;border-radius:9px;padding:15px;box-shadow:0 1px 4px rgba(0,0,0,.08)}
-.card-title{font-size:12px;color:#6b7280}
-.card-value{font-size:24px;font-weight:bold;margin-top:5px}
-.table-wrap{overflow:auto;border:1px solid #e5e7eb;border-radius:7px}
-table{width:100%;border-collapse:collapse;min-width:1000px}
-th,td{padding:9px 10px;border-bottom:1px solid #e5e7eb;text-align:left;white-space:nowrap;font-size:13px}
-th{background:#f9fafb;position:sticky;top:0}
-.badge{display:inline-block;padding:4px 8px;border-radius:15px;font-size:11px;font-weight:bold}
-.badge-active{background:#dcfce7;color:#166534}
-.badge-disabled{background:#fee2e2;color:#991b1b}
-.badge-pending{background:#fef3c7;color:#92400e}
-.badge-sent{background:#dcfce7;color:#166534}
+.actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:16px}
+.btn{border:0;border-radius:7px;padding:10px 16px}
+.btn-primary{background:#2563eb;color:#fff}
+.btn-success{background:#16a34a;color:#fff}
+.btn-danger{background:#dc2626;color:#fff}
+.btn-secondary{background:#e5e7eb;color:#111827}
+.btn-warning{background:#f59e0b;color:#fff}
+.search{margin-bottom:15px}
+.search input{width:100%;padding:11px;border:1px solid #d1d5db;border-radius:7px}
+.table-wrap{overflow:auto}
+table{width:100%;border-collapse:collapse;min-width:800px}
+th,td{padding:10px;border-bottom:1px solid #e5e7eb;text-align:left;font-size:13px}
+th{background:#f9fafb}
+.badge{display:inline-block;padding:4px 8px;border-radius:20px;font-size:11px}
+.badge-success{background:#dcfce7;color:#166534}
 .badge-error{background:#fee2e2;color:#991b1b}
-.cart-table{min-width:750px}
-.summary{margin-left:auto;max-width:400px;margin-top:15px}
-.summary-row{display:flex;justify-content:space-between;padding:6px 0}
-.summary-total{font-size:20px;font-weight:bold;border-top:2px solid #111827;margin-top:5px;padding-top:10px}
-.message{padding:10px;border-radius:7px;margin-bottom:15px;display:none}
+.badge-pending{background:#fef3c7;color:#92400e}
+.product-results{max-height:280px;overflow:auto;border:1px solid #e5e7eb;border-radius:8px;margin-top:8px}
+.product-result{padding:10px;border-bottom:1px solid #eee;cursor:pointer}
+.product-result:hover{background:#f3f4f6}
+.cart-table input{width:70px;padding:6px}
+.summary{margin-top:15px;margin-left:auto;max-width:420px}
+.summary-row{display:flex;justify-content:space-between;padding:7px 0}
+.summary-row.total{font-size:20px;font-weight:700;border-top:1px solid #ddd;margin-top:5px;padding-top:12px}
+.empty{padding:30px;text-align:center;color:#6b7280}
+.message{padding:10px 12px;border-radius:7px;margin-bottom:12px;display:none}
 .message.show{display:block}
-.message.success-msg{background:#dcfce7;color:#166534}
-.message.error-msg{background:#fee2e2;color:#991b1b}
-.message.info-msg{background:#dbeafe;color:#1e40af}
-.loading{position:fixed;inset:0;background:rgba(255,255,255,.75);display:none;align-items:center;justify-content:center;z-index:100}
-.loading.show{display:flex}
-.loader-box{background:#fff;padding:25px 35px;border-radius:10px;box-shadow:0 4px 20px rgba(0,0,0,.2);text-align:center}
-.progress{height:10px;background:#e5e7eb;border-radius:10px;overflow:hidden;margin-top:8px}
-.progress-bar{height:100%;width:0;background:#2563eb;transition:width .2s}
-.hidden{display:none!important}
-.search-row{display:grid;grid-template-columns:2fr 1fr 1fr;gap:10px;margin-bottom:12px}
-.product-results{max-height:300px;overflow:auto;border:1px solid #e5e7eb;border-radius:7px}
-.product-item{padding:10px;border-bottom:1px solid #eee;cursor:pointer}
-.product-item:hover{background:#f3f4f6}
-.product-item strong{display:block}
-.product-item small{color:#6b7280}
-.stock-low{color:#dc2626;font-weight:bold}
-.empty{text-align:center;color:#6b7280;padding:25px}
-.sync-box{display:grid;grid-template-columns:repeat(6,1fr);gap:10px}
-.sync-item{background:#f9fafb;padding:10px;border-radius:7px}
-.sync-item span{display:block;font-size:12px;color:#6b7280}
-.sync-item strong{font-size:18px}
-@media(max-width:1100px){
-.grid{grid-template-columns:repeat(3,1fr)}
-.cards{grid-template-columns:repeat(3,1fr)}
-.sync-box{grid-template-columns:repeat(3,1fr)}
-}
-@media(max-width:700px){
-.container{padding:10px}
-.grid{grid-template-columns:1fr}
-.cards{grid-template-columns:repeat(2,1fr)}
-.search-row{grid-template-columns:1fr}
-.sync-box{grid-template-columns:repeat(2,1fr)}
-.topbar{align-items:flex-start}
-.topbar-right{flex-direction:column;align-items:flex-end}
-}
+.message.success{background:#dcfce7;color:#166534}
+.message.error{background:#fee2e2;color:#991b1b}
+.message.info{background:#dbeafe;color:#1e40af}
+.log-box{max-height:400px;overflow:auto;background:#111827;color:#d1d5db;padding:15px;border-radius:8px;font-family:monospace;font-size:12px;white-space:pre-wrap}
+@media(max-width:1000px){.cards{grid-template-columns:repeat(2,1fr)}.grid{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:650px){.cards{grid-template-columns:1fr}.grid{grid-template-columns:1fr}.container{padding:10px}.topbar{padding:0 12px}}
 </style>
 </head>
 <body>
 
-<div id="loading" class="loading">
-<div class="loader-box">
-<div id="loadingText">Loading...</div>
-<div class="progress">
-<div id="loadingProgress" class="progress-bar"></div>
-</div>
-</div>
-</div>
-
-<div class="topbar">
-<h2>Shop Management</h2>
+<header class="topbar">
+<h1>Shop Management</h1>
 <div class="topbar-right">
-<span id="connectionStatus" class="status">Checking...</span>
-<span id="userInfo" class="status">Checking Login...</span>
-<button id="logoutBtn" class="logout">Logout</button>
+<span id="connectionDot" class="status-dot"></span>
+<span id="connectionText">Offline</span>
+<span id="userText">Not signed in</span>
 </div>
-</div>
+</header>
 
 <div class="container">
 
-<div id="message" class="message"></div>
-
 <div class="nav">
-<button class="active" data-section="dashboardSection">Dashboard</button>
-<button data-section="productSection">Products</button>
-<button data-section="saleSection">New Sale</button>
-<button data-section="salesSection">Sales</button>
-<button id="syncBtn" class="warning">Sync Now</button>
-<button id="retryBtn" class="secondary">Retry Failed</button>
+<button class="active" data-page="dashboardPage">Dashboard</button>
+<button data-page="productsPage">Products</button>
+<button data-page="salePage">New Sale</button>
+<button data-page="salesPage">Sales</button>
+<button id="syncBtn" class="btn-success">Sync Now</button>
+<button id="retryBtn" class="btn-warning">Retry Failed</button>
 </div>
 
-<section id="dashboardSection" class="section">
-<h3>Shop Dashboard</h3>
+<div id="globalMessage" class="message"></div>
 
+<section id="dashboardPage" class="page active">
 <div class="cards">
 <div class="card">
 <div class="card-title">Products</div>
-<div id="productCount" class="card-value">0</div>
+<div id="dashboardProducts" class="card-value">0</div>
 </div>
-
+<div class="card">
+<div class="card-title">Stock</div>
+<div id="dashboardStock" class="card-value">0</div>
+</div>
 <div class="card">
 <div class="card-title">Sales</div>
-<div id="saleCount" class="card-value">0</div>
+<div id="dashboardSales" class="card-value">0</div>
 </div>
-
-<div class="card">
-<div class="card-title">GST Records</div>
-<div id="gstCount" class="card-value">0</div>
-</div>
-
 <div class="card">
 <div class="card-title">Pending Sync</div>
-<div id="pendingCount" class="card-value">0</div>
-</div>
-
-<div class="card">
-<div class="card-title">Failed Sync</div>
-<div id="failedCount" class="card-value">0</div>
-</div>
-
-<div class="card">
-<div class="card-title">Stock Items</div>
-<div id="stockCount" class="card-value">0</div>
+<div id="dashboardPending" class="card-value">0</div>
 </div>
 </div>
 
-<div class="sync-box">
-<div class="sync-item">
-<span>Total</span>
-<strong id="syncTotal">0</strong>
-</div>
-
-<div class="sync-item">
-<span>Success</span>
-<strong id="syncSuccess">0</strong>
-</div>
-
-<div class="sync-item">
-<span>Processing</span>
-<strong id="syncProcessing">0</strong>
-</div>
-
-<div class="sync-item">
-<span>Remaining</span>
-<strong id="syncRemaining">0</strong>
-</div>
-
-<div class="sync-item">
-<span>Failed</span>
-<strong id="syncFailed">0</strong>
-</div>
-
-<div class="sync-item">
-<span>Progress</span>
-<strong id="syncPercent">0%</strong>
-</div>
-</div>
-
-<div class="section" style="margin-top:15px;margin-bottom:0">
-<div>
-<strong>Current Sync Record:</strong>
-<span id="currentSyncRecord">None</span>
-</div>
-
-<div style="margin-top:8px">
-<strong>Last Sync:</strong>
-<span id="lastSync">Never</span>
-</div>
+<div class="panel">
+<h2>Activity Log</h2>
+<div id="dashboardLog" class="log-box">No activity</div>
 </div>
 </section>
 
-<section id="productSection" class="section hidden">
-<h3>Product Management</h3>
-
-<form id="productForm">
-<input type="hidden" id="productEditId">
-
-<div class="grid">
-
-<div class="field">
-<label>Product ID</label>
-<input id="productId" required>
+<section id="productsPage" class="page">
+<div class="panel">
+<h2>Products</h2>
+<div class="search">
+<input id="productListSearch" placeholder="Search product, SKU, category or product ID">
 </div>
-
-<div class="field">
-<label>SKU</label>
-<input id="sku">
-</div>
-
-<div class="field">
-<label>Product Name</label>
-<input id="productName" required>
-</div>
-
-<div class="field">
-<label>Category</label>
-<input id="category">
-</div>
-
-<div class="field">
-<label>Brand</label>
-<input id="brand">
-</div>
-
-<div class="field">
-<label>Purchase Price</label>
-<input id="purchasePrice" type="number" min="0" step="0.01" required>
-</div>
-
-<div class="field">
-<label>Sale Price</label>
-<input id="salePrice" type="number" min="0" step="0.01" required>
-</div>
-
-<div class="field">
-<label>GST Rate %</label>
-<select id="gstRate">
-<option value="0">0%</option>
-<option value="5">5%</option>
-<option value="12">12%</option>
-<option value="18" selected>18%</option>
-<option value="28">28%</option>
-</select>
-</div>
-
-<div class="field">
-<label>Unit</label>
-<select id="unit">
-<option value="PCS">PCS</option>
-<option value="KG">KG</option>
-<option value="GRAM">GRAM</option>
-<option value="LTR">LTR</option>
-<option value="ML">ML</option>
-<option value="MTR">MTR</option>
-<option value="BOX">BOX</option>
-<option value="SET">SET</option>
-<option value="OTHER">OTHER</option>
-</select>
-</div>
-
-<div class="field">
-<label>Stock</label>
-<input id="stock" type="number" min="0" step="0.001" required>
-</div>
-
-<div class="field">
-<label>Minimum Stock</label>
-<input id="minimumStock" type="number" min="0" step="0.001" value="0">
-</div>
-
-<div class="field">
-<label>Status</label>
-<select id="productStatus">
-<option value="ACTIVE">Active</option>
-<option value="DISABLED">Disabled</option>
-</select>
-</div>
-
-</div>
-
-<div class="actions">
-<button class="primary" type="submit" id="saveProductBtn">Save Product</button>
-<button class="secondary" type="button" id="clearProductBtn">Clear</button>
-</div>
-</form>
-
-<hr style="border:0;border-top:1px solid #e5e7eb;margin:20px 0">
-
-<div class="search-row">
-<input id="productSearch" placeholder="Search Product ID / SKU / Name / Brand">
-
-<select id="productFilterStatus">
-<option value="">All Status</option>
-<option value="ACTIVE">Active</option>
-<option value="DISABLED">Disabled</option>
-</select>
-
-<select id="productFilterCategory">
-<option value="">All Categories</option>
-</select>
-</div>
-
 <div class="table-wrap">
 <table>
 <thead>
 <tr>
-<th>Product ID</th>
+<th>Product</th>
 <th>SKU</th>
-<th>Name</th>
 <th>Category</th>
-<th>Brand</th>
-<th>Purchase</th>
-<th>Sale</th>
+<th>Sale Price</th>
 <th>GST</th>
-<th>Unit</th>
 <th>Stock</th>
-<th>Min Stock</th>
 <th>Status</th>
-<th>Actions</th>
 </tr>
 </thead>
 <tbody id="productTableBody"></tbody>
 </table>
 </div>
+</div>
 </section>
 
-<section id="saleSection" class="section hidden">
-<h3>New Sale</h3>
+<section id="salePage" class="page">
 
-<div class="search-row">
-<input id="saleProductSearch" placeholder="Search Product Name / SKU / Product ID">
+<div class="panel">
+<h2>New Sale</h2>
 
-<select id="saleGstMode">
-<option value="INTRA">CGST + SGST</option>
-<option value="INTER">IGST</option>
-</select>
-
-<div></div>
+<div class="grid">
+<div class="field full">
+<label>Product Search</label>
+<input id="saleProductSearch" placeholder="Search product by name, SKU, product ID or barcode">
+<div id="productResults" class="product-results"></div>
 </div>
 
-<div id="productResults" class="product-results hidden"></div>
+<div class="field">
+<label>GST Mode</label>
+<select id="gstMode">
+<option value="INTRA">INTRA</option>
+<option value="INTER">INTER</option>
+</select>
+</div>
 
-<div style="margin-top:18px">
-<h4>Cart</h4>
+<div class="field">
+<label>Customer Name</label>
+<input id="customerName">
+</div>
 
+<div class="field">
+<label>Customer Mobile / Customer ID</label>
+<input id="customerMobile">
+</div>
+
+<div class="field">
+<label>Payment Mode</label>
+<select id="paymentMode">
+<option value="CASH">CASH</option>
+<option value="UPI">UPI</option>
+<option value="CARD">CARD</option>
+<option value="BANK">BANK</option>
+<option value="OTHER">OTHER</option>
+</select>
+</div>
+
+<div class="field">
+<label>Discount</label>
+<input id="discount" type="number" min="0" step="0.01" value="0">
+</div>
+</div>
+</div>
+
+<div class="panel">
+<h2>Cart</h2>
 <div class="table-wrap">
 <table class="cart-table">
 <thead>
@@ -366,8 +205,6 @@ th{background:#f9fafb;position:sticky;top:0}
 <th>Rate</th>
 <th>GST %</th>
 <th>Qty</th>
-<th>Taxable</th>
-<th>GST</th>
 <th>Total</th>
 <th>Action</th>
 </tr>
@@ -375,147 +212,74 @@ th{background:#f9fafb;position:sticky;top:0}
 <tbody id="cartBody"></tbody>
 </table>
 </div>
-</div>
 
-<div class="grid" style="margin-top:15px">
-
-<div class="field">
-<label>Customer Name</label>
-<input id="customerName">
-</div>
-
-<div class="field">
-<label>Customer Mobile</label>
-<input id="customerMobile">
-</div>
-
-<div class="field">
-<label>Payment Mode</label>
-<select id="paymentMode">
-<option value="Cash">Cash</option>
-<option value="UPI">UPI</option>
-<option value="Card">Card</option>
-<option value="Other">Other</option>
-</select>
-</div>
-
-<div class="field">
-<label>Discount</label>
-<input id="discount" type="number" min="0" step="0.01" value="0">
-</div>
-
-</div>
+<div id="cartEmpty" class="empty">Cart is empty</div>
 
 <div class="summary">
-<div class="summary-row">
-<span>Subtotal</span>
-<strong id="subtotal">₹0.00</strong>
-</div>
-
-<div class="summary-row">
-<span>Discount</span>
-<strong id="discountValue">₹0.00</strong>
-</div>
-
-<div class="summary-row">
-<span>Taxable Amount</span>
-<strong id="taxableAmount">₹0.00</strong>
-</div>
-
-<div class="summary-row">
-<span>CGST</span>
-<strong id="cgstAmount">₹0.00</strong>
-</div>
-
-<div class="summary-row">
-<span>SGST</span>
-<strong id="sgstAmount">₹0.00</strong>
-</div>
-
-<div class="summary-row">
-<span>IGST</span>
-<strong id="igstAmount">₹0.00</strong>
-</div>
-
-<div class="summary-row">
-<span>GST Total</span>
-<strong id="gstTotal">₹0.00</strong>
-</div>
-
-<div class="summary-row summary-total">
-<span>Grand Total</span>
-<strong id="grandTotal">₹0.00</strong>
-</div>
+<div class="summary-row"><span>Subtotal</span><strong id="summarySubtotal">₹0.00</strong></div>
+<div class="summary-row"><span>Discount</span><strong id="summaryDiscount">₹0.00</strong></div>
+<div class="summary-row"><span>Taxable Amount</span><strong id="summaryTaxable">₹0.00</strong></div>
+<div class="summary-row"><span>CGST</span><strong id="summaryCgst">₹0.00</strong></div>
+<div class="summary-row"><span>SGST</span><strong id="summarySgst">₹0.00</strong></div>
+<div class="summary-row"><span>IGST</span><strong id="summaryIgst">₹0.00</strong></div>
+<div class="summary-row"><span>GST Total</span><strong id="summaryGst">₹0.00</strong></div>
+<div class="summary-row total"><span>Grand Total</span><strong id="summaryGrand">₹0.00</strong></div>
 </div>
 
 <div class="actions">
-<button class="success" id="completeSaleBtn">Complete Sale</button>
-<button class="secondary" id="clearCartBtn">Clear Cart</button>
+<button id="completeSaleBtn" class="btn btn-primary">Complete Sale</button>
+<button id="clearCartBtn" class="btn btn-secondary">Clear Cart</button>
 </div>
+</div>
+
 </section>
 
-<section id="salesSection" class="section hidden">
-<h3>Sales Records</h3>
-
-<div class="search-row">
-
-<input id="salesSearch" placeholder="Search Invoice / Customer / Sale ID">
-
-<input id="salesDate" type="date">
-
-<select id="salesPaymentFilter">
-<option value="">All Payment Modes</option>
-<option value="Cash">Cash</option>
-<option value="UPI">UPI</option>
-<option value="Card">Card</option>
-<option value="Other">Other</option>
-</select>
-
+<section id="salesPage" class="page">
+<div class="panel">
+<h2>Sales</h2>
+<div class="search">
+<input id="salesSearch" placeholder="Search invoice, customer, mobile or sale ID">
 </div>
-
 <div class="table-wrap">
 <table>
 <thead>
 <tr>
-<th>Sale ID</th>
 <th>Invoice</th>
 <th>Date</th>
 <th>Customer</th>
 <th>Payment</th>
-<th>Subtotal</th>
-<th>Discount</th>
-<th>Taxable</th>
-<th>CGST</th>
-<th>SGST</th>
-<th>IGST</th>
-<th>GST Total</th>
-<th>Grand Total</th>
-<th>Actions</th>
+<th>Items</th>
+<th>Total</th>
+<th>Sync</th>
 </tr>
 </thead>
 <tbody id="salesTableBody"></tbody>
 </table>
 </div>
+</div>
+
+<div class="panel">
+<h2>Sync Activity</h2>
+<div id="activityLog" class="log-box">No activity</div>
+</div>
 </section>
 
 </div>
 
-<script src="https://www.gstatic.com/firebasejs/11.10.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/11.10.0/firebase-auth-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/11.10.0/firebase-database-compat.js"></script>
-
 <script>
 const firebaseConfig={
 apiKey:"AIzaSyApCoYU29E90_fORBdOKnR8BroSlURI_20",
-authDomain:"shop-management-system-909d3.firebaseapp.com",
-databaseURL:"https://shop-management-system-909d3-default-rtdb.asia-southeast1.firebasedatabase.app/",
-projectId:"shop-management-system-909d3",
-storageBucket:"shop-management-system-909d3.firebasestorage.app",
+authDomain:"shop-management-system-9093.firebaseapp.com",
+databaseURL:"https://shop-management-system-9093-default-rtdb.asia-southeast1.firebasedatabase.app/",
+projectId:"shop-management-system-9093",
+storageBucket:"shop-management-system-9093.firebasestorage.app",
 messagingSenderId:"108966486935",
 appId:"1:108966486935:web:47ffa7b9eb7b6d69a81ad2"
 };
 
 const SYNC_URL="https://script.google.com/macros/s/AKfycbyrS_NNgH1siSwOGdY9wMzfqqUnMZvauKDIAvS6R7s87kDr3ubvTWRCzRhjHPRTAleK8w/exec";
+const SALE_SYNC_URL="https://script.google.com/macros/s/AKfycbz-6o0RGbzDpvz11GaHLhXClpNvM5aCHMSqUw-FzCP49AQnxbo_sVRpsK7Ep_mOMnPL9w/exec";
+
 const DB_NAME="ShopManagementDB";
 const DB_VERSION=1;
 const SHOP_STORE="shops";
@@ -529,2591 +293,741 @@ const SETTINGS_STORE="settings";
 
 let db=null;
 let currentUser=null;
-let currentProfile=null;
+let currentProfile={};
 let products=[];
 let sales=[];
 let cart=[];
-let syncRunning=false;
-let eventsReady=false;
-let authStateResolved=false;
-let authCheckStarted=false;
-let authFailureShown=false;
+let syncing=false;
 
-firebase.initializeApp(firebaseConfig);
-
-const auth=firebase.auth();
-const database=firebase.database();
-
-function logInfo(...args){
-console.log("[ShopAuth]",...args);
-}
-
-function logWarn(...args){
-console.warn("[ShopAuth]",...args);
-}
-
-function logError(...args){
-console.error("[ShopAuth]",...args);
-}
-
-window.addEventListener("error",event=>{
-console.error(
-"[ShopUnhandledError]",
-event.error||event.message||event
-);
-});
-
-window.addEventListener("unhandledrejection",event=>{
-console.error(
-"[ShopUnhandledPromise]",
-event.reason
-);
-});
-
-function $(id){
-return document.getElementById(id);
-}
-
-function showMessage(text,type="info"){
-const el=$("message");
-el.textContent=text;
-el.className=
-"message show "+
-(
-type==="success"
-?"success-msg":
-type==="error"
-?"error-msg":
-"info-msg"
-);
-
-clearTimeout(showMessage.timer);
-
-showMessage.timer=setTimeout(()=>{
-el.className="message";
-},5000);
-}
-
-function setLoading(show,text="Processing...",percent=null){
-$("loadingText").textContent=text;
-$("loading").classList.toggle("show",show);
-
-if(percent!==null){
-$("loadingProgress").style.width=
-Math.max(0,Math.min(100,percent))+"%";
-}
-}
+const $=id=>document.getElementById(id);
 
 function generateId(prefix){
-const a=new Uint8Array(12);
-
-crypto.getRandomValues(a);
-
-const random=
-Array.from(a)
-.map(x=>x.toString(16).padStart(2,"0"))
-.join("");
-
-return prefix+
-"-"+
-Date.now().toString(36).toUpperCase()+
-"-"+
-random.toUpperCase();
+return prefix+"_"+Date.now()+"_"+Math.random().toString(36).slice(2,10);
 }
 
-function nowISO(){
+function timestamp(){
 return new Date().toISOString();
 }
 
 function today(){
-const d=new Date();
-
-return d.getFullYear()+
-"-"+
-String(d.getMonth()+1).padStart(2,"0")+
-"-"+
-String(d.getDate()).padStart(2,"0");
-}
-
-function money(value){
-return "₹"+
-Number(value||0).toLocaleString(
-"en-IN",
-{
-minimumFractionDigits:2,
-maximumFractionDigits:2
-}
-);
-}
-
-function escapeHtml(value){
-return String(value??"").replace(
-/[&<>"']/g,
-m=>({
-"&":"&amp;",
-"<":"&lt;",
-">":"&gt;",
-'"':"&quot;",
-"'":"&#039;"
-}[m])
-);
-}
-
-function openDB(){
-return new Promise((resolve,reject)=>{
-
-const request=
-indexedDB.open(
-DB_NAME,
-DB_VERSION
-);
-
-request.onupgradeneeded=e=>{
-const database=e.target.result;
-
-if(!database.objectStoreNames.contains(PRODUCT_STORE)){
-const s=
-database.createObjectStore(
-PRODUCT_STORE,
-{keyPath:"id"}
-);
-
-s.createIndex(
-"recordId",
-"recordId",
-{unique:true}
-);
-
-s.createIndex(
-"shopId",
-"shopId"
-);
-
-s.createIndex(
-"productId",
-"productId"
-);
-
-s.createIndex(
-"sku",
-"sku"
-);
-
-s.createIndex(
-"status",
-"status"
-);
-
-s.createIndex(
-"updatedAt",
-"updatedAt"
-);
-}
-
-if(!database.objectStoreNames.contains(SALES_STORE)){
-const s=
-database.createObjectStore(
-SALES_STORE,
-{keyPath:"id"}
-);
-
-s.createIndex(
-"recordId",
-"recordId",
-{unique:true}
-);
-
-s.createIndex(
-"shopId",
-"shopId"
-);
-
-s.createIndex(
-"agentId",
-"agentId"
-);
-
-s.createIndex(
-"saleId",
-"saleId"
-);
-
-s.createIndex(
-"createdAt",
-"createdAt"
-);
-}
-
-if(!database.objectStoreNames.contains(GST_STORE)){
-const s=
-database.createObjectStore(
-GST_STORE,
-{keyPath:"id"}
-);
-
-s.createIndex(
-"recordId",
-"recordId",
-{unique:true}
-);
-
-s.createIndex(
-"shopId",
-"shopId"
-);
-
-s.createIndex(
-"agentId",
-"agentId"
-);
-
-s.createIndex(
-"invoiceNo",
-"invoiceNo"
-);
-
-s.createIndex(
-"createdAt",
-"createdAt"
-);
-}
-
-if(!database.objectStoreNames.contains(ACTIVITY_STORE)){
-const s=
-database.createObjectStore(
-ACTIVITY_STORE,
-{keyPath:"id"}
-);
-
-s.createIndex(
-"activityId",
-"activityId",
-{unique:true}
-);
-
-s.createIndex(
-"shopId",
-"shopId"
-);
-
-s.createIndex(
-"agentId",
-"agentId"
-);
-
-s.createIndex(
-"timestamp",
-"timestamp"
-);
-}
-
-if(!database.objectStoreNames.contains(QUEUE_STORE)){
-const s=
-database.createObjectStore(
-QUEUE_STORE,
-{keyPath:"id"}
-);
-
-s.createIndex(
-"recordId",
-"recordId",
-{unique:true}
-);
-
-s.createIndex(
-"syncStatus",
-"syncStatus"
-);
-
-s.createIndex(
-"recordType",
-"recordType"
-);
-
-s.createIndex(
-"shopId",
-"shopId"
-);
-
-s.createIndex(
-"createdAt",
-"createdAt"
-);
-}
-
-if(!database.objectStoreNames.contains(SHOP_STORE)){
-const s=
-database.createObjectStore(
-SHOP_STORE,
-{keyPath:"id"}
-);
-
-s.createIndex(
-"shopId",
-"shopId",
-{unique:true}
-);
-}
-
-if(!database.objectStoreNames.contains(AGENT_STORE)){
-const s=
-database.createObjectStore(
-AGENT_STORE,
-{keyPath:"id"}
-);
-
-s.createIndex(
-"agentId",
-"agentId",
-{unique:true}
-);
-
-s.createIndex(
-"shopId",
-"shopId"
-);
-
-s.createIndex(
-"status",
-"status"
-);
-}
-
-if(!database.objectStoreNames.contains(SETTINGS_STORE)){
-database.createObjectStore(
-SETTINGS_STORE,
-{keyPath:"key"}
-);
-}
-};
-
-request.onsuccess=e=>{
-db=e.target.result;
-
-logInfo(
-"IndexedDB opened.",
-{
-name:DB_NAME,
-version:DB_VERSION
-}
-);
-
-resolve(db);
-};
-
-request.onerror=()=>{
-logError(
-"IndexedDB open failed.",
-request.error
-);
-
-reject(request.error);
-};
-});
-}
-
-function idbGetAll(storeName){
-return new Promise((resolve,reject)=>{
-
-if(!db){
-reject(
-new Error("DATABASE_NOT_READY")
-);
-return;
-}
-
-const tx=
-db.transaction(
-storeName,
-"readonly"
-);
-
-const request=
-tx.objectStore(
-storeName
-).getAll();
-
-request.onsuccess=()=>{
-resolve(
-request.result||[]
-);
-};
-
-request.onerror=()=>{
-reject(
-request.error
-);
-};
-});
-}
-
-function idbGet(storeName,key){
-return new Promise((resolve,reject)=>{
-
-if(!db){
-reject(
-new Error("DATABASE_NOT_READY")
-);
-return;
-}
-
-const tx=
-db.transaction(
-storeName,
-"readonly"
-);
-
-const request=
-tx.objectStore(
-storeName
-).get(key);
-
-request.onsuccess=()=>{
-resolve(
-request.result
-);
-};
-
-request.onerror=()=>{
-reject(
-request.error
-);
-};
-});
-}
-
-function idbPut(storeName,value){
-return new Promise((resolve,reject)=>{
-
-if(!db){
-reject(
-new Error("DATABASE_NOT_READY")
-);
-return;
-}
-
-const tx=
-db.transaction(
-storeName,
-"readwrite"
-);
-
-tx.objectStore(
-storeName
-).put(value);
-
-tx.oncomplete=()=>{
-resolve(value);
-};
-
-tx.onerror=()=>{
-reject(
-tx.error
-);
-};
-});
-}
-
-function idbDelete(storeName,key){
-return new Promise((resolve,reject)=>{
-
-if(!db){
-reject(
-new Error("DATABASE_NOT_READY")
-);
-return;
-}
-
-const tx=
-db.transaction(
-storeName,
-"readwrite"
-);
-
-tx.objectStore(
-storeName
-).delete(key);
-
-tx.oncomplete=()=>{
-resolve();
-};
-
-tx.onerror=()=>{
-reject(
-tx.error
-);
-};
-});
-}
-
-function idbCount(storeName){
-return new Promise((resolve,reject)=>{
-
-if(!db){
-reject(
-new Error("DATABASE_NOT_READY")
-);
-return;
-}
-
-const tx=
-db.transaction(
-storeName,
-"readonly"
-);
-
-const request=
-tx.objectStore(
-storeName
-).count();
-
-request.onsuccess=()=>{
-resolve(
-request.result
-);
-};
-
-request.onerror=()=>{
-reject(
-request.error
-);
-};
-});
+return new Date().toISOString().slice(0,10);
 }
 
 function normalizeNumber(value){
 const n=Number(value);
-
-return Number.isFinite(n)
-?n
-:0;
+return Number.isFinite(n)?n:0;
 }
 
-function updateConnection(){
-const online=
-navigator.onLine;
-
-$("connectionStatus").textContent=
-online
-?"ONLINE"
-:"OFFLINE";
-
-$("connectionStatus").style.background=
-online
-?"#166534"
-:"#92400e";
-
-logInfo(
-"Network status:",
-online
-?"ONLINE"
-:"OFFLINE"
-);
+function money(value){
+return "₹"+normalizeNumber(value).toFixed(2);
 }
 
-function authStateSummary(user){
-if(!user){
-return null;
+function escapeHtml(value){
+return String(value??"")
+.replace(/&/g,"&amp;")
+.replace(/</g,"&lt;")
+.replace(/>/g,"&gt;")
+.replace(/"/g,"&quot;")
+.replace(/'/g,"&#039;");
 }
 
-return{
-uid:user.uid,
-email:user.email||"",
-emailVerified:user.emailVerified,
-isAnonymous:user.isAnonymous
-};
+function showMessage(message,type="info"){
+const el=$("globalMessage");
+el.textContent=message;
+el.className="message show "+type;
+clearTimeout(showMessage.timer);
+showMessage.timer=setTimeout(()=>{
+el.className="message";
+},7000);
 }
 
-function getAuthFailureMessage(code){
-const messages={
-"AUTH_SESSION_MISSING":
-"Firebase login session is not available in shop.html.",
-"USER_PROFILE_NOT_FOUND":
-"Firebase user exists, but users/<uid> profile was not found.",
-"USER_ACCOUNT_DISABLED":
-"Firebase user profile status is not ACTIVE.",
-"INVALID_USER_ROLE":
-"User role is not agent.",
-"AGENT_SHOP_NOT_ASSIGNED":
-"Agent has no shopId assigned.",
-"AGENT_ACCESS_NOT_FOUND":
-"agent_access/<agentId> record was not found.",
-"AGENT_ACCESS_DISABLED":
-"Agent access status is not ACTIVE.",
-"AGENT_ACCESS_UID_MISMATCH":
-"agent_access uid does not match Firebase user UID.",
-"AGENT_ACCESS_SHOP_MISMATCH":
-"agent_access shopId does not match users shopId."
-};
-
-return messages[code]||code;
+function setConnection(){
+const online=navigator.onLine;
+$("connectionDot").classList.toggle("online",online);
+$("connectionText").textContent=online?"Online":"Offline";
 }
 
-function showAuthFailure(code,details={}){
-authFailureShown=true;
+function openDatabase(){
+return new Promise((resolve,reject)=>{
+const request=indexedDB.open(DB_NAME,DB_VERSION);
 
-logError(
-getAuthFailureMessage(code),
-details
-);
+request.onupgradeneeded=e=>{
+const database=e.target.result;
 
-$("userInfo").textContent=
-"AUTH ERROR";
+if(!database.objectStoreNames.contains(SHOP_STORE))
+database.createObjectStore(SHOP_STORE,{keyPath:"id"});
 
-setLoading(
-false,
-"",
-0
-);
+if(!database.objectStoreNames.contains(AGENT_STORE))
+database.createObjectStore(AGENT_STORE,{keyPath:"id"});
 
-showMessage(
-getAuthFailureMessage(code),
-"error"
-);
-}
+if(!database.objectStoreNames.contains(PRODUCT_STORE))
+database.createObjectStore(PRODUCT_STORE,{keyPath:"id"});
 
-async function getShopId(){
-if(
-!currentProfile||
-!currentProfile.shopId
-){
-throw new Error(
-"SHOP_ACCESS_NOT_ASSIGNED"
-);
-}
+if(!database.objectStoreNames.contains(SALES_STORE))
+database.createObjectStore(SALES_STORE,{keyPath:"id"});
 
-return currentProfile.shopId;
-}
+if(!database.objectStoreNames.contains(GST_STORE))
+database.createObjectStore(GST_STORE,{keyPath:"id"});
 
-async function validateAccess(){
-logInfo(
-"validateAccess() started."
-);
+if(!database.objectStoreNames.contains(ACTIVITY_STORE))
+database.createObjectStore(ACTIVITY_STORE,{keyPath:"id"});
 
-const user=
-auth.currentUser;
+if(!database.objectStoreNames.contains(QUEUE_STORE))
+database.createObjectStore(QUEUE_STORE,{keyPath:"id"});
 
-logInfo(
-"auth.currentUser:",
-authStateSummary(user)
-);
-
-if(!user){
-showAuthFailure(
-"AUTH_SESSION_MISSING",
-{
-currentUser:null,
-authReady:authStateResolved,
-persistence:
-"SESSION"
-}
-);
-
-return false;
-}
-
-currentUser=user;
-
-let snapshot;
-
-try{
-
-snapshot=
-await database
-.ref(
-"users/"+user.uid
-)
-.once("value");
-
-}catch(error){
-
-logError(
-"users/<uid> read failed.",
-{
-uid:user.uid,
-error
-}
-);
-
-showAuthFailure(
-"USER_PROFILE_READ_FAILED",
-error
-);
-
-return false;
-}
-
-if(!snapshot.exists()){
-showAuthFailure(
-"USER_PROFILE_NOT_FOUND",
-{
-uid:user.uid,
-path:"users/"+user.uid
-}
-);
-
-return false;
-}
-
-const profile=
-snapshot.val();
-
-logInfo(
-"users/<uid> profile:",
-profile
-);
-
-const profileStatus=
-String(
-profile.status||""
-)
-.toUpperCase();
-
-const profileRole=
-String(
-profile.role||""
-)
-.toLowerCase();
-
-if(
-profileStatus!=="ACTIVE"
-){
-showAuthFailure(
-"USER_ACCOUNT_DISABLED",
-{
-uid:user.uid,
-status:profile.status
-}
-);
-
-return false;
-}
-
-if(
-profileRole!=="agent"
-){
-showAuthFailure(
-"INVALID_USER_ROLE",
-{
-uid:user.uid,
-role:profile.role
-}
-);
-
-return false;
-}
-
-if(!profile.shopId){
-showAuthFailure(
-"AGENT_SHOP_NOT_ASSIGNED",
-{
-uid:user.uid,
-agentId:profile.agentId,
-shopId:profile.shopId
-}
-);
-
-return false;
-}
-
-if(!profile.agentId){
-logWarn(
-"users/<uid> has no agentId. Checking agent_access with empty agentId."
-);
-}
-
-let accessSnapshot;
-
-try{
-
-accessSnapshot=
-await database
-.ref(
-"agent_access/"+profile.agentId
-)
-.once("value");
-
-}catch(error){
-
-logError(
-"agent_access read failed.",
-{
-path:
-"agent_access/"+profile.agentId,
-error
-}
-);
-
-showAuthFailure(
-"AGENT_ACCESS_READ_FAILED",
-error
-);
-
-return false;
-}
-
-if(!accessSnapshot.exists()){
-
-showAuthFailure(
-"AGENT_ACCESS_NOT_FOUND",
-{
-path:
-"agent_access/"+profile.agentId,
-agentId:profile.agentId
-}
-);
-
-return false;
-}
-
-const access=
-accessSnapshot.val();
-
-logInfo(
-"agent_access record:",
-access
-);
-
-const accessStatus=
-String(
-access.status||""
-)
-.toUpperCase();
-
-if(accessStatus!=="ACTIVE"){
-
-showAuthFailure(
-"AGENT_ACCESS_DISABLED",
-{
-status:access.status,
-agentId:profile.agentId
-}
-);
-
-return false;
-}
-
-if(
-String(access.uid||"")!==
-String(user.uid)
-){
-
-showAuthFailure(
-"AGENT_ACCESS_UID_MISMATCH",
-{
-firebaseUid:user.uid,
-accessUid:access.uid,
-agentId:profile.agentId
-}
-);
-
-return false;
-}
-
-if(
-String(access.shopId||"")!==
-String(profile.shopId)
-){
-
-showAuthFailure(
-"AGENT_ACCESS_SHOP_MISMATCH",
-{
-profileShopId:profile.shopId,
-accessShopId:access.shopId,
-agentId:profile.agentId
-}
-);
-
-return false;
-}
-
-currentProfile={
-...profile,
-status:profileStatus,
-role:profileRole
+if(!database.objectStoreNames.contains(SETTINGS_STORE))
+database.createObjectStore(SETTINGS_STORE,{keyPath:"id"});
 };
 
-$("userInfo").textContent=
-(
-profile.name||
-user.email||
-""
-)+
-" | "+
-profile.shopId;
+request.onsuccess=e=>{
+db=e.target.result;
+resolve(db);
+};
 
-logInfo(
-"Authorization successful.",
-{
-uid:user.uid,
-shopId:profile.shopId,
-agentId:profile.agentId,
-role:profileRole
+request.onerror=()=>reject(request.error);
+});
 }
+
+function idbPut(store,value){
+return new Promise((resolve,reject)=>{
+const tx=db.transaction(store,"readwrite");
+tx.objectStore(store).put(value);
+tx.oncomplete=()=>resolve(value);
+tx.onerror=()=>reject(tx.error);
+});
+}
+
+function idbGetAll(store){
+return new Promise((resolve,reject)=>{
+const tx=db.transaction(store,"readonly");
+const request=tx.objectStore(store).getAll();
+request.onsuccess=()=>resolve(request.result||[]);
+request.onerror=()=>reject(request.error);
+});
+}
+
+function idbDelete(store,key){
+return new Promise((resolve,reject)=>{
+const tx=db.transaction(store,"readwrite");
+tx.objectStore(store).delete(key);
+tx.oncomplete=()=>resolve();
+tx.onerror=()=>reject(tx.error);
+});
+}
+
+function idbGet(store,key){
+return new Promise((resolve,reject)=>{
+const tx=db.transaction(store,"readonly");
+const request=tx.objectStore(store).get(key);
+request.onsuccess=()=>resolve(request.result);
+request.onerror=()=>reject(request.error);
+});
+}
+
+async function loadLocalData(){
+products=await idbGetAll(PRODUCT_STORE);
+sales=await idbGetAll(SALES_STORE);
+renderProducts();
+renderSales();
+renderDashboard();
+}
+
+async function saveActivity(action,status,result,error=""){
+const item={
+id:generateId("ACT"),
+action,
+status,
+result:result||"",
+error:error||"",
+dateTime:timestamp()
+};
+
+await idbPut(ACTIVITY_STORE,item);
+
+await idbPut(QUEUE_STORE,{
+id:generateId("QUEUE"),
+recordId:item.id,
+recordType:"Activity_Log",
+shopId:currentProfile.shopId||"",
+agentId:currentProfile.agentId||"",
+operation:"CREATE",
+payload:item,
+status:"PENDING",
+createdAt:timestamp(),
+updatedAt:timestamp()
+});
+
+renderActivity();
+}
+
+async function renderActivity(){
+const logs=await idbGetAll(ACTIVITY_STORE);
+logs.sort((a,b)=>String(b.dateTime).localeCompare(String(a.dateTime)));
+
+const text=logs.slice(0,100).map(x=>{
+return [
+"DATE: "+x.dateTime,
+"ACTION: "+x.action,
+"STATUS: "+x.status,
+"RESULT: "+x.result,
+"ERROR: "+x.error,
+"----------------------------------------"
+].join("\n");
+}).join("\n");
+
+$("activityLog").textContent=text||"No activity";
+$("dashboardLog").textContent=text||"No activity";
+}
+
+function getProfileValue(...keys){
+for(const key of keys){
+if(currentProfile&&currentProfile[key]!==undefined&&currentProfile[key]!==null&&String(currentProfile[key]).trim()!=="")
+return currentProfile[key];
+}
+return "";
+}
+
+function formatLoginDate(){
+if(currentUser&&currentUser.metadata&&currentUser.metadata.lastSignInTime)
+return new Date(currentUser.metadata.lastSignInTime).toISOString();
+return timestamp();
+}
+
+function getCategoryId(product){
+return String(
+product.categoryId||
+product.productCategoryId||
+product.category||
+"NA"
+).trim()||"NA";
+}
+
+function getBarcode(product,item){
+return String(
+product.barcode||
+product.productLineBarcode||
+item.barcode||
+item.productLineBarcode||
+product.productId||
+item.productId||
+"NA"
+).trim()||"NA";
+}
+
+function getGstin(){
+return String(
+getProfileValue("gstin","GSTIN","gstinNumber","GSTINNumber")||
+"NA"
+).trim()||"NA";
+}
+
+function getCustomerId(sale){
+return String(
+sale.customerMobile||
+sale.customerName||
+"WALKIN"
+).trim()||"WALKIN";
+}
+
+function buildSale13Fields(sale,item,index){
+const product=products.find(p=>String(p.id)===String(item.id))||
+products.find(p=>String(p.productId)===String(item.productId))||
+{};
+
+const categoryId=getCategoryId(product);
+const barcode=getBarcode(product,item);
+const shopId=String(sale.shopId||currentProfile.shopId||"NA");
+const firebaseClientId=String(currentUser?.uid||"NA");
+const sku=String(item.sku||product.sku||"NA");
+const loginDateTime=formatLoginDate();
+const notes=[
+"Payment:"+String(sale.paymentMode||"NA"),
+"Customer:"+String(sale.customerName||"WALKIN"),
+"Mobile:"+String(sale.customerMobile||"")
+].join(" | ");
+const invoiceNo=String(sale.invoiceNo||"NA");
+const gstin=getGstin();
+const customerId=getCustomerId(sale);
+const rate=normalizeNumber(item.salePrice);
+const receiveAmount=normalizeNumber(item.lineTotal);
+const transactionId=String(
+sale.recordId+
+"-LINE-"+
+String(index+1).padStart(4,"0")
 );
+
+return [
+categoryId,
+barcode,
+shopId,
+firebaseClientId,
+sku,
+loginDateTime,
+notes,
+invoiceNo,
+gstin,
+customerId,
+rate,
+receiveAmount,
+transactionId
+];
+}
+
+function validateSalePayload(payload){
+if(!payload||payload.action!=="addSale")
+throw new Error("Invalid sale action");
+
+if(!Array.isArray(payload.sale))
+throw new Error("Sale must be an array");
+
+if(payload.sale.length!==13)
+throw new Error("Sale must contain exactly 13 fields");
+
+for(let i=0;i<payload.sale.length;i++){
+if(payload.sale[i]===undefined||
+payload.sale[i]===null||
+String(payload.sale[i]).trim()==="")
+throw new Error("Sale field "+(i+1)+" is empty");
+}
 
 return true;
 }
 
-async function addActivity(
-action,
-module,
-recordId,
-status,
-details
-){
+async function sendSaleAddRequest(payload){
+validateSalePayload(payload);
 
-const timestamp=
-nowISO();
-
-const activityId=
-generateId("ACTIVITY");
-
-const record={
-id:activityId,
-activityId,
-timestamp,
-date:
-timestamp.slice(0,10),
-time:
-timestamp.slice(11,19),
-shopId:
-currentProfile?.shopId||"",
-agentId:
-currentProfile?.agentId||"",
-userId:
-currentUser?.uid||"",
-userName:
-currentProfile?.name||
-currentUser?.email||
-"",
-role:
-currentProfile?.role||"",
-action,
-module,
-recordId:
-recordId||"",
-status,
-details:
-typeof details==="string"
-?details
-:JSON.stringify(
-details||{}
-),
-syncStatus:"PENDING"
-};
-
-await idbPut(
-ACTIVITY_STORE,
-record
-);
-
-await addQueue({
-recordId:
-record.activityId,
-recordType:
-"Activity_Log",
-shopId:
-record.shopId,
-agentId:
-record.agentId,
-operation:
-"CREATE",
-payload:
-record,
-syncStatus:
-"PENDING",
-retryCount:
-0,
-lastAttempt:
-"",
-lastError:
-"",
-createdAt:
-timestamp,
-updatedAt:
-timestamp,
-syncedAt:
-""
-});
-
-return record;
-}
-
-async function addQueue(record){
-
-const existing=
-await idbGet(
-QUEUE_STORE,
-record.recordId
-);
-
-if(
-existing&&
-existing.syncStatus==="SENT"
-){
-return existing;
-}
-
-const item={
-id:
-record.recordId,
-recordId:
-record.recordId,
-recordType:
-record.recordType,
-shopId:
-record.shopId,
-agentId:
-record.agentId,
-operation:
-record.operation,
-payload:
-record.payload,
-syncStatus:
-record.syncStatus||"PENDING",
-retryCount:
-record.retryCount||0,
-lastAttempt:
-record.lastAttempt||"",
-lastError:
-record.lastError||"",
-createdAt:
-record.createdAt||nowISO(),
-updatedAt:
-record.updatedAt||nowISO(),
-syncedAt:
-record.syncedAt||""
-};
-
-await idbPut(
-QUEUE_STORE,
-item
-);
-
-return item;
-}
-
-async function updateQueue(item){
-item.updatedAt=
-nowISO();
-
-await idbPut(
-QUEUE_STORE,
-item
-);
-}
-
-async function saveRecordAndQueue(
-storeName,
-record,
-recordType
-){
-
-await idbPut(
-storeName,
-record
-);
-
-await addQueue({
-recordId:
-record.recordId,
-recordType,
-shopId:
-record.shopId,
-agentId:
-record.agentId,
-operation:
-"CREATE",
-payload:
-record,
-syncStatus:
-"PENDING",
-retryCount:
-0,
-lastAttempt:
-"",
-lastError:
-"",
-createdAt:
-record.createdAt||nowISO(),
-updatedAt:
-record.updatedAt||nowISO(),
-syncedAt:
-""
-});
-}
-
-async function getPendingQueue(){
-
-const all=
-await idbGetAll(
-QUEUE_STORE
-);
-
-return all.filter(x=>
-x.syncStatus==="PENDING"||
-x.syncStatus==="ERROR"||
-x.syncStatus==="SYNCING"
-);
-}
-
-function updateSyncUI(
-total,
-success,
-processing,
-remaining,
-failed,
-current
-){
-
-$("syncTotal").textContent=
-total;
-
-$("syncSuccess").textContent=
-success;
-
-$("syncProcessing").textContent=
-processing;
-
-$("syncRemaining").textContent=
-remaining;
-
-$("syncFailed").textContent=
-failed;
-
-const percent=
-total
-?Math.floor(
-(success/total)*100
-)
-:0;
-
-$("syncPercent").textContent=
-percent+"%";
-
-$("currentSyncRecord").textContent=
-current||"None";
-
-$("loadingProgress").style.width=
-percent+"%";
-}
-
-async function getFirebaseToken(){
-
-if(!currentUser){
-throw new Error(
-"AUTHENTICATION_REQUIRED"
-);
-}
-
-return await currentUser
-.getIdToken(true);
-}
-
-async function sendBatch(batch){
-
-if(!SYNC_URL){
-throw new Error(
-"SYNC_URL_NOT_CONFIGURED"
-);
-}
-
-const idToken=
-await getFirebaseToken();
-
-const body={
-action:
-"batchSync",
-siteId:
-"shophariom",
-timestamp:
-Date.now(),
-nonce:
-generateId("NONCE"),
-idToken,
-records:
-batch.map(x=>({
-recordId:
-x.recordId,
-recordType:
-x.recordType,
-shopId:
-x.shopId,
-agentId:
-x.agentId,
-operation:
-x.operation,
-payload:
-x.payload
-}))
-};
-
-logInfo(
-"Sending sync batch.",
-{
-count:
-batch.length,
-records:
-batch.map(
-x=>x.recordId
-)
-}
-);
-
-const response=
-await fetch(
-SYNC_URL,
-{
+const response=await fetch(SALE_SYNC_URL,{
 method:"POST",
 headers:{
-"Content-Type":
-"text/plain;charset=utf-8"
+"Content-Type":"text/plain;charset=utf-8"
 },
-body:
-JSON.stringify(body),
+body:JSON.stringify(payload),
+redirect:"follow",
 cache:"no-store"
-}
-);
+});
 
-if(!response.ok){
-throw new Error(
-"HTTP "+response.status
-);
-}
-
-const text=
-await response.text();
+const text=await response.text();
 
 let data;
 
 try{
-data=
-JSON.parse(text);
-}catch(error){
-
-logError(
-"Apps Script invalid JSON.",
-{
-text,
-error
+data=JSON.parse(text);
+}catch(e){
+throw new Error("Invalid JSON response: "+text.slice(0,500));
 }
-);
 
+if(!response.ok)
 throw new Error(
-"INVALID_APPS_SCRIPT_RESPONSE"
+data.message||
+data.error||
+"HTTP "+response.status
 );
-}
 
-if(
-!data||
-data.success!==true
-){
-
+if(!data.ok)
 throw new Error(
-data?.error||
-data?.message||
-"SYNC_FAILED"
+data.message||
+data.error||
+"Sale sync failed"
 );
-}
 
 return data;
 }
 
-async function syncPending(forceRetry=false){
-
-if(syncRunning){
-return;
-}
-
-if(!currentUser||!currentProfile){
-
-logWarn(
-"Sync skipped because authorization is not ready.",
-{
-user:
-authStateSummary(
-auth.currentUser
-),
-profile:
-currentProfile
-}
-);
-
-return;
-}
-
-if(!navigator.onLine){
-
-showMessage(
-"Device is offline. Local data remains safe in IndexedDB.",
-"info"
-);
-
-return;
-}
-
-syncRunning=true;
-
-try{
-
-let queue=
-await getPendingQueue();
-
-if(forceRetry){
-queue=
-queue.filter(
-x=>
-x.syncStatus==="ERROR"||
-x.syncStatus==="PENDING"||
-x.syncStatus==="SYNCING"
-);
-}
-
-if(!queue.length){
-
-await refreshDashboard();
-
-showMessage(
-"No pending records to sync.",
-"success"
-);
-
-return;
-}
-
-const total=
-queue.length;
-
-let success=0;
-let failed=0;
-let processing=0;
-let remaining=total;
-
-updateSyncUI(
-total,
-success,
-processing,
-remaining,
-failed,
-"Starting..."
-);
-
-const concurrency=3;
-
-let index=0;
-
-async function worker(){
-
-while(true){
-
-const i=
-index++;
-
-if(i>=queue.length){
-return;
-}
-
-const item=
-queue[i];
-
-item.syncStatus=
-"SYNCING";
-
-item.lastAttempt=
-nowISO();
-
-item.retryCount=
-normalizeNumber(
-item.retryCount
-)+1;
-
-item.lastError="";
-
-await updateQueue(item);
-
-processing++;
-
-remaining--;
-
-updateSyncUI(
-total,
-success,
-processing,
-remaining,
-failed,
-item.recordId
-);
-
-try{
-
-const result=
-await sendBatch(
-[item]
-);
-
-const resultItem=
-Array.isArray(
-result.results
-)
-?result.results[0]
-:null;
-
-const state=
-resultItem?.status||
-resultItem?.syncStatus||
-"SENT";
-
-if(
-state==="SENT"||
-state==="ALREADY_EXISTS"||
-state==="SUCCESS"
-){
-
-item.syncStatus=
-"SENT";
-
-item.syncedAt=
-nowISO();
-
-item.lastError="";
-
-await updateQueue(
-item
-);
-
-await markLocalRecordSynced(
-item
-);
-
-success++;
-
-}else{
-
-throw new Error(
-resultItem?.error||
-"SERVER_DID_NOT_CONFIRM"
-);
-}
-
-}catch(error){
-
-logError(
-"Record sync failed.",
-{
-recordId:
-item.recordId,
-error
-}
-);
-
-item.syncStatus=
-"ERROR";
-
-item.lastError=
-String(
-error.message||
-error
-);
-
-await updateQueue(
-item
-);
-
-failed++;
-
-}finally{
-
-processing--;
-
-remaining=
-total-
-success-
-failed-
-processing;
-
-updateSyncUI(
-total,
-success,
-processing,
-remaining,
-failed,
-item.recordId
-);
-}
-}
-}
-
-await Promise.all(
-Array.from(
-{
-length:
-Math.min(
-concurrency,
-queue.length
-)
-},
-worker
-)
-);
-
-$("lastSync").textContent=
-new Date()
-.toLocaleString(
-"en-IN"
-);
-
-if(failed){
-
-showMessage(
-success+
-" synced, "+
-failed+
-" failed. Failed records remain in queue.",
-"error"
-);
-
-}else{
-
-showMessage(
-"All "+
-success+
-" records confirmed successfully.",
-"success"
-);
-}
-
-await refreshDashboard();
-
-}catch(error){
-
-logError(
-"Sync process failed.",
-error
-);
-
-showMessage(
-error.message||
-"Sync failed.",
-"error"
-);
-
-}finally{
-
-syncRunning=false;
-}
-}
-
-async function markLocalRecordSynced(item){
-
-if(
-item.recordType===
-"Activity_Log"
-){
-
-const activity=
-await findActivity(
-item.recordId
-);
-
-if(activity){
-
-activity.syncStatus=
-"SENT";
-
-await idbPut(
-ACTIVITY_STORE,
-activity
-);
-}
-}
-}
-
-async function findActivity(activityId){
-
-const all=
-await idbGetAll(
-ACTIVITY_STORE
-);
-
-return all.find(
-x=>
-x.activityId===
-activityId
-)||null;
-}
-
-async function refreshDashboard(){
-
-if(!currentProfile){
-return;
-}
-
-const[
-allProducts,
-allSales,
-allGst,
-queue
-]=
-await Promise.all([
-idbGetAll(
-PRODUCT_STORE
-),
-idbGetAll(
-SALES_STORE
-),
-idbGetAll(
-GST_STORE
-),
-idbGetAll(
-QUEUE_STORE
-)
-]);
-
-const shopId=
-currentProfile.shopId;
-
-const shopProducts=
-allProducts.filter(
-x=>x.shopId===shopId
-);
-
-const shopSales=
-allSales.filter(
-x=>x.shopId===shopId
-);
-
-const shopGst=
-allGst.filter(
-x=>x.shopId===shopId
-);
-
-const pending=
-queue.filter(
-x=>
-x.shopId===shopId&&
-(
-x.syncStatus==="PENDING"||
-x.syncStatus==="SYNCING"
-)
-);
-
-const failed=
-queue.filter(
-x=>
-x.shopId===shopId&&
-x.syncStatus==="ERROR"
-);
-
-$("productCount").textContent=
-shopProducts.length;
-
-$("saleCount").textContent=
-shopSales.length;
-
-$("gstCount").textContent=
-shopGst.length;
-
-$("pendingCount").textContent=
-pending.length;
-
-$("failedCount").textContent=
-failed.length;
-
-$("stockCount").textContent=
-shopProducts.filter(
-x=>
-x.status==="ACTIVE"&&
-normalizeNumber(x.stock)>0
-).length;
-
-updateSyncUI(
-pending.length+
-failed.length,
-0,
-0,
-pending.length+
-failed.length,
-failed.length,
-""
-);
-}
-
-async function loadProducts(){
-
-if(!currentProfile){
-return;
-}
-
-const all=
-await idbGetAll(
-PRODUCT_STORE
-);
-
-products=
-all.filter(
-x=>
-x.shopId===
-currentProfile.shopId
-);
-
-renderProductFilters();
-renderProducts();
-}
-
-function renderProductFilters(){
-
-const select=
-$("productFilterCategory");
-
-const current=
-select.value;
-
-const categories=
-[
-...new Set(
-products
-.map(x=>x.category)
-.filter(Boolean)
-)
-].sort();
-
-select.innerHTML=
-'<option value="">All Categories</option>';
-
-categories.forEach(
-category=>{
-const option=
-document.createElement(
-"option"
-);
-
-option.value=
-category;
-
-option.textContent=
-category;
-
-select.appendChild(
-option
-);
-});
-
-select.value=
-categories.includes(
-current
-)
-?current
-:"";
-}
-
-function renderProducts(){
-
-const body=
-$("productTableBody");
-
-const search=
-$("productSearch")
-.value
-.trim()
-.toLowerCase();
-
-const status=
-$("productFilterStatus")
-.value;
-
-const category=
-$("productFilterCategory")
-.value;
-
-const filtered=
-products.filter(p=>{
-
-const text=[
-p.productId,
-p.sku,
-p.productName,
-p.category,
-p.brand
-]
-.join(" ")
-.toLowerCase();
-
-return(
-(!search||
-text.includes(
-search
-))&&
-(!status||
-p.status===status)&&
-(!category||
-p.category===category)
-);
-});
-
-body.innerHTML="";
-
-if(!filtered.length){
-
-body.innerHTML=
-'<tr><td colspan="13" class="empty">No products found</td></tr>';
-
-return;
-}
-
-filtered.sort(
-(a,b)=>
-String(
-a.productName
-)
-.localeCompare(
-String(
-b.productName
-)
-)
-);
-
-filtered.forEach(p=>{
-
-const tr=
-document.createElement(
-"tr"
-);
-
-const low=
-normalizeNumber(
-p.stock
-)<=
-normalizeNumber(
-p.minimumStock
-);
-
-tr.innerHTML=`
-<td>${escapeHtml(p.productId)}</td>
-<td>${escapeHtml(p.sku)}</td>
-<td>${escapeHtml(p.productName)}</td>
-<td>${escapeHtml(p.category)}</td>
-<td>${escapeHtml(p.brand)}</td>
-<td>${money(p.purchasePrice)}</td>
-<td>${money(p.salePrice)}</td>
-<td>${escapeHtml(p.gstRate)}%</td>
-<td>${escapeHtml(p.unit)}</td>
-<td class="${low?"stock-low":""}">${escapeHtml(p.stock)}</td>
-<td>${escapeHtml(p.minimumStock)}</td>
-<td><span class="badge ${p.status==="ACTIVE"?"badge-active":"badge-disabled"}">${escapeHtml(p.status)}</span></td>
-<td>
-<button class="primary edit-product" data-id="${escapeHtml(p.id)}">Edit</button>
-<button class="${p.status==="ACTIVE"?"danger":"success"} toggle-product" data-id="${escapeHtml(p.id)}">${p.status==="ACTIVE"?"Disable":"Enable"}</button>
-</td>
-`;
-
-body.appendChild(
-tr
-);
-});
-}
-
-async function editProduct(id){
-
-const p=
-await idbGet(
-PRODUCT_STORE,
-id
-);
-
-if(!p){
-return;
-}
-
-$("productEditId").value=
-p.id;
-
-$("productId").value=
-p.productId;
-
-$("sku").value=
-p.sku||"";
-
-$("productName").value=
-p.productName||"";
-
-$("category").value=
-p.category||"";
-
-$("brand").value=
-p.brand||"";
-
-$("purchasePrice").value=
-p.purchasePrice;
-
-$("salePrice").value=
-p.salePrice;
-
-$("gstRate").value=
-p.gstRate;
-
-$("unit").value=
-p.unit;
-
-$("stock").value=
-p.stock;
-
-$("minimumStock").value=
-p.minimumStock;
-
-$("productStatus").value=
-p.status;
-
-$("saveProductBtn").textContent=
-"Update Product";
-
-document
-.querySelector(
-'[data-section="productSection"]'
-)
-.click();
-
-window.scrollTo(
-{
-top:0,
-behavior:"smooth"
-}
-);
-}
-
-async function toggleProduct(id){
-
-const p=
-await idbGet(
-PRODUCT_STORE,
-id
-);
-
-if(!p){
-return;
-}
-
-p.status=
-p.status==="ACTIVE"
-?"DISABLED"
-:"ACTIVE";
-
-p.updatedAt=
-nowISO();
-
-await idbPut(
-PRODUCT_STORE,
-p
-);
-
-await addActivity(
-p.status==="ACTIVE"
-?"Enable Product"
-:"Disable Product",
-"Products",
-p.recordId,
-"SUCCESS",
-{
-productId:
-p.productId,
-status:
-p.status
-}
-);
-
-await addQueue({
-recordId:
-p.recordId,
-recordType:
-"Products",
-shopId:
-p.shopId,
-agentId:
-p.agentId,
-operation:
-"UPDATE",
-payload:
-p,
-syncStatus:
-"PENDING",
-retryCount:
-0,
-lastAttempt:
-"",
-lastError:
-"",
-createdAt:
-p.createdAt,
-updatedAt:
-p.updatedAt,
-syncedAt:
-""
-});
-
-await loadProducts();
-
-await refreshDashboard();
-
-showMessage(
-"Product status updated.",
-"success"
-);
-
-if(navigator.onLine){
-syncPending();
-}
-}
-
-async function saveProduct(event){
-
-event.preventDefault();
-
-const editId=
-$("productEditId")
-.value
-.trim();
-
-const productId=
-$("productId")
-.value
-.trim();
-
-const sku=
-$("sku")
-.value
-.trim();
-
-const productName=
-$("productName")
-.value
-.trim();
-
-const category=
-$("category")
-.value
-.trim();
-
-const brand=
-$("brand")
-.value
-.trim();
-
-const purchasePrice=
-normalizeNumber(
-$("purchasePrice").value
-);
-
-const salePrice=
-normalizeNumber(
-$("salePrice").value
-);
-
-const gstRate=
-normalizeNumber(
-$("gstRate").value
-);
-
-const unit=
-$("unit").value;
-
-const stock=
-normalizeNumber(
-$("stock").value
-);
-
-const minimumStock=
-normalizeNumber(
-$("minimumStock").value
-);
-
-const status=
-$("productStatus").value;
-
-if(!productId||!productName){
-
-showMessage(
-"Product ID and Product Name are required.",
-"error"
-);
-
-return;
-}
-
-if(
-purchasePrice<0||
-salePrice<0||
-stock<0||
-minimumStock<0
-){
-
-showMessage(
-"Invalid numeric value.",
-"error"
-);
-
-return;
-}
-
-const duplicate=
-products.find(
-x=>
-x.productId.toLowerCase()===
-productId.toLowerCase()&&
-x.id!==editId
-);
-
-if(duplicate){
-
-showMessage(
-"Product ID already exists.",
-"error"
-);
-
-return;
-}
-
-const timestamp=
-nowISO();
-
-let record;
-
-if(editId){
-
-record=
-await idbGet(
-PRODUCT_STORE,
-editId
-);
-
-if(!record){
-
-showMessage(
-"Product not found.",
-"error"
-);
-
-return;
-}
-
-record.productId=
-productId;
-
-record.sku=
-sku;
-
-record.productName=
-productName;
-
-record.category=
-category;
-
-record.brand=
-brand;
-
-record.purchasePrice=
-purchasePrice;
-
-record.salePrice=
-salePrice;
-
-record.gstRate=
-gstRate;
-
-record.unit=
-unit;
-
-record.stock=
-stock;
-
-record.minimumStock=
-minimumStock;
-
-record.status=
-status;
-
-record.updatedAt=
-timestamp;
-
-await idbPut(
-PRODUCT_STORE,
-record
-);
-
-await addActivity(
-"Edit Product",
-"Products",
-record.recordId,
-"SUCCESS",
-{
-productId
-}
-);
-
-await addQueue({
-recordId:
-record.recordId,
-recordType:
-"Products",
-shopId:
-record.shopId,
-agentId:
-record.agentId,
-operation:
-"UPDATE",
-payload:
-record,
-syncStatus:
-"PENDING",
-retryCount:
-0,
-lastAttempt:
-"",
-lastError:
-"",
-createdAt:
-record.createdAt,
-updatedAt:
-timestamp,
-syncedAt:
-""
-});
-
-showMessage(
-"Product updated locally.",
-"success"
-);
-
-}else{
-
-record={
-id:
-generateId("PRODUCT"),
-recordId:
-generateId("PRODUCT"),
-shopId:
-currentProfile.shopId,
-agentId:
-currentProfile.agentId,
-productId,
-sku,
-productName,
-category,
-brand,
-purchasePrice,
-salePrice,
-gstRate,
-unit,
-stock,
-minimumStock,
-status,
-createdAt:
-timestamp,
-updatedAt:
-timestamp
+async function queueSaleLine(sale,item,index){
+const payload={
+action:"addSale",
+sale:buildSale13Fields(sale,item,index)
 };
 
-await saveRecordAndQueue(
-PRODUCT_STORE,
-record,
-"Products"
+validateSalePayload(payload);
+
+const queue={
+id:generateId("QUEUE"),
+recordId:sale.recordId+"-LINE-"+String(index+1).padStart(4,"0"),
+recordType:"Sale_Add",
+shopId:sale.shopId||"",
+agentId:sale.agentId||"",
+operation:"CREATE",
+payload,
+status:"PENDING",
+createdAt:timestamp(),
+updatedAt:timestamp()
+};
+
+await idbPut(QUEUE_STORE,queue);
+return queue;
+}
+
+async function completeSale(){
+if(cart.length===0){
+showMessage("Cart is empty","error");
+return;
+}
+
+const summary=calculateSummary();
+
+const saleId=generateId("SALE");
+const invoiceNo="INV-"+new Date().getTime();
+
+const sale={
+id:saleId,
+recordId:saleId,
+shopId:currentProfile.shopId||"NA",
+agentId:currentProfile.agentId||currentUser?.uid||"NA",
+saleId,
+invoiceNo,
+date:today(),
+customerName:$("customerName").value.trim(),
+customerMobile:$("customerMobile").value.trim(),
+paymentMode:$("paymentMode").value,
+subtotal:summary.subtotal,
+discount:summary.discount,
+taxableAmount:summary.taxable,
+cgst:summary.cgst,
+sgst:summary.sgst,
+igst:summary.igst,
+gstTotal:summary.gstTotal,
+grandTotal:summary.grandTotal,
+items:cart.map(x=>({
+productId:x.productId,
+sku:x.sku,
+productName:x.productName,
+salePrice:x.salePrice,
+gstRate:x.gstRate,
+qty:x.qty,
+lineTotal:x.salePrice*x.qty,
+id:x.id
+})),
+createdAt:timestamp(),
+remoteSyncStatus:"PENDING"
+};
+
+try{
+await idbPut(SALES_STORE,sale);
+
+for(const item of cart){
+const product=products.find(p=>String(p.id)===String(item.id));
+if(product){
+product.stock=Math.max(
+0,
+normalizeNumber(product.stock)-normalizeNumber(item.qty)
+);
+product.updatedAt=timestamp();
+await idbPut(PRODUCT_STORE,product);
+}
+}
+
+for(let i=0;i<sale.items.length;i++){
+await queueSaleLine(sale,sale.items[i],i);
+}
+
+await idbPut(GST_STORE,{
+id:generateId("GST"),
+recordId:sale.recordId,
+saleId:sale.saleId,
+invoiceNo:sale.invoiceNo,
+shopId:sale.shopId,
+gstMode:$("gstMode").value,
+cgst:sale.cgst,
+sgst:sale.sgst,
+igst:sale.igst,
+gstTotal:sale.gstTotal,
+grandTotal:sale.grandTotal,
+createdAt:sale.createdAt
+});
+
+await saveActivity(
+"SALE_CREATE",
+"SUCCESS",
+"Local sale created: "+sale.invoiceNo+
+" | Lines: "+sale.items.length+
+" | Total: "+money(sale.grandTotal)
 );
 
-await addActivity(
-"Add Product",
-"Products",
-record.recordId,
-"SUCCESS",
-{
-productId
-}
-);
+cart=[];
+renderCart();
+await loadLocalData();
 
 showMessage(
-"Product saved locally. Sync will run in background.",
+"Sale "+sale.invoiceNo+" saved locally. "+sale.items.length+" sale line(s) queued for sync.",
 "success"
 );
-}
 
-clearProductForm();
+if(navigator.onLine)
+await syncPending();
 
-await loadProducts();
-
-await refreshDashboard();
-
-if(navigator.onLine){
-syncPending();
-}
-}
-
-function clearProductForm(){
-
-$("productForm").reset();
-
-$("productEditId").value="";
-
-$("gstRate").value="18";
-
-$("unit").value="PCS";
-
-$("productStatus").value=
-"ACTIVE";
-
-$("minimumStock").value=
-"0";
-
-$("saveProductBtn").textContent=
-"Save Product";
-}
-
-function searchSaleProducts(){
-
-const q=
-$("saleProductSearch")
-.value
-.trim()
-.toLowerCase();
-
-const box=
-$("productResults");
-
-if(!q){
-
-box.classList.add(
-"hidden"
+}catch(error){
+await saveActivity(
+"SALE_CREATE",
+"ERROR",
+"",
+error.message
 );
-
-box.innerHTML="";
-
-return;
+showMessage("Sale creation failed: "+error.message,"error");
+}
 }
 
-const result=
-products
-.filter(
-p=>
-p.status==="ACTIVE"&&
-[
-p.productId,
-p.sku,
-p.productName,
-p.brand
-]
-.join(" ")
-.toLowerCase()
-.includes(q)
-)
-.slice(0,50);
+async function sendBatch(items){
+const body={
+action:"batchSync",
+siteId:"shophariom",
+timestamp:Date.now(),
+nonce:generateId("NONCE"),
+idToken:currentUser?await currentUser.getIdToken():null,
+records:items.map(x=>({
+recordId:x.recordId,
+recordType:x.recordType,
+shopId:x.shopId,
+agentId:x.agentId,
+operation:x.operation,
+payload:x.payload
+}))
+};
 
-box.innerHTML="";
-
-if(!result.length){
-
-box.innerHTML=
-'<div class="empty">No matching product</div>';
-
-box.classList.remove(
-"hidden"
-);
-
-return;
-}
-
-result.forEach(
-p=>{
-
-const div=
-document.createElement(
-"div"
-);
-
-div.className=
-"product-item";
-
-div.dataset.id=
-p.id;
-
-div.innerHTML=`
-<strong>${escapeHtml(p.productName)}</strong>
-<small>ID: ${escapeHtml(p.productId)} | SKU: ${escapeHtml(p.sku)} | Rate: ${money(p.salePrice)} | Stock: ${escapeHtml(p.stock)} | GST: ${escapeHtml(p.gstRate)}%</small>
-`;
-
-box.appendChild(
-div
-);
+const response=await fetch(SYNC_URL,{
+method:"POST",
+headers:{
+"Content-Type":"text/plain;charset=utf-8"
+},
+body:JSON.stringify(body),
+cache:"no-store"
 });
 
-box.classList.remove(
-"hidden"
-);
+const text=await response.text();
+
+let data;
+
+try{
+data=JSON.parse(text);
+}catch(e){
+throw new Error("Invalid batch JSON response");
 }
 
-function addToCart(product){
+if(!response.ok||data.ok===false)
+throw new Error(data.message||data.error||"Batch sync failed");
 
-if(
-product.status!==
-"ACTIVE"
-){
+return data;
+}
 
-showMessage(
-"This product is disabled.",
-"error"
+async function applyDirectSaleSyncResult(item,data){
+item.status="SENT";
+item.serverResponse=data;
+item.updatedAt=timestamp();
+
+await idbPut(QUEUE_STORE,item);
+
+const salesList=await idbGetAll(SALES_STORE);
+const sale=salesList.find(x=>String(x.recordId)===String(item.recordId).split("-LINE-")[0]);
+
+if(sale){
+const all=await idbGetAll(QUEUE_STORE);
+const saleQueues=all.filter(q=>
+q.recordType==="Sale_Add"&&
+String(q.recordId).startsWith(String(sale.recordId)+"-LINE-")
 );
 
+const complete=saleQueues.length>0&&
+saleQueues.every(q=>q.status==="SENT");
+
+if(complete){
+sale.remoteSyncStatus="SYNCED";
+sale.remoteSyncedAt=timestamp();
+await idbPut(SALES_STORE,sale);
+}
+}
+}
+
+async function syncDirectSaleItem(item){
+try{
+const data=await sendSaleAddRequest(item.payload);
+
+await applyDirectSaleSyncResult(item,data);
+
+await saveActivity(
+"SALE_ADD_SYNC",
+"SUCCESS",
+(item.recordId||"")+" | "+(data.message||"Sale synced")
+);
+
+return true;
+}catch(error){
+item.status="ERROR";
+item.error=error.message;
+item.updatedAt=timestamp();
+await idbPut(QUEUE_STORE,item);
+
+await saveActivity(
+"SALE_ADD_SYNC",
+"ERROR",
+item.recordId||"",
+error.message
+);
+
+return false;
+}
+}
+
+async function syncBatchItems(items){
+if(items.length===0)return;
+
+try{
+const data=await sendBatch(items);
+
+for(const item of items){
+item.status="SENT";
+item.serverResponse=data;
+item.updatedAt=timestamp();
+await idbPut(QUEUE_STORE,item);
+}
+
+await saveActivity(
+"BATCH_SYNC",
+"SUCCESS",
+items.length+" record(s) synced"
+);
+
+}catch(error){
+for(const item of items){
+item.status="ERROR";
+item.error=error.message;
+item.updatedAt=timestamp();
+await idbPut(QUEUE_STORE,item);
+}
+
+await saveActivity(
+"BATCH_SYNC",
+"ERROR",
+items.length+" record(s)",
+error.message
+);
+}
+}
+
+async function syncPending(){
+if(syncing)return;
+
+if(!navigator.onLine){
+showMessage("Offline. Pending records remain in local queue.","info");
 return;
 }
 
-if(
-normalizeNumber(
-product.stock
-)<=0
-){
+syncing=true;
 
-showMessage(
-"Product is out of stock.",
-"error"
+try{
+const queue=await idbGetAll(QUEUE_STORE);
+
+const pending=queue.filter(x=>
+x.status==="PENDING"||
+x.status==="ERROR"
 );
 
+const saleItems=pending.filter(x=>x.recordType==="Sale_Add");
+const batchItems=pending.filter(x=>x.recordType!=="Sale_Add");
+
+for(const item of saleItems){
+await syncDirectSaleItem(item);
+}
+
+if(batchItems.length){
+await syncBatchItems(batchItems);
+}
+
+await loadLocalData();
+await renderActivity();
+await renderDashboard();
+
+showMessage(
+"Sync completed. Sale and normal queues processed separately.",
+"success"
+);
+
+}catch(error){
+await saveActivity(
+"SYNC",
+"ERROR",
+"",
+error.message
+);
+
+showMessage("Sync error: "+error.message,"error");
+}finally{
+syncing=false;
+}
+}
+
+async function retryFailed(){
+const queue=await idbGetAll(QUEUE_STORE);
+const failed=queue.filter(x=>x.status==="ERROR");
+
+if(!failed.length){
+showMessage("No failed records found.","info");
 return;
 }
 
-const existing=
-cart.find(
-x=>
-x.productId===
-product.productId
-);
-
-if(existing){
-
-if(
-existing.qty+1>
-normalizeNumber(
-product.stock
-)
-){
-
-showMessage(
-"Available stock exceeded.",
-"error"
-);
-
-return;
+for(const item of failed){
+item.status="PENDING";
+item.error="";
+item.updatedAt=timestamp();
+await idbPut(QUEUE_STORE,item);
 }
 
-existing.qty++;
+showMessage(failed.length+" failed record(s) moved to retry queue.","info");
 
-}else{
-
-cart.push({
-id:
-product.id,
-recordId:
-product.recordId,
-productId:
-product.productId,
-sku:
-product.sku,
-productName:
-product.productName,
-salePrice:
-normalizeNumber(
-product.salePrice
-),
-gstRate:
-normalizeNumber(
-product.gstRate
-),
-stock:
-normalizeNumber(
-product.stock
-),
-qty:1
-});
+await syncPending();
 }
 
-$("saleProductSearch").value="";
+function calculateSummary(){
+const subtotal=cart.reduce((sum,x)=>{
+return sum+normalizeNumber(x.salePrice)*normalizeNumber(x.qty);
+},0);
 
-$("productResults")
-.classList.add(
-"hidden"
+const discount=Math.min(
+subtotal,
+Math.max(0,normalizeNumber($("discount").value))
 );
 
-renderCart();
-}
-
-function calculateCart(){
-
-let subtotal=0;
-let gstTotal=0;
-
-cart.forEach(
-item=>{
-const gross=
-item.salePrice*
-item.qty;
-
-subtotal+=gross;
-}
-);
-
-const discount=
-Math.max(
-0,
-normalizeNumber(
-$("discount").value
-)
-);
-
-const taxable=
-Math.max(
-0,
-subtotal-
-discount
-);
-
-if(subtotal>0){
-
-cart.forEach(
-item=>{
-
-const gross=
-item.salePrice*
-item.qty;
-
-const proportion=
-gross/subtotal;
-
-const itemTaxable=
-taxable*
-proportion;
-
-gstTotal+=
-itemTaxable*
-(item.gstRate/100);
-});
-}
-
-const mode=
-$("saleGstMode")
-.value;
+const taxable=Math.max(0,subtotal-discount);
 
 let cgst=0;
 let sgst=0;
 let igst=0;
 
-if(mode==="INTRA"){
+if($("gstMode").value==="INTRA"){
+for(const item of cart){
+const lineBase=
+normalizeNumber(item.salePrice)*
+normalizeNumber(item.qty);
 
-cgst=
-gstTotal/2;
+const lineDiscount=
+subtotal>0?
+discount*(lineBase/subtotal):
+0;
 
-sgst=
-gstTotal/2;
+const taxableLine=Math.max(0,lineBase-lineDiscount);
+const gst=taxableLine*normalizeNumber(item.gstRate)/100;
 
-}else{
-
-igst=
-gstTotal;
+cgst+=gst/2;
+sgst+=gst/2;
 }
+}else{
+for(const item of cart){
+const lineBase=
+normalizeNumber(item.salePrice)*
+normalizeNumber(item.qty);
+
+const lineDiscount=
+subtotal>0?
+discount*(lineBase/subtotal):
+0;
+
+const taxableLine=Math.max(0,lineBase-lineDiscount);
+
+igst+=taxableLine*normalizeNumber(item.gstRate)/100;
+}
+}
+
+const gstTotal=cgst+sgst+igst;
+const grandTotal=taxable+gstTotal;
 
 return{
 subtotal,
@@ -3123,1450 +1037,401 @@ cgst,
 sgst,
 igst,
 gstTotal,
-grandTotal:
-taxable+
-gstTotal
+grandTotal
 };
+}
+
+function renderSummary(){
+const s=calculateSummary();
+
+$("summarySubtotal").textContent=money(s.subtotal);
+$("summaryDiscount").textContent=money(s.discount);
+$("summaryTaxable").textContent=money(s.taxable);
+$("summaryCgst").textContent=money(s.cgst);
+$("summarySgst").textContent=money(s.sgst);
+$("summaryIgst").textContent=money(s.igst);
+$("summaryGst").textContent=money(s.gstTotal);
+$("summaryGrand").textContent=money(s.grandTotal);
 }
 
 function renderCart(){
-
-const body=
-$("cartBody");
-
-body.innerHTML="";
+const body=$("cartBody");
 
 if(!cart.length){
+body.innerHTML="";
+$("cartEmpty").style.display="block";
+renderSummary();
+return;
+}
 
-body.innerHTML=
-'<tr><td colspan="9" class="empty">Cart is empty</td></tr>';
+$("cartEmpty").style.display="none";
 
-}else{
+body.innerHTML=cart.map((item,index)=>{
+const total=normalizeNumber(item.salePrice)*normalizeNumber(item.qty);
 
-cart.forEach(
-(item,index)=>{
-
-const gross=
-item.salePrice*
-item.qty;
-
-const taxable=
-gross;
-
-const gst=
-taxable*
-(item.gstRate/100);
-
-const total=
-taxable+
-gst;
-
-const tr=
-document.createElement(
-"tr"
-);
-
-tr.innerHTML=`
+return `
+<tr>
 <td>${escapeHtml(item.productName)}</td>
 <td>${escapeHtml(item.sku)}</td>
 <td>${money(item.salePrice)}</td>
-<td>${escapeHtml(item.gstRate)}%</td>
-<td><input class="cart-qty" data-index="${index}" type="number" min="0.001" max="${item.stock}" step="0.001" value="${item.qty}" style="width:80px"></td>
-<td>${money(taxable)}</td>
-<td>${money(gst)}</td>
+<td>${normalizeNumber(item.gstRate).toFixed(2)}%</td>
+<td>
+<input class="cart-qty" data-index="${index}" type="number" min="1" max="${Math.max(1,normalizeNumber(item.stock)+normalizeNumber(item.qty))}" value="${item.qty}">
+</td>
 <td>${money(total)}</td>
-<td><button class="danger remove-cart" data-index="${index}">Remove</button></td>
+<td><button class="btn btn-danger remove-cart" data-index="${index}">Remove</button></td>
+</tr>
 `;
+}).join("");
 
-body.appendChild(
-tr
-);
+document.querySelectorAll(".cart-qty").forEach(input=>{
+input.addEventListener("change",e=>{
+const index=Number(e.target.dataset.index);
+const qty=Math.max(1,Math.floor(normalizeNumber(e.target.value)));
+cart[index].qty=qty;
+renderCart();
+});
+});
+
+document.querySelectorAll(".remove-cart").forEach(button=>{
+button.addEventListener("click",e=>{
+const index=Number(e.target.dataset.index);
+cart.splice(index,1);
+renderCart();
+});
+});
+
+renderSummary();
+}
+
+function addProductToCart(product){
+const existing=cart.find(x=>String(x.id)===String(product.id));
+
+if(existing){
+existing.qty++;
+}else{
+cart.push({
+id:product.id,
+recordId:product.recordId,
+productId:product.productId||product.id,
+sku:product.sku||"",
+productName:product.productName||"Unnamed Product",
+salePrice:normalizeNumber(product.salePrice),
+gstRate:normalizeNumber(product.gstRate),
+stock:normalizeNumber(product.stock),
+qty:1,
+barcode:product.barcode||product.productLineBarcode||""
 });
 }
-
-const summary=
-calculateCart();
-
-$("subtotal").textContent=
-money(summary.subtotal);
-
-$("discountValue").textContent=
-money(summary.discount);
-
-$("taxableAmount").textContent=
-money(summary.taxable);
-
-$("cgstAmount").textContent=
-money(summary.cgst);
-
-$("sgstAmount").textContent=
-money(summary.sgst);
-
-$("igstAmount").textContent=
-money(summary.igst);
-
-$("gstTotal").textContent=
-money(summary.gstTotal);
-
-$("grandTotal").textContent=
-money(summary.grandTotal);
-}
-
-function clearCart(){
-
-cart=[];
-
-$("customerName").value="";
-
-$("customerMobile").value="";
-
-$("paymentMode").value=
-"Cash";
-
-$("discount").value=
-"0";
-
-$("saleGstMode").value=
-"INTRA";
-
-$("saleProductSearch").value="";
-
-$("productResults")
-.classList.add(
-"hidden"
-);
 
 renderCart();
+$("saleProductSearch").value="";
+$("productResults").innerHTML="";
 }
 
-function generateInvoiceNumber(){
+function searchSaleProducts(){
+const q=$("saleProductSearch").value.trim().toLowerCase();
 
-const d=
-new Date();
-
-const date=
-d.getFullYear().toString()+
-String(
-d.getMonth()+1
-).padStart(2,"0")+
-String(
-d.getDate()
-).padStart(2,"0");
-
-return "INV-"+
-date+
-"-"+
-Math.random()
-.toString(36)
-.slice(2,8)
-.toUpperCase();
-}
-
-async function completeSale(){
-
-if(!currentUser||!currentProfile){
-
-showMessage(
-"Login session is not available.",
-"error"
-);
-
-logError(
-"Complete Sale blocked because authentication is missing."
-);
-
+if(!q){
+$("productResults").innerHTML="";
 return;
 }
 
-if(!cart.length){
+const result=products.filter(p=>{
+return [
+p.productName,
+p.sku,
+p.productId,
+p.id,
+p.barcode,
+p.productLineBarcode,
+p.category
+].some(v=>String(v||"").toLowerCase().includes(q));
+}).slice(0,50);
 
-showMessage(
-"Cart is empty.",
-"error"
-);
-
+if(!result.length){
+$("productResults").innerHTML='<div class="empty">No product found</div>';
 return;
 }
 
-for(
-const item of cart
-){
+$("productResults").innerHTML=result.map(p=>{
+return `
+<div class="product-result" data-product-id="${escapeHtml(p.id)}">
+<strong>${escapeHtml(p.productName||"Unnamed")}</strong>
+<br>
+<span>SKU: ${escapeHtml(p.sku||"")}</span>
+<span> | Price: ${money(p.salePrice)}</span>
+<span> | Stock: ${normalizeNumber(p.stock)}</span>
+</div>
+`;
+}).join("");
 
-const product=
-await idbGet(
-PRODUCT_STORE,
-item.id
-);
-
-if(
-!product||
-product.status!==
-"ACTIVE"
-){
-
-showMessage(
-"A cart product is no longer available.",
-"error"
-);
-
-return;
-}
-
-if(
-normalizeNumber(
-item.qty
-)<=0||
-normalizeNumber(
-item.qty)>
-normalizeNumber(
-product.stock
-)
-){
-
-showMessage(
-"Insufficient stock for "+
-product.productName+
-".",
-"error"
-);
-
-return;
-}
-}
-
-const summary=
-calculateCart();
-
-const timestamp=
-nowISO();
-
-const saleId=
-generateId("SALE");
-
-const invoiceNo=
-generateInvoiceNumber();
-
-const gstId=
-generateId("GST");
-
-const sale={
-id:
-generateId("SALE"),
-recordId:
-saleId,
-shopId:
-currentProfile.shopId,
-agentId:
-currentProfile.agentId,
-saleId,
-invoiceNo,
-date:
-today(),
-customerName:
-$("customerName")
-.value.trim(),
-customerMobile:
-$("customerMobile")
-.value.trim(),
-paymentMode:
-$("paymentMode")
-.value,
-subtotal:
-summary.subtotal,
-discount:
-summary.discount,
-taxableAmount:
-summary.taxable,
-cgst:
-summary.cgst,
-sgst:
-summary.sgst,
-igst:
-summary.igst,
-gstTotal:
-summary.gstTotal,
-grandTotal:
-summary.grandTotal,
-items:
-cart.map(
-x=>({
-productId:
-x.productId,
-sku:
-x.sku,
-productName:
-x.productName,
-salePrice:
-x.salePrice,
-gstRate:
-x.gstRate,
-qty:
-x.qty,
-lineTotal:
-x.salePrice*
-x.qty
-})
-),
-createdAt:
-timestamp
-};
-
-const gstRecord={
-id:
-generateId("GST"),
-recordId:
-gstId,
-shopId:
-currentProfile.shopId,
-agentId:
-currentProfile.agentId,
-gstId,
-invoiceNo,
-date:
-today(),
-customerName:
-sale.customerName,
-customerGSTIN:"",
-taxableAmount:
-summary.taxable,
-cgst:
-summary.cgst,
-sgst:
-summary.sgst,
-igst:
-summary.igst,
-totalGST:
-summary.gstTotal,
-invoiceTotal:
-summary.grandTotal,
-createdAt:
-timestamp
-};
-
-try{
-
-setLoading(
-true,
-"Saving sale locally...",
-10
-);
-
-await idbPut(
-SALES_STORE,
-sale
-);
-
-setLoading(
-true,
-"Updating stock locally...",
-35
-);
-
-for(
-const item of cart
-){
-
-const product=
-await idbGet(
-PRODUCT_STORE,
-item.id
-);
-
-product.stock=
-normalizeNumber(
-product.stock
-)-
-normalizeNumber(
-item.qty
-);
-
-product.updatedAt=
-timestamp;
-
-await idbPut(
-PRODUCT_STORE,
-product
-);
-}
-
-setLoading(
-true,
-"Creating GST record...",
-55
-);
-
-if(
-summary.gstTotal>0
-){
-
-await idbPut(
-GST_STORE,
-gstRecord
-);
-}
-
-setLoading(
-true,
-"Creating sync queue...",
-70
-);
-
-await addQueue({
-recordId:
-sale.recordId,
-recordType:
-"Sales",
-shopId:
-sale.shopId,
-agentId:
-sale.agentId,
-operation:
-"CREATE",
-payload:
-sale,
-syncStatus:
-"PENDING",
-retryCount:
-0,
-lastAttempt:
-"",
-lastError:
-"",
-createdAt:
-timestamp,
-updatedAt:
-timestamp,
-syncedAt:
-""
+document.querySelectorAll(".product-result").forEach(el=>{
+el.addEventListener("click",()=>{
+const product=products.find(p=>String(p.id)===String(el.dataset.productId));
+if(product)addProductToCart(product);
 });
-
-if(
-summary.gstTotal>0
-){
-
-await addQueue({
-recordId:
-gstRecord.recordId,
-recordType:
-"GST",
-shopId:
-gstRecord.shopId,
-agentId:
-gstRecord.agentId,
-operation:
-"CREATE",
-payload:
-gstRecord,
-syncStatus:
-"PENDING",
-retryCount:
-0,
-lastAttempt:
-"",
-lastError:
-"",
-createdAt:
-timestamp,
-updatedAt:
-timestamp,
-syncedAt:
-""
 });
 }
 
-await addActivity(
-"Sale Created",
-"Sales",
-sale.recordId,
-"SUCCESS",
-{
-saleId,
-invoiceNo,
-grandTotal:
-summary.grandTotal
+function renderProducts(){
+const q=$("productListSearch").value.trim().toLowerCase();
+
+const result=products.filter(p=>{
+if(!q)return true;
+
+return [
+p.productName,
+p.sku,
+p.category,
+p.productId,
+p.id,
+p.barcode
+].some(v=>String(v||"").toLowerCase().includes(q));
+});
+
+$("productTableBody").innerHTML=result.map(p=>{
+const stock=normalizeNumber(p.stock);
+const status=p.status||(
+stock<=0?"OUT OF STOCK":
+stock<=normalizeNumber(p.minimumStock)?"LOW STOCK":"ACTIVE"
+);
+
+return `
+<tr>
+<td>${escapeHtml(p.productName||"")}</td>
+<td>${escapeHtml(p.sku||"")}</td>
+<td>${escapeHtml(p.category||"")}</td>
+<td>${money(p.salePrice)}</td>
+<td>${normalizeNumber(p.gstRate).toFixed(2)}%</td>
+<td>${stock}</td>
+<td>${escapeHtml(status)}</td>
+</tr>
+`;
+}).join("");
+
+if(!result.length){
+$("productTableBody").innerHTML='<tr><td colspan="7" class="empty">No products</td></tr>';
 }
-);
-
-setLoading(
-true,
-"Sale saved locally.",
-100
-);
-
-clearCart();
-
-await loadProducts();
-
-await loadSales();
-
-await refreshDashboard();
-
-setLoading(
-false
-);
-
-showMessage(
-"Sale "+
-invoiceNo+
-" saved locally. Remote sync will continue in background.",
-"success"
-);
-
-if(navigator.onLine){
-syncPending();
-}
-
-}catch(error){
-
-logError(
-"Sale save failed.",
-error
-);
-
-setLoading(
-false
-);
-
-showMessage(
-error.message||
-"Sale could not be saved.",
-"error"
-);
-}
-}
-
-async function loadSales(){
-
-if(!currentProfile){
-return;
-}
-
-const all=
-await idbGetAll(
-SALES_STORE
-);
-
-sales=
-all.filter(
-x=>
-x.shopId===
-currentProfile.shopId
-);
-
-renderSales();
 }
 
 function renderSales(){
+const q=$("salesSearch").value.trim().toLowerCase();
 
-const body=
-$("salesTableBody");
+const result=sales.filter(s=>{
+if(!q)return true;
 
-const search=
-$("salesSearch")
-.value
-.trim()
-.toLowerCase();
-
-const date=
-$("salesDate").value;
-
-const payment=
-$("salesPaymentFilter")
-.value;
-
-const filtered=
-sales.filter(
-s=>{
-
-const text=[
-s.saleId,
+return [
 s.invoiceNo,
 s.customerName,
-s.customerMobile
-]
-.join(" ")
-.toLowerCase();
-
-return(
-(!search||
-text.includes(
-search
-))&&
-(!date||
-s.date===date)&&
-(!payment||
-s.paymentMode===payment)
-);
+s.customerMobile,
+s.saleId,
+s.recordId
+].some(v=>String(v||"").toLowerCase().includes(q));
 });
 
-body.innerHTML="";
-
-if(!filtered.length){
-
-body.innerHTML=
-'<tr><td colspan="14" class="empty">No sales found</td></tr>';
-
-return;
-}
-
-filtered.sort(
-(a,b)=>
-String(
-b.createdAt
-)
-.localeCompare(
-String(
-a.createdAt
-)
-)
+result.sort((a,b)=>
+String(b.createdAt||"").localeCompare(String(a.createdAt||""))
 );
 
-filtered.forEach(
-s=>{
+$("salesTableBody").innerHTML=result.map(s=>{
+const status=s.remoteSyncStatus||"PENDING";
 
-const tr=
-document.createElement(
-"tr"
-);
+const badge=status==="SYNCED"?
+"badge-success":
+status==="ERROR"?
+"badge-error":"badge-pending";
 
-tr.innerHTML=`
-<td>${escapeHtml(s.saleId)}</td>
+return `
+<tr>
 <td>${escapeHtml(s.invoiceNo)}</td>
 <td>${escapeHtml(s.date)}</td>
-<td>${escapeHtml(s.customerName||"")}</td>
-<td>${escapeHtml(s.paymentMode)}</td>
-<td>${money(s.subtotal)}</td>
-<td>${money(s.discount)}</td>
-<td>${money(s.taxableAmount)}</td>
-<td>${money(s.cgst)}</td>
-<td>${money(s.sgst)}</td>
-<td>${money(s.igst)}</td>
-<td>${money(s.gstTotal)}</td>
-<td><strong>${money(s.grandTotal)}</strong></td>
-<td><button class="primary view-sale" data-id="${escapeHtml(s.id)}">View</button></td>
+<td>${escapeHtml(s.customerName||"WALK-IN")}</td>
+<td>${escapeHtml(s.paymentMode||"")}</td>
+<td>${Array.isArray(s.items)?s.items.length:0}</td>
+<td>${money(s.grandTotal)}</td>
+<td><span class="badge ${badge}">${escapeHtml(status)}</span></td>
+</tr>
 `;
+}).join("");
 
-body.appendChild(
-tr
-);
-});
+if(!result.length){
+$("salesTableBody").innerHTML='<tr><td colspan="7" class="empty">No sales</td></tr>';
+}
 }
 
-async function viewSale(id){
+async function renderDashboard(){
+const queue=await idbGetAll(QUEUE_STORE);
 
-const sale=
-await idbGet(
-SALES_STORE,
-id
+const pending=queue.filter(x=>
+x.status==="PENDING"||
+x.status==="ERROR"
+).length;
+
+const stock=products.reduce((sum,p)=>
+sum+normalizeNumber(p.stock),0
 );
 
-if(!sale){
+$("dashboardProducts").textContent=products.length;
+$("dashboardStock").textContent=stock;
+$("dashboardSales").textContent=sales.length;
+$("dashboardPending").textContent=pending;
+}
+
+async function initializeFirebase(){
+try{
+if(!firebase.apps.length)
+firebase.initializeApp(firebaseConfig);
+
+firebase.auth().onAuthStateChanged(async user=>{
+currentUser=user;
+
+if(user){
+$("userText").textContent=user.email||user.uid;
+
+try{
+const snap=await firebase.database()
+.ref("users/"+user.uid)
+.once("value");
+
+const value=snap.val();
+
+if(value&&typeof value==="object")
+currentProfile=value;
+}catch(e){}
+}else{
+$("userText").textContent="Not signed in";
+}
+
+await renderDashboard();
+});
+}catch(error){
+await saveActivity(
+"FIREBASE_INIT",
+"ERROR",
+"",
+error.message
+);
+}
+}
+
+async function testSalePayload(){
+if(!cart.length){
+showMessage("Add at least one product to test sale payload.","error");
 return;
 }
 
-const items=
-sale.items||[];
+const sale={
+recordId:"TEST_"+Date.now(),
+shopId:currentProfile.shopId||"TEST_SHOP",
+invoiceNo:"TEST_INV_"+Date.now(),
+customerName:"TEST CUSTOMER",
+customerMobile:"TEST",
+paymentMode:"TEST"
+};
 
-let text=
-"Invoice: "+
-sale.invoiceNo+
-"\nSale ID: "+
-sale.saleId+
-"\nDate: "+
-sale.date+
-"\nCustomer: "+
-(sale.customerName||"")+
-"\nPayment: "+
-sale.paymentMode+
-"\n\nItems:\n";
+const item={
+id:cart[0].id,
+productId:cart[0].productId,
+sku:cart[0].sku,
+salePrice:cart[0].salePrice,
+lineTotal:cart[0].salePrice*cart[0].qty
+};
 
-items.forEach(
-item=>{
-text+=
-item.productName+
-" | Qty: "+
-item.qty+
-" | Rate: "+
-money(
-item.salePrice
-)+
-" | Total: "+
-money(
-item.lineTotal
-)+
-"\n";
-});
+const payload={
+action:"addSale",
+sale:buildSale13Fields(sale,item,0)
+};
 
-text+=
-"\nSubtotal: "+
-money(
-sale.subtotal
-)+
-"\nDiscount: "+
-money(
-sale.discount
-)+
-"\nTaxable: "+
-money(
-sale.taxableAmount
-)+
-"\nCGST: "+
-money(
-sale.cgst
-)+
-"\nSGST: "+
-money(
-sale.sgst
-)+
-"\nIGST: "+
-money(
-sale.igst
-)+
-"\nGST Total: "+
-money(
-sale.gstTotal
-)+
-"\nGrand Total: "+
-money(
-sale.grandTotal
+try{
+validateSalePayload(payload);
+
+const data=await sendSaleAddRequest(payload);
+
+await saveActivity(
+"SALE_TEST",
+"SUCCESS",
+JSON.stringify(data)
 );
 
-alert(text);
+showMessage("Sale API test PASS","success");
+}catch(error){
+await saveActivity(
+"SALE_TEST",
+"ERROR",
+"",
+error.message
+);
+
+showMessage("Sale API test failed: "+error.message,"error");
+}
 }
 
 function setupEvents(){
+document.querySelectorAll(".nav button[data-page]").forEach(button=>{
+button.addEventListener("click",()=>{
+document.querySelectorAll(".nav button[data-page]").forEach(x=>{
+x.classList.remove("active");
+});
+button.classList.add("active");
 
-if(eventsReady){
-return;
-}
+document.querySelectorAll(".page").forEach(page=>{
+page.classList.remove("active");
+});
 
-eventsReady=true;
-
-logInfo(
-"Binding UI events."
-);
-
-document
-.querySelectorAll(
-".nav button[data-section]"
-)
-.forEach(
-button=>{
-
-button.addEventListener(
-"click",
-async()=>{
-
-document
-.querySelectorAll(
-".nav button[data-section]"
-)
-.forEach(
-x=>
-x.classList.remove(
-"active"
-)
-);
-
-button.classList.add(
-"active"
-);
-
-document
-.querySelectorAll(
-"section"
-)
-.forEach(
-section=>
-section.classList.add(
-"hidden"
-)
-);
-
-const target=
-$(button.dataset.section);
-
-if(!target){
-logError(
-"Section not found.",
-button.dataset.section
-);
-return;
-}
-
-target.classList.remove(
-"hidden"
-);
-
-try{
-
-if(
-button.dataset.section===
-"productSection"
-){
-await loadProducts();
-}
-
-if(
-button.dataset.section===
-"salesSection"
-){
-await loadSales();
-}
-
-if(
-button.dataset.section===
-"dashboardSection"
-){
-await refreshDashboard();
-}
-
-}catch(error){
-
-logError(
-"Section load failed.",
-{
-section:
-button.dataset.section,
-error
-}
-);
-
-showMessage(
-error.message||
-"Section loading failed.",
-"error"
-);
-}
+$(button.dataset.page).classList.add("active");
 });
 });
 
-$("logoutBtn")
-.addEventListener(
-"click",
-async()=>{
+$("syncBtn").addEventListener("click",syncPending);
+$("retryBtn").addEventListener("click",retryFailed);
 
-logInfo(
-"Logout button clicked."
-);
+$("saleProductSearch").addEventListener("input",searchSaleProducts);
 
-$("logoutBtn").disabled=true;
+$("discount").addEventListener("input",renderSummary);
+$("gstMode").addEventListener("change",renderSummary);
 
-try{
+$("completeSaleBtn").addEventListener("click",completeSale);
 
-if(
-currentUser&&
-currentProfile
-){
-
-try{
-
-await addActivity(
-"Logout",
-"Authentication",
-"",
-"SUCCESS",
-{}
-);
-
-}catch(error){
-
-logError(
-"Logout activity failed.",
-error
-);
-}
-}
-
-await auth.signOut();
-
-logInfo(
-"Firebase signOut completed."
-);
-
-currentUser=null;
-currentProfile=null;
-
-window.location.replace(
-"./index.html"
-);
-
-}catch(error){
-
-logError(
-"Logout failed.",
-error
-);
-
-$("logoutBtn").disabled=false;
-
-showMessage(
-error.message||
-"Logout failed.",
-"error"
-);
-}
-});
-
-$("productForm")
-.addEventListener(
-"submit",
-saveProduct
-);
-
-$("clearProductBtn")
-.addEventListener(
-"click",
-clearProductForm
-);
-
-$("productSearch")
-.addEventListener(
-"input",
-renderProducts
-);
-
-$("productFilterStatus")
-.addEventListener(
-"change",
-renderProducts
-);
-
-$("productFilterCategory")
-.addEventListener(
-"change",
-renderProducts
-);
-
-$("productTableBody")
-.addEventListener(
-"click",
-async e=>{
-
-const edit=
-e.target.closest(
-".edit-product"
-);
-
-const toggle=
-e.target.closest(
-".toggle-product"
-);
-
-try{
-
-if(edit){
-await editProduct(
-edit.dataset.id
-);
-}
-
-if(toggle){
-await toggleProduct(
-toggle.dataset.id
-);
-}
-
-}catch(error){
-
-logError(
-"Product action failed.",
-error
-);
-
-showMessage(
-error.message||
-"Product action failed.",
-"error"
-);
-}
-});
-
-$("saleProductSearch")
-.addEventListener(
-"input",
-searchSaleProducts
-);
-
-$("productResults")
-.addEventListener(
-"click",
-e=>{
-
-const item=
-e.target.closest(
-".product-item"
-);
-
-if(!item){
-return;
-}
-
-const product=
-products.find(
-x=>
-x.id===
-item.dataset.id
-);
-
-if(product){
-addToCart(
-product
-);
-}
-});
-
-$("cartBody")
-.addEventListener(
-"click",
-e=>{
-
-const remove=
-e.target.closest(
-".remove-cart"
-);
-
-if(remove){
-
-cart.splice(
-Number(
-remove.dataset.index
-),
-1
-);
-
-renderCart();
-}
-});
-
-$("cartBody")
-.addEventListener(
-"change",
-e=>{
-
-const input=
-e.target.closest(
-".cart-qty"
-);
-
-if(!input){
-return;
-}
-
-const index=
-Number(
-input.dataset.index
-);
-
-const qty=
-normalizeNumber(
-input.value
-);
-
-if(qty<=0){
-
-cart.splice(
-index,
-1
-);
-
-}else if(
-qty>
-cart[index].stock
-){
-
-input.value=
-cart[index].qty;
-
-showMessage(
-"Available stock exceeded.",
-"error"
-);
-
-}else{
-
-cart[index].qty=
-qty;
-}
-
+$("clearCartBtn").addEventListener("click",()=>{
+cart=[];
+$("customerName").value="";
+$("customerMobile").value="";
+$("discount").value="0";
 renderCart();
 });
 
-$("discount")
-.addEventListener(
-"input",
-renderCart
-);
+$("productListSearch").addEventListener("input",renderProducts);
+$("salesSearch").addEventListener("input",renderSales);
 
-$("saleGstMode")
-.addEventListener(
-"change",
-renderCart
-);
-
-$("completeSaleBtn")
-.addEventListener(
-"click",
-completeSale
-);
-
-$("clearCartBtn")
-.addEventListener(
-"click",
-clearCart
-);
-
-$("salesSearch")
-.addEventListener(
-"input",
-renderSales
-);
-
-$("salesDate")
-.addEventListener(
-"change",
-renderSales
-);
-
-$("salesPaymentFilter")
-.addEventListener(
-"change",
-renderSales
-);
-
-$("salesTableBody")
-.addEventListener(
-"click",
-e=>{
-
-const button=
-e.target.closest(
-".view-sale"
-);
-
-if(button){
-viewSale(
-button.dataset.id
-);
-}
-});
-
-$("syncBtn")
-.addEventListener(
-"click",
-()=>{
-syncPending(
-false
-);
-});
-
-$("retryBtn")
-.addEventListener(
-"click",
-()=>{
-syncPending(
-true
-);
-});
-
-window.addEventListener(
-"online",
-()=>{
-
-updateConnection();
-
-if(
-currentUser&&
-currentProfile
-){
-
-showMessage(
-"Internet connection restored. Sync starting.",
-"success"
-);
-
+window.addEventListener("online",()=>{
+setConnection();
 syncPending();
-}
 });
 
-window.addEventListener(
-"offline",
-()=>{
-
-updateConnection();
-
-showMessage(
-"Offline mode. New business records will be saved locally.",
-"info"
-);
-});
-
-document.addEventListener(
-"visibilitychange",
-()=>{
-
-if(
-document.visibilityState===
-"visible"
-){
-
-if(
-currentUser&&
-currentProfile
-){
-
-refreshDashboard();
-
-if(navigator.onLine){
-syncPending();
-}
-}
-}
-});
+window.addEventListener("offline",setConnection);
 }
 
-async function initialize(){
+async function startup(){
+setConnection();
 
-logInfo(
-"Shop initialization started."
-);
+try{
+await openDatabase();
+await loadLocalData();
+await renderActivity();
+await renderDashboard();
+await initializeFirebase();
+
+if(navigator.onLine)
+setTimeout(syncPending,1000);
+
+}catch(error){
+showMessage("Startup error: "+error.message,"error");
+}
+}
 
 setupEvents();
-
-updateConnection();
-
-setLoading(
-true,
-"Opening local database...",
-5
-);
-
-try{
-
-await openDB();
-
-logInfo(
-"Database ready."
-);
-
-setLoading(
-true,
-"Initializing Firebase SESSION...",
-15
-);
-
-try{
-
-await auth.setPersistence(
-firebase.auth.Auth.Persistence.SESSION
-);
-
-logInfo(
-"Firebase persistence = SESSION"
-);
-
-}catch(error){
-
-logError(
-"Firebase SESSION persistence initialization failed.",
-error
-);
-
-showMessage(
-"Firebase SESSION persistence initialization failed.",
-"error"
-);
-}
-
-setLoading(
-true,
-"Waiting for Firebase Auth...",
-25
-);
-
-authStateResolved=false;
-authCheckStarted=true;
-
-auth.onAuthStateChanged(
-async user=>{
-
-authStateResolved=true;
-
-logInfo(
-"onAuthStateChanged fired.",
-authStateSummary(user)
-);
-
-if(!user){
-
-currentUser=null;
-currentProfile=null;
-
-if(!authFailureShown){
-
-showAuthFailure(
-"AUTH_SESSION_MISSING",
-{
-event:
-"onAuthStateChanged",
-persistence:
-"SESSION",
-url:
-location.href
-}
-);
-
-}
-
-setLoading(
-false,
-"",
-0
-);
-
-return;
-}
-
-authFailureShown=false;
-
-currentUser=user;
-
-logInfo(
-"Firebase user restored.",
-authStateSummary(user)
-);
-
-try{
-
-setLoading(
-true,
-"Checking authorization...",
-40
-);
-
-const valid=
-await validateAccess();
-
-if(!valid){
-
-setLoading(
-false,
-"",
-0
-);
-
-return;
-}
-
-setLoading(
-true,
-"Loading local products...",
-55
-);
-
-await loadProducts();
-
-setLoading(
-true,
-"Loading local sales...",
-65
-);
-
-await loadSales();
-
-setLoading(
-true,
-"Refreshing dashboard...",
-75
-);
-
-await refreshDashboard();
-
-setLoading(
-true,
-"Checking pending sync...",
-85
-);
-
-if(
-navigator.onLine
-){
-
-setTimeout(
-()=>{
-
-if(
-currentUser&&
-currentProfile
-){
-
-logInfo(
-"Automatic background sync started."
-);
-
-syncPending();
-}
-
-},
-500
-);
-}
-
-setLoading(
-false,
-"",
-100
-);
-
-logInfo(
-"Shop initialization completed successfully."
-);
-
-}catch(error){
-
-logError(
-"Shop authorization/initialization failed.",
-error
-);
-
-setLoading(
-false,
-"",
-0
-);
-
-showMessage(
-error.message||
-"Shop initialization failed.",
-"error"
-);
-}
-});
-
-}catch(error){
-
-logError(
-"Shop initialization fatal error.",
-error
-);
-
-setLoading(
-false,
-"",
-0
-);
-
-showMessage(
-error.message||
-"Shop initialization failed.",
-"error"
-);
-}
-}
-
-initialize();
+startup();
 </script>
-
 </body>
 </html>
-
